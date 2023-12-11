@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    role: dareg-frontend
+    deployment-id: ${APP_ID}
+  name: dareg-web-${APP_ID}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: dareg-frontend-${APP_ID}
+  template:
+    metadata:
+      labels:
+        role: dareg-frontend-${APP_ID}
+    spec:
+      imagePullSecrets:
+      - name: gitlab-coffee-auth
+      securityContext:
+        runAsGroup: 1000
+        runAsUser: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - image: ${DOCKER_IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
+          imagePullPolicy: Always
+          name: dareg-web
+          ports:
+          - containerPort: 8080
+            name: dareg-frontend
+            protocol: TCP
+          resources:
+            requests:
+              cpu: 0.1
+              memory: "64Mi"
+            limits:
+              cpu: 0.5
+              memory: "128Mi"
+          securityContext:
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          volumeMounts:
+          - name: app-config
+            mountPath: /usr/share/nginx/html/configs
+      volumes:
+        - name: app-config 
+          configMap:
+            name: ${APP}-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    deployment-id: ${APP_ID}
+  name: dareg-web-svc-${APP_ID}
+spec:
+  selector:
+    role: dareg-frontend-${APP_ID}
+  type: ClusterIP
+  ports:
+  - name: default
+    port: 8081
+    protocol: TCP
+    targetPort: 8081
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dareg-web-ingress-${APP_ID}
+  labels:
+    deployment-id: ${APP_ID}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+spec:
+  tls:
+  - hosts:
+      - ${APP_HOST}
+      - ${APP_HOST_FIX}
+    secretName: ${APP_ID}-dareg-web-dyn-cloud-e-infra-cz
+  rules:
+  - host: ${APP_HOST}
+    http:
+      paths:
+        - pathType: ImplementationSpecific
+          path: "/"
+          backend:
+            service:
+              name: dareg-web-svc-${APP_ID}
+              port: 
+                name: default
+        - pathType: ImplementationSpecific
+          path: "/api"
+          backend:
+            service:
+              name: dareg-backend-svc-${APP_ID}
+              port: 
+                name: default
+  - host: ${APP_HOST_FIX}
+    http:
+      paths:
+        - pathType: ImplementationSpecific
+          path: "/"
+          backend:
+            service:
+              name: dareg-web-svc-${APP_ID}
+              port: 
+                name: default
+        - pathType: ImplementationSpecific
+          path: "/api"
+          backend:
+            service:
+              name: dareg-backend-svc-${APP_ID}
+              port: 
+                name: default

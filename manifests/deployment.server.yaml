@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    role: dareg-backend
+    deployment-id: ${APP}
+  name: dareg-server-${APP}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: dareg-backend-${APP}
+  template:
+    metadata:
+      labels:
+        role: dareg-backend-${APP}
+    spec:
+      imagePullSecrets:
+      - name: gitlab-coffee-auth
+      securityContext:
+        runAsGroup: 1000
+        runAsUser: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - image: ${DOCKER_IMAGE_NAME_BE}:${CI_COMMIT_SHORT_SHA}
+          imagePullPolicy: Always
+          name: dareg-backend
+          ports:
+          - containerPort: 8080
+            name: dareg-backend
+            protocol: TCP
+          resources:
+            requests:
+              cpu: 0.1
+              memory: "64Mi"
+            limits:
+              cpu: 0.5
+              memory: "128Mi"
+          securityContext:
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          volumeMounts:
+          - mountPath: "/app/instance"
+            name: db-persistance
+      volumes:
+        - name: db-persistance 
+          persistentVolumeClaim:
+            claimName: ${APP}-app-persistance       
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    deployment-id: ${APP}
+  name: dareg-backend-svc-${APP}
+spec:
+  selector:
+    role: dareg-backend-${APP}
+  type: ClusterIP
+  ports:
+  - name: default
+    port: 5000
+    protocol: TCP
+    targetPort: 5000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dareg-backend-ingress-${APP}
+  labels:
+    deployment-id: ${APP}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+spec:
+  tls:
+  - hosts:
+      - ${APP_HOST}
+      - ${APP_HOST_FIX}
+    secretName: ${APP}-dareg-backend-dyn-cloud-e-infra-cz
+  rules:
+  - host: ${APP_HOST}
+    http:
+      paths:
+        - pathType: ImplementationSpecific
+          path: "/"
+          backend:
+            service:
+              name: dareg-backend-svc-${APP}
+              port: 
+                name: default
+  - host: ${APP_HOST_FIX}
+    http:
+      paths:
+        - pathType: ImplementationSpecific
+          path: "/"
+          backend:
+            service:
+              name: dareg-backend-svc-${APP}
+              port: 
+                name: default
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ${APP}-app-persistance
+  labels:
+    deployment-id: ${APP}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 256Mi
+  storageClassName: nfs-csi
+  volumeMode: Filesystem
