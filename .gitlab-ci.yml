@@ -1,0 +1,148 @@
+image: node:20-alpine
+
+stages:
+  - build
+  - publish
+  - review
+  - staging
+  - production
+  - cleanup
+
+variables:
+  DOCKER_IMAGE_NAME: "$HARBOR_URL/ceitec-biodata/dareg-ui"
+  CLUSTER_DOMAIN: "dyn.cloud.e-infra.cz"
+  DEPLOYMENT_TLD: dareg.${CLUSTER_DOMAIN}
+  DEPLOYMENT_TLD_FIX: "dareg.biodata.ceitec.cz"
+  K8S_AGENT_NAME: agent-dareg
+  K8S_NAMESPACE: ceitec-dareg-ns
+
+cache:
+  key:
+    files:
+      - package.json
+  paths:
+    - $CI_PROJECT_DIR/.npm/
+    - $CI_PROJECT_DIR/node_modules
+
+# unit test:
+#     stage: test
+#     before_script:
+#       - npm ci --cache .npm --prefer-offline
+#     script:
+#       - npm run test
+#     needs: ["eslint"]
+
+# eslint:
+#     stage: lint
+#     before_script:
+#       - npm ci --cache .npm --prefer-offline
+#     script:
+#       - npm run lint
+
+build_app:
+  stage: build
+  before_script:
+    - npm i --cache .npm --prefer-offline
+  script:
+    - unset CI #This will need to be fixed + add test beforehand
+    - npm run build
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR/build/
+    expire_in: 2 hours
+  # needs: ["unit test"]
+
+build_image:
+  stage: publish
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u $HUB_REGISTRY_USER -p $HARBOR_PASSWORD $HARBOR_URL
+  script:
+    - docker build --tag $DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA --tag latest --tag $CI_COMMIT_REF_SLUG -f $CI_PROJECT_DIR/Dockerfile .
+    - docker push --all-tags $DOCKER_IMAGE_NAME
+
+.deploy: &deploy
+  image:
+    name: zhangsean/kubectl
+    entrypoint: ['']
+  before_script:
+    - kubectl config use-context $(kubectl config get-contexts -o=name | grep ${K8S_AGENT_NAME})
+  script:
+    - mkdir -p $CI_PROJECT_DIR/manifests/prepared/$APP_COMPONENT || true
+    - cd $CI_PROJECT_DIR/manifests
+    - for f in *.$APP_COMPONENT.yaml; do envsubst < $f > prepared/$APP_COMPONENT/$f; done
+    - ls -la prepared/$APP_COMPONENT || true
+    - cat prepared/$APP_COMPONENT/*.yaml || true
+    - kubectl apply -f prepared/$APP_COMPONENT --recursive -n ${K8S_NAMESPACE}
+  artifacts:
+    name: deployments-$CI_COMMIT_REF_SLUG
+    paths:
+      - $CI_PROJECT_DIR/manifests/prepared/$APP_COMPONENT
+    expire_in: 1 week
+
+review:
+  <<: *deploy
+  stage: review
+  variables:
+    APP_COMPONENT: web
+    APP: review-$CI_COMMIT_REF_SLUG
+    APP_ID: review-$CI_COMMIT_REF_SLUG
+    APP_HOST: $CI_COMMIT_REF_SLUG.${DEPLOYMENT_TLD}
+    APP_HOST_FIX: test.${DEPLOYMENT_TLD_FIX}
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    url: https://$CI_COMMIT_REF_SLUG.${DEPLOYMENT_TLD}
+    on_stop: stop-review
+  only:
+    - branches
+  except:
+    - master
+
+staging:
+  <<: *deploy
+  stage: staging
+  variables:
+    APP: staging
+    APP_HOST: stage.${DEPLOYMENT_TLD}
+    APP_HOST_FIX: stage.${DEPLOYMENT_TLD_FIX}
+  environment:
+    name: staging
+    url: https://stage.${DEPLOYMENT_TLD_FIX}
+  only:
+    - master
+
+production:
+  <<: *deploy
+  stage: production
+  variables:
+    APP: production
+    APP_HOST: ${DEPLOYMENT_TLD}
+    APP_HOST_FIX: ${DEPLOYMENT_TLD_FIX}
+  when: manual
+  environment:
+    name: production
+    url: https://${DEPLOYMENT_TLD_FIX}
+  only:
+    - tags
+  except:
+    - branches
+
+stop-review:
+  <<: *deploy
+  stage: cleanup
+  script:
+    - echo "All cluster resources within the namespace ${K8S_NAMESPACE} with label 'deployment-id=$APP' will be removed" || true
+    - kubectl delete deployments,services,ingresses,configmaps,secrets -n ${K8S_NAMESPACE} -l deployment-id=$APP
+  when: manual
+  variables:
+    APP: review-$CI_COMMIT_REF_SLUG
+    GIT_STRATEGY: none
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    action: stop
+  only:
+    - branches
+  except:
+    - master
