@@ -72,7 +72,7 @@ build_image:
   script:
     - mkdir -p $CI_PROJECT_DIR/manifests/prepared/$APP_COMPONENT || true
     - cd $CI_PROJECT_DIR/manifests
-    - for f in *.$APP_COMPONENT.yaml; do envsubst < $f > prepared/$APP_COMPONENT/$f; done
+    - for f in $APP_COMPONENT/*.yaml; do envsubst < $f > prepared/$f; done
     - ls -la prepared/$APP_COMPONENT || true
     - cat prepared/$APP_COMPONENT/*.yaml || true
     - kubectl apply -f prepared/$APP_COMPONENT --recursive -n ${K8S_NAMESPACE}
