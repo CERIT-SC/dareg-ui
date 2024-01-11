@@ -16,6 +16,7 @@ import { Project, useGetProjectQuery } from "../../Services/projects";
 import { LoadingButton } from "@mui/lab";
 import CodeEditor from '@uiw/react-textarea-code-editor';
 import { Facility } from "../../Services/facilities";
+import FilesActiveArea from "./FilesActiveArea";
 
 type Props = {
     mode: ViewModes
@@ -189,6 +190,9 @@ const DatasetView = ({mode}: Props) => {
                             Download metadata
                         </Button>
                     </Stack>
+                </ContentCard>
+                <ContentCard paperProps={{elevation: 1}} sx={{mb: 1, p: 1, pt: 0}}>
+                    <FilesActiveArea id="1" changeId={() => {}}/>
                 </ContentCard>
             </Box>
         )
