@@ -416,9 +416,6 @@ const FilesActiveArea = (props: {
         <WindowNewFolder id={props.id} closeSelf={() => setNewFolderModalVisible(false)}/>
       </Modal>
 
-      <Modal open={renameItemModalVisible} onClose={() => setRenameItemModalVisible(false)}>
-        <WindowRenameItem item={selectedItems[0]} closeSelf={() => setRenameItemModalVisible(false)}/>
-      </Modal>
 
     </>
 
