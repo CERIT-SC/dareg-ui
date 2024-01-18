@@ -62,6 +62,8 @@ build_image:
   script:
     - docker build --tag $DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA --tag latest --tag $CI_COMMIT_REF_SLUG -f $CI_PROJECT_DIR/Dockerfile .
     - docker push --all-tags $DOCKER_IMAGE_NAME
+  except:
+    - tags
 
 .deploy: &deploy
   image:
@@ -104,6 +106,8 @@ staging:
   <<: *deploy
   stage: staging
   variables:
+    APP_COMPONENT: web
+    APP_ID: staging
     APP: staging
     APP_HOST: stage.${DEPLOYMENT_TLD}
     APP_HOST_FIX: stage.${DEPLOYMENT_TLD_FIX}
@@ -117,6 +121,8 @@ production:
   <<: *deploy
   stage: production
   variables:
+    APP_COMPONENT: web
+    APP_ID: production
     APP: production
     APP_HOST: ${DEPLOYMENT_TLD}
     APP_HOST_FIX: ${DEPLOYMENT_TLD_FIX}

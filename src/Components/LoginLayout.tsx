@@ -12,8 +12,8 @@ const LoginLayout = () => {
 
   return (
     <Box bgcolor={"background.default"} color={"text.primary"}>
-      <Stack direction="row" justifyContent="center" height="100vh">
-        <Box sx={{mt:10}}>
+      <Stack direction="row" height="100vh">
+        <Box sx={{width: "100%"}}>
           <Outlet/>
         </Box>
       </Stack>
