@@ -11,7 +11,7 @@
     "@jsonforms/material-renderers": "3.1.0",
     "@jsonforms/react": "3.1.0",
     "@mui/icons-material": "~5.11.16",
-    "@mui/lab": "^5.0.0-alpha.58",
+    "@mui/lab": "5.0.0-alpha.58",
     "@mui/material": "~5.13.0",
     "@mui/styles": "^5.2.3",
     "@mui/x-data-grid": "^6.16.2",
