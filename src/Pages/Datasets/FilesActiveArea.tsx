@@ -7,18 +7,11 @@ import { AddRounded, ArrowBackRounded, CheckRounded, CloudUploadRounded, Content
 import FilesHeadItem from "./FilesHeadItem"
 import FilesRowItem from "./FilesRowItem"
 import { useEffect, useRef, useState } from "react"
-import WindowNewFolder from "./WindowNewFolder"
-import WindowRenameItem from "./WindowRenameItem"
-import { Box, Button, Divider, IconButton, Modal, Stack, Tooltip, Typography } from "@mui/material"
-export type Item = {
-  id: string,
-  name: string,
-  upper: string,
-  addDate: number, 
-  size: number // -1 if item is a folder
-}
+import WindowTextInput from "./WindowTextInput"
+import { Box, Button, Dialog, Divider, IconButton, Modal, Stack, Tooltip, Typography } from "@mui/material"
+import { ExplorerItem } from "../../types/global"
 
-const data:{info: Item, content: Item[]} = {
+const data:{info: ExplorerItem, content: ExplorerItem[]} = {
   info: {
     id: "0",
     addDate: 0,
@@ -182,7 +175,7 @@ const FilesActiveArea = (props: {
   type Column = "name" | "addDate" | "size"
   const [sortBy, setSortBy] = useState<Column>("name")
   const [sortReverse, setSortReverse] = useState<boolean>(true)
-  const [selectedItems, setSelectedItems] = useState<Item[]>([])
+  const [selectedItems, setSelectedItems] = useState<ExplorerItem[]>([])
   
   // Data manipulation modals
   const [newFolderModalVisible, setNewFolderModalVisible] = useState(false)
@@ -199,7 +192,7 @@ const FilesActiveArea = (props: {
       setSortReverse(false)
     }
   }
-  const [sortedItems, setSortedItems] = useState<Item[]>([])
+  const [sortedItems, setSortedItems] = useState<ExplorerItem[]>([])
   const lastSelect = useRef(-1)
   useEffect(() => {
     setSortedItems(stableSort(data.content, getComparator(sortReverse, sortBy)))
@@ -237,7 +230,7 @@ const FilesActiveArea = (props: {
 
   // Selecting items using mouse + ctrl/cmd or shift
   //  handles double click for opening folders
-  const handleClick = (e: any, item: Item, index:number) => {
+  const handleClick = (e: any, item: ExplorerItem, index:number) => {
     if (e.ctrlKey || e.metaKey) {
       if (selectedItems.includes(item)) {
         setSelectedItems(selectedItems.filter((selectedItem) => selectedItem !== item))
@@ -411,10 +404,21 @@ const FilesActiveArea = (props: {
       </div>
       
 
+      <Dialog open={newFolderModalVisible} onClose={() => setNewFolderModalVisible(false)}>
+        <WindowTextInput 
+          item={{id: props.id}}
+          closeSelf={() => setNewFolderModalVisible(false)}
+          type="new"
+        />
+      </Dialog>
 
-      <Modal open={newFolderModalVisible} onClose={() => setNewFolderModalVisible(false)}>
-        <WindowNewFolder id={props.id} closeSelf={() => setNewFolderModalVisible(false)}/>
-      </Modal>
+      <Dialog open={renameItemModalVisible} onClose={() => setRenameItemModalVisible(false)}>
+        <WindowTextInput
+          item={selectedItems[0]}
+          closeSelf={() => setRenameItemModalVisible(false)}
+          type="rename"
+        />
+      </Dialog>
 
 
     </>
