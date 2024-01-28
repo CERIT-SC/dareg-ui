@@ -56,6 +56,8 @@ const DatasetList = () => {
           loading={isLoading}
           columns={tableColumns}
           data={{...data, results:filteredDatasets || []} as unknown as DaregAPIResponse<Dataset>}
+          page={page}
+          setPage={setPage}
         />
       </ContentCard>
     </Box>
