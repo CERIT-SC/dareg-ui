@@ -24,20 +24,20 @@ interface Props<T> extends TableProps {
 
 const DaregTable = <T, >({ columns, data, loading = false, page = 1, setPage = () => {}, ...other }: Props<T>) => {
 
-    const [ rowsPerPage, setRowsPerPage ] = useState(25);
+    const [ rowsPerPage, setRowsPerPage ] = useState(100);
     
     const handleChangePage = (
         event: React.MouseEvent<HTMLButtonElement> | null,
         newPage: number,
     ) => {
-        setPage(newPage);
+        setPage(newPage+1);
     };
     
     const handleChangeRowsPerPage = (
         event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
         setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
+        setPage(1);
     };
 
     // data = { results: [] } as unknown as DaregAPIResponse<T>;

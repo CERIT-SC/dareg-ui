@@ -29,7 +29,8 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
     
     const templateData = useGetSchemaQuery(data.default_dataset_schema as string).data
 
-    const {data: datasets} = useGetDatasetsQuery({page: 1, projId: projectId}, {skip: projectId===undefined})
+    const [ page, setPage ] = useState(1)
+    const {data: datasets} = useGetDatasetsQuery({page: page, projId: projectId}, {skip: projectId===undefined})
 
     const [loadingState, setLoadingState] = useState<boolean>(false)
 
@@ -143,6 +144,8 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             columns={datasetsTable}
                             data={datasets || {results: []} as unknown as DaregAPIResponse<Dataset>}
                             size="small"
+                            page={page}
+                            setPage={setPage}
                         />
                     </ContentCard>
                 ) : <></>}
