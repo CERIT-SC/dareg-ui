@@ -22,6 +22,7 @@ import config from './Config';
 import ProjectEdit from './Pages/Projects/ProjectEdit';
 import DatasetView from './Pages/Datasets/DatasetView';
 import { ViewModes } from './types/enums';
+import DatasetList from './Pages/Datasets/DatasetList';
 
 const App = () => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
@@ -86,6 +87,10 @@ const options = {
                           <Route path=':datasetId/edit' element={<ProjectEdit editMode={true} />} />
                         </Route>
                       </Route> */}
+                    </Route>
+
+                    <Route path='datasets'>
+                      <Route index element={<DatasetList />} />
                     </Route>
                     
                     <Route path='templates'>

@@ -32,6 +32,7 @@ i18n
           LeftBar: {
             home: "Home",
             projects: "Projects",
+            datasets: "Datasets",
             templates: "Templates",
             logout: "Logout",
             account: "Account",
@@ -103,6 +104,7 @@ i18n
           LeftBar: {
             home: "Domov",
             projects: "Projekty",
+            datasets: "Datasety",
             templates: "Šablony",
             logout: "Odhlásit se",
             account: "Účet",
