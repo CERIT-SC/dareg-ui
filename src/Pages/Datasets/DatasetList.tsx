@@ -16,8 +16,6 @@ const DatasetList = () => {
   const [ page, setPage ] = useState(1)
   const {data, isLoading} = useGetDatasetsQuery({page: page, projId: undefined})
   const navigate = useNavigate()
-  const [searchTerm, setSearchTerm] = useState<string>("")
-  const [filteredDatasets, setFilteredDatasets] = useState<Dataset[]>([])
 
   const tableColumns: Column<Dataset>[] = [
     { id: 'name', label: 'Name', minWidth: 200 },
@@ -30,32 +28,15 @@ const DatasetList = () => {
     )}
   ]
 
-  useEffect(() => {
-    if (searchTerm.length === 0){
-        setFilteredDatasets(data?.results as Dataset[])
-    } else {
-      const filtered = data?.results.filter((dataset) => dataset.name.includes(searchTerm) || dataset.description.includes(searchTerm))
-      setFilteredDatasets(filtered as Dataset[])
-    }
-  }, [searchTerm, data])
-
   return (
     <Box>
       <ContentHeader title={"Datasets"} actions={<></>}>
       </ContentHeader>
       <ContentCard>
-        <TextField
-          margin="dense"
-          label="Seach datasets"
-          fullWidth
-          variant="filled"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
         <DaregTable
           loading={isLoading}
           columns={tableColumns}
-          data={{...data, results:filteredDatasets || []} as unknown as DaregAPIResponse<Dataset>}
+          data={data as unknown as DaregAPIResponse<Dataset>}
           page={page}
           setPage={setPage}
         />
