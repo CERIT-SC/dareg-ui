@@ -16,24 +16,15 @@ const Layout = () => {
 
   const navigate = useNavigate()
 
-  const leftBarBox = useRef<any>(null)
-  const [leftBarWidth, setLeftBarWidth] = useState(0)
-  useEffect(() => {
-    setLeftBarWidth(leftBarBox.current.offsetWidth)
-  } ,[])
-
   return (
-    <Box bgcolor={"background.default"} color={"text.primary"}>
-      <Box position="fixed" ref={leftBarBox}>
-        <LeftBar setSection={(to: string) => navigate(`/${to}`)} />
-      </Box>
-      <Stack direction="row" justifyContent="center" height="100vh">
-        <Box minWidth={leftBarWidth+1}/>
-        <Box width={"75%"}>
+    <Stack width={"100vw"} height={"100vh"} direction="row" bgcolor={"background.default"} color={"text.primary"}>
+      <LeftBar setSection={(to: string) => navigate(`/${to}`)} />
+      <Stack direction={"row"} flexGrow={1} justifyContent="center">
+        <Box pl={2} pr={2} flexGrow={1} flex={1} maxWidth={1800} overflow="auto">
           <Outlet/>
         </Box>
       </Stack>
-    </Box>
+    </Stack>
   );
 }
 

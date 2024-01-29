@@ -21,7 +21,7 @@ const ProjectsList = () => {
     { id: 'facility', label: 'Facility', minWidth: 200, renderCell: (params: any) => (params.facility.abbreviation)},
     { id: 'created_by', label: 'Creator', minWidth: 200, renderCell: (params: any) => (params.created_by?.full_name || "Unknown")},
     { id: 'created', label: 'Creation', minWidth: 200, renderCell: (params: any) => <DateTimeFormatter>{params.created}</DateTimeFormatter> },
-    { id: 'actions', label: 'Actions', minWidth: 200, renderCell: (params: any) => (
+    { id: 'actions', label: 'Actions', minWidth: 50, renderCell: (params: any) => (
       <Button variant="contained" size="small" onClick={() => navigate(`/projects/${params.id}`)}>View</Button>
     )}
   ]
