@@ -11,12 +11,13 @@ import { stringify } from 'yaml'
 import { DaregAPIMinimalNestedObject, FormData } from "../../types/global";
 import { ViewModes } from "../../types/enums";
 import { Dataset, DatasetRequest, useAddDatasetMutation, useGetDatasetQuery, useUpdateDatasetMutation } from "../../Services/datasets";
-import { useGetSchemaQuery } from "../../Services/schemas";
+import { useGetSchemaQuery, useGetSchemasQuery } from "../../Services/schemas";
 import { Project, useGetProjectQuery } from "../../Services/projects";
 import { LoadingButton } from "@mui/lab";
 import CodeEditor from '@uiw/react-textarea-code-editor';
 import { Facility } from "../../Services/facilities";
 import FilesActiveArea from "./FilesActiveArea";
+import TemplateSelect from "../../Components/TemplateSelect";
 
 type Props = {
     mode: ViewModes
@@ -33,16 +34,18 @@ const DatasetView = ({mode}: Props) => {
     
     const datasetData = useGetDatasetQuery(datasetId as string).data
     
-    const [ data, setData ] = useState<Dataset>({name: "", description: "", schema: {id: "", name: ""}, project: {id: "", name: ""}, metadata: {}} as Dataset);
+    const [ data, setData ] = useState<Dataset>({name: "", description: "", schema: projectData?.default_dataset_schema ? projectData?.default_dataset_schema.id : "", project: {id: "", name: ""}, metadata: {}} as Dataset);
 
-    const schema = useGetSchemaQuery(projectData?.default_dataset_schema.id ?? "").data
+    const {data: schemas, isLoading} = useGetSchemasQuery(1) // TODO: Implement pagination
+
+    const schema = useGetSchemaQuery(data.schema as string).data
     
     useEffect(() => {
         if ((mode===ViewModes.Edit||mode===ViewModes.View) && datasetData && projectData){
             setData(datasetData)
         }
         else{
-            const dataset_schema = projectData?.default_dataset_schema.id
+            const dataset_schema = projectData?.default_dataset_schema ? projectData?.default_dataset_schema.id : ""
             setData({...data, project: projectData as Project, schema: dataset_schema || ""})
         }
     }, [datasetData, projectData])
@@ -75,7 +78,7 @@ const DatasetView = ({mode}: Props) => {
         })
     }
 
-    const handleChange = (inputId: ProjectDataStateKeys | keyof FormData, e: any): void => {
+    const handleChange = (inputId: ProjectDataStateKeys | keyof FormData | "schema", e: any): void => {
         if(!inputId){ 
             return 
         }
@@ -137,6 +140,9 @@ const DatasetView = ({mode}: Props) => {
                             disabled={mode===ViewModes.View}
                             />
                     </Stack>
+                    {mode===ViewModes.New && schemas ?
+                        <TemplateSelect label="Select template" selectedId={data.schema as string} setSelectedId={(value) => handleChange("schema", value)} entities={schemas}/>
+                    : <></>}
                 </ContentHeader>
                 <ContentCard title={"Metadata"} actions={
                     <Button sx={{ml:2}} variant="contained" size="small" onClick={toggleEditor}>
