@@ -2,7 +2,7 @@ import { or } from "@jsonforms/core"
 import { AccessTime, AccountCircle, ArrowBackRounded, HomeRepairService } from "@mui/icons-material"
 import { Paper, Stack, IconButton, Typography, SxProps, Avatar } from "@mui/material"
 import { ReactFragment } from "react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 
 type ContentHeaderProps<T> = {
     title?: string,
@@ -24,12 +24,13 @@ export interface ContentHeaderMetadata<T> {
 const ContentHeader = <T, >({title, children, sx, backAction, actions, metadata}: ContentHeaderProps<T>) => {
     
     const navigate = useNavigate()
+    const { pathname } = useLocation();
 
     const handleBackClick = (): void => {
         if (backAction){
             backAction()
         } else {
-            navigate(-1)
+            navigate("..", { relative: "path" })
         }
     }
 
@@ -37,7 +38,9 @@ const ContentHeader = <T, >({title, children, sx, backAction, actions, metadata}
         <Paper sx={{p: 2, mt:2, background: "#9ed060", ...sx}}>
             <Stack direction="row" justifyContent="space-between">
                 <Stack direction="row" alignItems="center">
-                    <IconButton sx={{ mr: 1 }} edge="start" onClick={() => handleBackClick()}><ArrowBackRounded/></IconButton>
+                    {pathname.split('/').length > 2 ? 
+                        <IconButton sx={{ mr: 1 }} edge="start" onClick={() => handleBackClick()}><ArrowBackRounded/></IconButton>
+                    : null}
                     <Typography variant="h5" color="text.primary">{title}</Typography>
                 </Stack>
                 {actions}

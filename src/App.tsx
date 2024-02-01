@@ -4,7 +4,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { CssBaseline, ThemeProvider, createTheme, useMediaQuery } from '@mui/material';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './Components/Layout';
 import Login from './Pages/Login';
 import ProjectsList from './Pages/Projects/ProjectList';
@@ -77,7 +77,7 @@ const options = {
                       <Route path='new' element={<ProjectEdit mode={ViewModes.New} />} />
                       <Route path=':projectId' element={<ProjectEdit mode={ViewModes.View} />} />
                       <Route path=':projectId/edit' element={<ProjectEdit mode={ViewModes.Edit} />} />
-                      <Route path=':projectId/datasets' element={<DatasetCard />} />
+                      <Route path=':projectId/datasets' element={<Navigate to="../" relative="path" />} />
                       <Route path=':projectId/datasets/new' element={<DatasetView mode={ViewModes.New} />} />
                       <Route path=':projectId/datasets/:datasetId' element={<DatasetView mode={ViewModes.View} />} />
                       <Route path=':projectId/datasets/:datasetId/edit' element={<DatasetView mode={ViewModes.Edit} />} />
