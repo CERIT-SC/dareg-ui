@@ -1,5 +1,5 @@
 import { AccessTime, AccountCircle, Assignment, DataObject, Edit, HomeRepairService, Save } from "@mui/icons-material";
-import { Alert, Box, Button, Skeleton, Stack, TextField } from "@mui/material";
+import { Alert, Box, Button, Skeleton, Stack, Tab, TextField, Typography } from "@mui/material";
 import ContentHeader from "../../Components/ContentHeader";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -11,11 +11,13 @@ import { stringify } from 'yaml'
 import { DaregAPIMinimalNestedObject, FormData } from "../../types/global";
 import { ViewModes } from "../../types/enums";
 import { Dataset, DatasetRequest, useAddDatasetMutation, useGetDatasetQuery, useUpdateDatasetMutation } from "../../Services/datasets";
-import { useGetSchemaQuery } from "../../Services/schemas";
+import { useGetSchemaQuery, useGetSchemasQuery } from "../../Services/schemas";
 import { Project, useGetProjectQuery } from "../../Services/projects";
-import { LoadingButton } from "@mui/lab";
+import { LoadingButton, TabContext, TabList, TabPanel } from "@mui/lab";
 import CodeEditor from '@uiw/react-textarea-code-editor';
 import { Facility } from "../../Services/facilities";
+import FilesActiveArea from "./FilesActiveArea";
+import TemplateSelect from "../../Components/TemplateSelect";
 
 type Props = {
     mode: ViewModes
@@ -31,17 +33,21 @@ const DatasetView = ({mode}: Props) => {
     const projectData = useGetProjectQuery(projectId as string).data
     
     const datasetData = useGetDatasetQuery(datasetId as string).data
-    
-    const [ data, setData ] = useState<Dataset>({name: "", description: "", schema: {id: "", name: ""}, project: {id: "", name: ""}, metadata: {}} as Dataset);
 
-    const schema = useGetSchemaQuery(projectData?.default_dataset_schema.id ?? "").data
+    const [ tabContent, setTabContent ] = useState<string>("0")
+    
+    const [ data, setData ] = useState<Dataset>({name: "", description: "", schema: projectData?.default_dataset_schema ? projectData?.default_dataset_schema.id : "", project: {id: "", name: ""}, metadata: {}} as Dataset);
+
+    const {data: schemas, isLoading} = useGetSchemasQuery(1) // TODO: Implement pagination
+
+    const schema = useGetSchemaQuery(data.schema as string).data
     
     useEffect(() => {
         if ((mode===ViewModes.Edit||mode===ViewModes.View) && datasetData && projectData){
             setData(datasetData)
         }
         else{
-            const dataset_schema = projectData?.default_dataset_schema.id
+            const dataset_schema = projectData?.default_dataset_schema ? projectData?.default_dataset_schema.id : ""
             setData({...data, project: projectData as Project, schema: dataset_schema || ""})
         }
     }, [datasetData, projectData])
@@ -70,11 +76,11 @@ const DatasetView = ({mode}: Props) => {
         }
         updatedDataset?.then((response) => {
         setLoadingButtonState(false)
-        navigate(`/projects/${projectId}/datasets/${(response as {data: Dataset}).data.id}`)
+        navigate(`/collections/${projectId}/datasets/${(response as {data: Dataset}).data.id}`)
         })
     }
 
-    const handleChange = (inputId: ProjectDataStateKeys | keyof FormData, e: any): void => {
+    const handleChange = (inputId: ProjectDataStateKeys | keyof FormData | "schema", e: any): void => {
         if(!inputId){ 
             return 
         }
@@ -99,7 +105,7 @@ const DatasetView = ({mode}: Props) => {
         return (
             <Box>
                 <ContentHeader<Dataset & Facility> title={`Dataset: ${mode}`} actions={
-                            mode===ViewModes.View ? (<Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => navigate(`/projects/${projectId}/datasets/${datasetId}/edit`)}>
+                            mode===ViewModes.View ? (<Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => navigate(`/collections/${projectId}/datasets/${datasetId}/edit`)}>
                                 Edit
                             </Button>) : <></>
                         }
@@ -119,7 +125,7 @@ const DatasetView = ({mode}: Props) => {
                             label="Dataset name"
                             fullWidth
                             required
-                            variant="filled"
+                            variant="outlined"
                             value={data.name}
                             onChange={(e) => handleChange("name", e.target.value)}
                             sx={{maxWidth: "33.33%", background: "#FFF"}}
@@ -129,67 +135,98 @@ const DatasetView = ({mode}: Props) => {
                             margin="dense"
                             label="Dataset description"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={data.description}
                             onChange={(e) => handleChange("description", e.target.value)}
-                            sx={{maxWidth: "66.67%", background: "#FFF"}}
+                            sx={{maxWidth: "66.67%", backgroundColor: "#FFF"}}
                             disabled={mode===ViewModes.View}
                             />
                     </Stack>
+                    {mode===ViewModes.New && schemas ?
+                        <TemplateSelect label="Select template" selectedId={data.schema as string} setSelectedId={(value) => handleChange("schema", value)} entities={schemas}/>
+                    : <></>}
                 </ContentHeader>
-                <ContentCard title={"Metadata"} actions={
-                    <Button sx={{ml:2}} variant="contained" size="small" onClick={toggleEditor}>
-                        Switch Editor
-                    </Button>
-                }>
-                    {error ? (
-                        <Alert sx={{mb:2}} severity="warning">
-                            There might be a problem with metadata! Switch to the text editor instead?
+                <TabContext value={tabContent}>
+                    <ContentCard>
+                            <TabList onChange={(e, newValue) => setTabContent(newValue)} aria-label="lab API tabs example">
+                                <Tab label="Metadata" value={"0"} />
+                                <Tab label="Files" value={"1"} />
+                                <Tab label="Settings" value={"2"} />
+                            </TabList>
+                    </ContentCard>
+                    <TabPanel value="0" sx={{p:0}}>
+                        <ContentCard title={"Metadata"} actions={
                             <Button sx={{ml:2}} variant="contained" size="small" onClick={toggleEditor}>
-                                Switch
+                                Switch Editor
                             </Button>
-                        </Alert>
-                    ) : <></> }
-                    {editorMode==='form' ? (
-                        schema && schema.uischema ? (
-                            <FormsWrapped readonly={mode===ViewModes.View} schema={schema.schema} uischema={schema.uischema} data={data.metadata} setData={(value) => handleChange("metadata", value)} />
-                        ) : <><FormsWrapperSkeleton></FormsWrapperSkeleton></>
-                    ) : (
-                        <CodeEditor
-                            value={transform}
-                            readOnly={mode===ViewModes.View}
-                            language="js"
-                            placeholder="Please enter JS code."
-                            onChange={(e) => handleChange("metadata", JSON.parse(e.target.value))}
-                            padding={15}
-                            style={{
-                                width: "100%",
-                                fontSize: 14,
-                                backgroundColor: "#FFF",
-                                fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
-                            }}
-                        />        
-                    )}
-                </ContentCard>
-                <ContentCard paperProps={{elevation: 0}} sx={{mb: 2, p: 0}}>
-                    <Stack gap={2} direction="row" justifyContent="flex-start">
-                        {mode===ViewModes.View ? <></> : (
-                            <LoadingButton
-                                loading={loadingButtonState}
-                                loadingPosition="end"
-                                endIcon={<Save />}
-                                variant="contained"
-                                size="large"
-                                onClick={() => saveForm()}
-                            >
-                                Save
-                            </LoadingButton>
-                        )}
-                        <Button disabled={/*data.metadata==="{}"*/undefined} variant="contained" size="large" endIcon={<DataObject />} onClick={() => downloadMetadata()}>
-                            Download metadata
-                        </Button>
-                    </Stack>
-                </ContentCard>
+                        }>
+                            {error ? (
+                                <Alert sx={{mb:2}} severity="warning">
+                                    There might be a problem with metadata! Switch to the text editor instead?
+                                    <Button sx={{ml:2}} variant="contained" size="small" onClick={toggleEditor}>
+                                        Switch
+                                    </Button>
+                                </Alert>
+                            ) : <></> }
+                            {editorMode==='form' ? (
+                                schema && schema.uischema ? (
+                                    <FormsWrapped readonly={mode===ViewModes.View} schema={schema.schema} uischema={schema.uischema} data={data.metadata} setData={(value) => handleChange("metadata", value)} />
+                                ) : <><FormsWrapperSkeleton></FormsWrapperSkeleton></>
+                            ) : (
+                                <CodeEditor
+                                    value={transform}
+                                    readOnly={mode===ViewModes.View}
+                                    language="js"
+                                    placeholder="Please enter JS code."
+                                    onChange={(e) => handleChange("metadata", JSON.parse(e.target.value))}
+                                    padding={15}
+                                    style={{
+                                        width: "100%",
+                                        fontSize: 14,
+                                        backgroundColor: "#FFF",
+                                        fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
+                                    }}
+                                />        
+                            )}
+                        </ContentCard>
+                    </TabPanel>
+                    <TabPanel value="1" sx={{p:0}}>
+                        <ContentCard title={"Files"}>
+                            {true ? <Typography variant="subtitle1">No files available</Typography> :
+                                <FilesActiveArea id="sss" changeId={() => {}} />
+                            }
+                        </ContentCard>
+                    </TabPanel>
+                    <TabPanel value="2" sx={{p:0}}>
+                        <ContentCard title={"Dataset lifecycle settings"}>
+                            <>
+                                    <TextField 
+                                        label="Dataset ID"
+                                        value={data.id}
+                                        disabled={true}
+                                        fullWidth
+                                        sx={{mb:2}}/>
+                                    <TextField 
+                                        label="Dataset Retention"
+                                        value={"3m"}
+                                        helperText="How long should the dataset be kept on hot storage?"
+                                        disabled={true}
+                                        fullWidth
+                                        sx={{mb:2}}/>
+                            </>
+                        </ContentCard>
+                        <ContentCard title={"Onedata settings"}>
+                            <>
+                                    <TextField 
+                                        label="Space ID"
+                                        value={data.id}
+                                        disabled={true}
+                                        fullWidth
+                                        sx={{mb:2}}/>
+                            </>
+                        </ContentCard>
+                    </TabPanel>
+                </TabContext>
             </Box>
         )
     } else {
@@ -209,7 +246,7 @@ const DatasetView = ({mode}: Props) => {
                             margin="dense"
                             label="Template name"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={""}
                             disabled={true}
                             sx={{maxWidth: "33.33%", background: "#FFF"}}
@@ -220,7 +257,7 @@ const DatasetView = ({mode}: Props) => {
                             margin="dense"
                             label="Template description"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={""}
                             disabled={true}
                             sx={{maxWidth: "66.67%", background: "#FFF"}}
@@ -236,7 +273,7 @@ const DatasetView = ({mode}: Props) => {
                     <Skeleton width={"50%"} height={"2em"}/>
                     <Skeleton width={"25%"} height={"2em"}/>
                 </ContentCard>
-                <ContentCard paperProps={{elevation: 0}} sx={{mb: 2, p: 0}}>
+                <ContentCard paperProps={{variant: "elevation", elevation: 0}} sx={{mb: 2, p: 0}}>
                     <Stack gap={2} direction="row" justifyContent="flex-start">
                         <Skeleton width={"5%"} height={"4em"}>
                         {mode===ViewModes.View ? <></> : (

@@ -31,7 +31,7 @@ const TemplateView = () => {
                         margin="dense"
                         label="Template name"
                         fullWidth
-                        variant="filled"
+                        variant="outlined"
                         value={data?.name}
                         disabled={true}
                         sx={{maxWidth: "33.33%", background: "#FFF"}}
@@ -40,7 +40,7 @@ const TemplateView = () => {
                         margin="dense"
                         label="Template description"
                         fullWidth
-                        variant="filled"
+                        variant="outlined"
                         value={data?.description}
                         disabled={true}
                         sx={{maxWidth: "66.67%", background: "#FFF"}}
@@ -71,7 +71,7 @@ const TemplateView = () => {
                             margin="dense"
                             label="Template name"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={""}
                             disabled={true}
                             sx={{maxWidth: "33.33%", background: "#FFF"}}
@@ -82,7 +82,7 @@ const TemplateView = () => {
                             margin="dense"
                             label="Template description"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={""}
                             disabled={true}
                             sx={{maxWidth: "66.67%", background: "#FFF"}}

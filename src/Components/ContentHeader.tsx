@@ -1,8 +1,8 @@
 import { or } from "@jsonforms/core"
 import { AccessTime, AccountCircle, ArrowBackRounded, HomeRepairService } from "@mui/icons-material"
-import { Paper, Stack, IconButton, Typography, SxProps, Avatar } from "@mui/material"
+import { Paper, Stack, IconButton, Typography, SxProps, Avatar, Box } from "@mui/material"
 import { ReactFragment } from "react"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 
 type ContentHeaderProps<T> = {
     title?: string,
@@ -24,23 +24,26 @@ export interface ContentHeaderMetadata<T> {
 const ContentHeader = <T, >({title, children, sx, backAction, actions, metadata}: ContentHeaderProps<T>) => {
     
     const navigate = useNavigate()
+    const { pathname } = useLocation();
 
     const handleBackClick = (): void => {
         if (backAction){
             backAction()
         } else {
-            navigate(-1)
+            navigate("..", { relative: "path" })
         }
     }
 
     return (
-        <Paper sx={{p: 2, mt:2, background: "#9ed060", ...sx}}>
+        <Paper variant="outlined" sx={{p: 2, mt:2, border: "solid", borderWidth: 1, borderColor: "#9ed060", backgroundColor: "#dcf1d2", ...sx}}>
             <Stack direction="row" justifyContent="space-between">
                 <Stack direction="row" alignItems="center">
-                    <IconButton sx={{ mr: 1 }} edge="start" onClick={() => handleBackClick()}><ArrowBackRounded/></IconButton>
-                    <Typography variant="h5" color="text.primary">{title}</Typography>
+                    {pathname.split('/').length > 2 ? 
+                        <IconButton sx={{ mr: 1 }} edge="start" onClick={() => handleBackClick()}><ArrowBackRounded/></IconButton>
+                    : null}
+                    <Typography variant="subtitle2" fontSize={22} fontWeight={500} color="text.primary">{title}</Typography>
                 </Stack>
-                {actions}
+                <Box>{actions}</Box>
             </Stack>
             {children}
             {metadata ? (
@@ -49,7 +52,7 @@ const ContentHeader = <T, >({title, children, sx, backAction, actions, metadata}
                         return (
                             (item.renderCell || item.value) ? (
                             <Stack direction="row" spacing={1} alignItems="center" key={index}>
-                                <Avatar sx={{color: "#32421e", background: "#e0e0e0"}} alt={item.label}>{item.icon}</Avatar>
+                                <Avatar sx={{color: "#32421e", background: "#FFF"}} alt={item.label}>{item.icon}</Avatar>
                                 <Typography variant="body1" color="text.primary">{item.renderCell ? item.renderCell(item.value) : item.value}</Typography>
                             </Stack>
                             ) : null

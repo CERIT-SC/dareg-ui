@@ -92,7 +92,7 @@ const TemplatesNew = ({mode}: Props) => {
                     margin="dense"
                     label="Template name"
                     fullWidth
-                    variant="filled"
+                    variant="outlined"
                     value={data.name}
                     onChange={(e) => handleChange("name", e)}
                     sx={{maxWidth: "33.33%", background: "#FFF"}}
@@ -101,7 +101,7 @@ const TemplatesNew = ({mode}: Props) => {
                     margin="dense"
                     label="Template description"
                     fullWidth
-                    variant="filled"
+                    variant="outlined"
                     value={data.description}
                     onChange={(e) => handleChange("description", e)}
                     sx={{maxWidth: "66.67%", background: "#FFF"}}
@@ -145,7 +145,7 @@ const TemplatesNew = ({mode}: Props) => {
             }>
         <PermissionsTable />
         </ContentCard> */}
-        <ContentCard paperProps={{elevation: 0}} sx={{mb: 2, p: 0}}>
+        <ContentCard paperProps={{variant: "elevation", elevation: 0}} sx={{mb: 2, p: 0}}>
             <LoadingButton
                 loading={loadingButtonState}
                 loadingPosition="end"
