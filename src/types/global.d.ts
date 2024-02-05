@@ -75,6 +75,14 @@ export type SchemasData = {
     created?: string,
 }
 
+export type ExplorerItem = {
+    id: string,
+    name: string,
+    upper: string,
+    addDate: number, 
+    size: number
+}
+
 module.exports = {
     DatasetsData,
     ProjectsData,

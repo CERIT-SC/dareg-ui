@@ -63,7 +63,7 @@ const Profile = (props: {selectedTheme: string, setSelectedTheme: (theme: "light
             </Stack>
         </ContentCard>
         <ContentCard title='Settings'>
-            <Box sx={{width: "25%"}}>
+            <Box sx={{width: 300}}>
         <Stack direction="row" justifyContent="space-between" alignItems="baseline">
             <Typography>{t("Settings.language")}: </Typography>
             <SettingsMenu

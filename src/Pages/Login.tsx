@@ -1,5 +1,4 @@
-import { Box, Button, Card, CardContent, CardMedia, CircularProgress, Divider, Grid, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { Button, Card, CardContent, CardMedia, Divider, Grid, Typography } from '@mui/material';
 import { useAuth, hasAuthParams } from 'react-oidc-context';
 import ceitec_logo from '../ceitec_logo.png'
 import { useLocation } from 'react-router-dom';
@@ -10,16 +9,7 @@ const Login = () => {
   const auth = useAuth();
   const location = useLocation();
   const r = "dareg-"+(Math.random() + 1).toString(36).substring(7);
-  const [authNonce, setAuthNonce] = useLocalStorage(r, "none");
-
-  const [tab, setTab] = useState("login");
-  const handleChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newTab: string,
-  ) => {
-    if (newTab !== null)
-      setTab(newTab);
-  };
+  const [_, setAuthNonce] = useLocalStorage(r, "none");
 
   const initLogin = () => {
     if (!hasAuthParams() &&

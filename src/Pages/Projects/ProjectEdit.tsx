@@ -29,7 +29,8 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
     
     const templateData = useGetSchemaQuery(data.default_dataset_schema as string).data
 
-    const {data: datasets} = useGetDatasetsQuery({page: 1, projId: projectId}, {skip: projectId===undefined})
+    const [ page, setPage ] = useState(1)
+    const {data: datasets} = useGetDatasetsQuery({page: page, projId: projectId}, {skip: projectId===undefined})
 
     const [loadingState, setLoadingState] = useState<boolean>(false)
 
@@ -70,7 +71,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
         }
         updatedProject?.then((response) => {
         setLoadingButtonState(false)
-        navigate(`/projects/${(response as {data: {id: string}}).data.id}`)
+        navigate(`/collections/${(response as {data: {id: string}}).data.id}`)
         })
     }
 
@@ -90,16 +91,16 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
         { id: 'tags', label: 'Tags', minWidth: 100, renderCell: (params: any) => (params.tags?.map((item: string, index: number) => (<Chip label={item} size="small" variant="outlined" />)) || "None") },
         { id: 'created_by', label: 'Creator', minWidth: 200, renderCell: (params: any) => (params.created_by?.full_name || "Unknown")},
         { id: 'created', label: 'Creation', minWidth: 200, renderCell: (params: any) => <DateTimeFormatter>{params.created}</DateTimeFormatter>},
-        { id: 'actions', label: 'Actions', minWidth: 200, renderCell: (params: any) => (
-            <Button variant="contained" size="small" onClick={() => navigate(`/projects/${projectId}/datasets/${params.id}`)}>View</Button>
+        { id: 'actions', label: 'Actions', minWidth: 50, renderCell: (params: any) => (
+            <Button variant="contained" size="small" onClick={() => navigate(`/collections/${projectId}/datasets/${params.id}`)}>View</Button>
         )}
     ]
 
     if (data){
         return (
             <Box>
-                <ContentHeader title={`Project: ${mode}`} actions={
-                            mode===ViewModes.View ? (<Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => navigate(`/projects/${data?.id}/edit`)}>
+                <ContentHeader title={`Collection: ${mode}`} actions={
+                            mode===ViewModes.View ? (<Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => navigate(`/collections/${data?.id}/edit`)}>
                                 Edit
                             </Button>) : <></>
                         }>
@@ -107,9 +108,9 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                         <TextField
                             autoFocus
                             margin="dense"
-                            label="Project name"
+                            label="Collection name"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={data?.name}
                             onChange={(e) => handleChange("name", e)}
                             sx={{maxWidth: "33.33%", background: "#FFF"}}
@@ -117,9 +118,9 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             />
                         <TextField
                             margin="dense"
-                            label="Project description"
+                            label="Collection description"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={data?.description}
                             onChange={(e) => handleChange("description", e)}
                             sx={{maxWidth: "66.67%", background: "#FFF"}}
@@ -134,7 +135,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             InputProps={{
                                 startAdornment: <InputAdornment position="start"><SearchRounded></SearchRounded></InputAdornment>,
                               }}/> */}
-                            <Button variant={"contained"} size="medium" endIcon={<Add />} onClick={() => navigate(`/projects/${data?.id}/datasets/new`)}>
+                            <Button variant={"contained"} size="medium" endIcon={<Add />} onClick={() => navigate(`/collections/${data?.id}/datasets/new`)}>
                                 New Dataset
                             </Button>
                         </>
@@ -143,6 +144,8 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             columns={datasetsTable}
                             data={datasets || {results: []} as unknown as DaregAPIResponse<Dataset>}
                             size="small"
+                            page={page}
+                            setPage={setPage}
                         />
                     </ContentCard>
                 ) : <></>}
@@ -164,7 +167,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                     <FormsWrapped readonly schema={templateData?.schema || {}} uischema={templateData?.uischema || {}} data={{}} setData={() => {}} />
                     : <>No schema defined, use "Edit templates" section</>}
                 </ContentCard> */}
-                {mode===ViewModes.View ? <></> : (<ContentCard paperProps={{elevation: 0}} sx={{mb: 2, p: 0}}>
+                {mode===ViewModes.View ? <></> : (<ContentCard paperProps={{variant: "elevation", elevation: 0}} sx={{mb: 2, p: 0}}>
                     <LoadingButton
                         loading={loadingButtonState}
                         loadingPosition="end"
@@ -196,7 +199,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             margin="dense"
                             label="Template name"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={""}
                             disabled={true}
                             sx={{maxWidth: "33.33%", background: "#FFF"}}
@@ -207,7 +210,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             margin="dense"
                             label="Template description"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={""}
                             disabled={true}
                             sx={{maxWidth: "66.67%", background: "#FFF"}}

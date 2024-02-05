@@ -1,5 +1,5 @@
 import { Avatar, Box, CardMedia, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack } from '@mui/material';
-import { BackupTableRounded, ExitToAppRounded, FolderCopyRounded } from '@mui/icons-material';
+import { BackupTableRounded, ExitToAppRounded, FolderCopyRounded, LibraryBooksRounded } from '@mui/icons-material';
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
 import ceitec_logo from '../ceitec_logo.png'
@@ -29,11 +29,19 @@ const LeftBar = (props: {setSection: (value: string) => void}) => {
             />
           </Box>
           <ListItem disablePadding>
-            <ListItemButton selected={location.pathname.startsWith('/projects') || location.pathname==="/"} onClick={() => props.setSection("projects")}>
+            <ListItemButton selected={location.pathname.startsWith('/collections') || location.pathname==="/"} onClick={() => props.setSection("collections")}>
               <ListItemIcon>
                 <FolderCopyRounded />
               </ListItemIcon>
               <ListItemText primary={t('LeftBar.projects')} />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton selected={location.pathname.startsWith('/datasets')} onClick={() => props.setSection("datasets")}>
+              <ListItemIcon>
+                <LibraryBooksRounded />
+              </ListItemIcon>
+              <ListItemText primary={t('LeftBar.datasets')} />
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
@@ -47,7 +55,7 @@ const LeftBar = (props: {setSection: (value: string) => void}) => {
         </List>
         <List disablePadding>
           <ListItem disablePadding>
-            <ListItemButton onClick={() => props.setSection("projects")}>
+            <ListItemButton onClick={() => auth.signoutRedirect()}>
               <ListItemIcon>
                 <ExitToAppRounded />
               </ListItemIcon>

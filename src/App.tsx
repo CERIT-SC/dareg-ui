@@ -4,12 +4,11 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { CssBaseline, ThemeProvider, createTheme, useMediaQuery } from '@mui/material';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './Components/Layout';
 import Login from './Pages/Login';
 import ProjectsList from './Pages/Projects/ProjectList';
 import TemplateList from './Pages/Templates/TemplateList';
-import DatasetCard from './Components/DatasetCard';
 import LoginLayout from './Components/LoginLayout';
 import AuthenticatedRoute from './Components/AuthenticatedRoute';
 import OIDCCallback from './Components/OIDCCallback';
@@ -22,13 +21,17 @@ import config from './Config';
 import ProjectEdit from './Pages/Projects/ProjectEdit';
 import DatasetView from './Pages/Datasets/DatasetView';
 import { ViewModes } from './types/enums';
+import DatasetList from './Pages/Datasets/DatasetList';
 
 const App = () => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
   const [selectedTheme, setSelectedTheme] = useState<"dark"|"light"|"system">("system")
   const darkTheme = createTheme({
     palette: {
-      mode: selectedTheme==="system" ? (prefersDarkMode ? "light" : "dark") : selectedTheme
+      mode: selectedTheme==="system" ? (prefersDarkMode ? "light" : "dark") : selectedTheme,
+      primary: {main: "#2b8600"},
+      secondary: {main: "#2d3c25"}
+
     }
   })
 
@@ -71,21 +74,19 @@ const options = {
                   <Route path='/' element={<Layout />} >
                     <Route index element={<ProjectsList />} />
 
-                    <Route path='projects'>
+                    <Route path='collections'>
                       <Route index element={<ProjectsList />} />
                       <Route path='new' element={<ProjectEdit mode={ViewModes.New} />} />
                       <Route path=':projectId' element={<ProjectEdit mode={ViewModes.View} />} />
                       <Route path=':projectId/edit' element={<ProjectEdit mode={ViewModes.Edit} />} />
-                      <Route path=':projectId/datasets' element={<DatasetCard />} />
+                      <Route path=':projectId/datasets' element={<Navigate to="../" relative="path" />} />
                       <Route path=':projectId/datasets/new' element={<DatasetView mode={ViewModes.New} />} />
                       <Route path=':projectId/datasets/:datasetId' element={<DatasetView mode={ViewModes.View} />} />
                       <Route path=':projectId/datasets/:datasetId/edit' element={<DatasetView mode={ViewModes.Edit} />} />
-                      {/* <Route path=':projId'>
-                        <Route index element={<ListCard/>} />
-                        <Route path='dataset' element={<DatasetCard />}>
-                          <Route path=':datasetId/edit' element={<ProjectEdit editMode={true} />} />
-                        </Route>
-                      </Route> */}
+                    </Route>
+
+                    <Route path='datasets'>
+                      <Route index element={<DatasetList />} />
                     </Route>
                     
                     <Route path='templates'>

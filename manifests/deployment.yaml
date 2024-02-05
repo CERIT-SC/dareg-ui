@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    role: frontend
+    deployment-id: ${APP}
+  name: dareg-web-web-${APP}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: ps-frontend-${APP}
+  template:
+    metadata:
+      labels:
+        role: ps-frontend-${APP}
+    spec:
+      imagePullSecrets:
+      - name: gitlab-coffee-auth
+      securityContext:
+        runAsGroup: 1000
+        runAsUser: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - image: ${DOCKER_IMAGE_NAME_FE}:${CI_COMMIT_SHORT_SHA}
+          imagePullPolicy: Always
+          name: dareg-web
+          ports:
+          - containerPort: 8080
+            name: dareg-frontend
+            protocol: TCP
+          resources:
+            requests:
+              cpu: 0.1
+              memory: "64Mi"
+            limits:
+              cpu: 0.5
+              memory: "128Mi"
+          securityContext:
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    deployment-id: ${APP}
+  name: dareg-web-svc-${APP}
+spec:
+  selector:
+    role: ps-frontend-${APP}
+  type: ClusterIP
+  ports:
+  - name: default
+    port: 8081
+    protocol: TCP
+    targetPort: 8081
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dareg-web-ingress-${APP}
+  labels:
+    deployment-id: ${APP}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+spec:
+  tls:
+  - hosts:
+      - ${APP_HOST}
+    secretName: ${APP}-dareg-web-dyn-cloud-e-infra-cz
+  rules:
+  - host: ${APP_HOST}
+    http:
+      paths:
+        - pathType: ImplementationSpecific
+          path: "/"
+          backend:
+            service:
+              name: dareg-web-svc-${APP}
+              port: 
+                name: default
