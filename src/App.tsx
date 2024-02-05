@@ -75,7 +75,7 @@ const options = {
                   <Route path='/' element={<Layout />} >
                     <Route index element={<ProjectsList />} />
 
-                    <Route path='projects'>
+                    <Route path='collections'>
                       <Route index element={<ProjectsList />} />
                       <Route path='new' element={<ProjectEdit mode={ViewModes.New} />} />
                       <Route path=':projectId' element={<ProjectEdit mode={ViewModes.View} />} />

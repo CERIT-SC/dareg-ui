@@ -71,7 +71,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
         }
         updatedProject?.then((response) => {
         setLoadingButtonState(false)
-        navigate(`/projects/${(response as {data: {id: string}}).data.id}`)
+        navigate(`/collections/${(response as {data: {id: string}}).data.id}`)
         })
     }
 
@@ -92,15 +92,15 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
         { id: 'created_by', label: 'Creator', minWidth: 200, renderCell: (params: any) => (params.created_by?.full_name || "Unknown")},
         { id: 'created', label: 'Creation', minWidth: 200, renderCell: (params: any) => <DateTimeFormatter>{params.created}</DateTimeFormatter>},
         { id: 'actions', label: 'Actions', minWidth: 50, renderCell: (params: any) => (
-            <Button variant="contained" size="small" onClick={() => navigate(`/projects/${projectId}/datasets/${params.id}`)}>View</Button>
+            <Button variant="contained" size="small" onClick={() => navigate(`/collections/${projectId}/datasets/${params.id}`)}>View</Button>
         )}
     ]
 
     if (data){
         return (
             <Box>
-                <ContentHeader title={`Project: ${mode}`} actions={
-                            mode===ViewModes.View ? (<Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => navigate(`/projects/${data?.id}/edit`)}>
+                <ContentHeader title={`Collection: ${mode}`} actions={
+                            mode===ViewModes.View ? (<Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => navigate(`/collections/${data?.id}/edit`)}>
                                 Edit
                             </Button>) : <></>
                         }>
@@ -108,7 +108,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                         <TextField
                             autoFocus
                             margin="dense"
-                            label="Project name"
+                            label="Collection name"
                             fullWidth
                             variant="outlined"
                             value={data?.name}
@@ -118,7 +118,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             />
                         <TextField
                             margin="dense"
-                            label="Project description"
+                            label="Collection description"
                             fullWidth
                             variant="outlined"
                             value={data?.description}
@@ -135,7 +135,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             InputProps={{
                                 startAdornment: <InputAdornment position="start"><SearchRounded></SearchRounded></InputAdornment>,
                               }}/> */}
-                            <Button variant={"contained"} size="medium" endIcon={<Add />} onClick={() => navigate(`/projects/${data?.id}/datasets/new`)}>
+                            <Button variant={"contained"} size="medium" endIcon={<Add />} onClick={() => navigate(`/collections/${data?.id}/datasets/new`)}>
                                 New Dataset
                             </Button>
                         </>

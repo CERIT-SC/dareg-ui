@@ -29,7 +29,7 @@ const LeftBar = (props: {setSection: (value: string) => void}) => {
             />
           </Box>
           <ListItem disablePadding>
-            <ListItemButton selected={location.pathname.startsWith('/projects') || location.pathname==="/"} onClick={() => props.setSection("projects")}>
+            <ListItemButton selected={location.pathname.startsWith('/collections') || location.pathname==="/"} onClick={() => props.setSection("collections")}>
               <ListItemIcon>
                 <FolderCopyRounded />
               </ListItemIcon>

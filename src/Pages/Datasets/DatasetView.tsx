@@ -76,7 +76,7 @@ const DatasetView = ({mode}: Props) => {
         }
         updatedDataset?.then((response) => {
         setLoadingButtonState(false)
-        navigate(`/projects/${projectId}/datasets/${(response as {data: Dataset}).data.id}`)
+        navigate(`/collections/${projectId}/datasets/${(response as {data: Dataset}).data.id}`)
         })
     }
 
@@ -105,7 +105,7 @@ const DatasetView = ({mode}: Props) => {
         return (
             <Box>
                 <ContentHeader<Dataset & Facility> title={`Dataset: ${mode}`} actions={
-                            mode===ViewModes.View ? (<Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => navigate(`/projects/${projectId}/datasets/${datasetId}/edit`)}>
+                            mode===ViewModes.View ? (<Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => navigate(`/collections/${projectId}/datasets/${datasetId}/edit`)}>
                                 Edit
                             </Button>) : <></>
                         }
