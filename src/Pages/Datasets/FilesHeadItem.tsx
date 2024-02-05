@@ -2,8 +2,8 @@
  *  Author: Tomáš Drdla (xdrdla04@stud.fit.vutbr.cz)
  */
 
-import { ArrowDownwardRounded, ArrowUpwardRounded } from "@mui/icons-material";
-import { Link, Stack, SxProps } from "@mui/material";
+import { ArrowDownwardRounded } from "@mui/icons-material";
+import { Link, Stack, SxProps, Theme } from "@mui/material";
 import { Box } from "@mui/system";
 
 // Header label for files browser
@@ -11,12 +11,12 @@ const FilesHeadItem = (props: {
   sort: "down"|"up"|"none"
   anchor: "left"|"right",
   label: string,
-  sx?: SxProps,
+  sx?: SxProps<Theme>,
   onClick: () => void
 }) => {
 
   return (
-    <Box display="flex" sx={props.sx} flexDirection="row" justifyContent={props.anchor==="right"?"flex-end":"flex-start"}>
+    <Box display="flex" sx={props?.sx as any} flexDirection="row" justifyContent={props.anchor==="right"?"flex-end":"flex-start"}>
       <Link
         underline="none"
         color='primary.plainColor'

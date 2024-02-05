@@ -9,7 +9,6 @@ import Layout from './Components/Layout';
 import Login from './Pages/Login';
 import ProjectsList from './Pages/Projects/ProjectList';
 import TemplateList from './Pages/Templates/TemplateList';
-import DatasetCard from './Components/DatasetCard';
 import LoginLayout from './Components/LoginLayout';
 import AuthenticatedRoute from './Components/AuthenticatedRoute';
 import OIDCCallback from './Components/OIDCCallback';
@@ -84,12 +83,6 @@ const options = {
                       <Route path=':projectId/datasets/new' element={<DatasetView mode={ViewModes.New} />} />
                       <Route path=':projectId/datasets/:datasetId' element={<DatasetView mode={ViewModes.View} />} />
                       <Route path=':projectId/datasets/:datasetId/edit' element={<DatasetView mode={ViewModes.Edit} />} />
-                      {/* <Route path=':projId'>
-                        <Route index element={<ListCard/>} />
-                        <Route path='dataset' element={<DatasetCard />}>
-                          <Route path=':datasetId/edit' element={<ProjectEdit editMode={true} />} />
-                        </Route>
-                      </Route> */}
                     </Route>
 
                     <Route path='datasets'>
