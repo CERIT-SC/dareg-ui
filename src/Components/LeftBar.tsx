@@ -55,7 +55,7 @@ const LeftBar = (props: {setSection: (value: string) => void}) => {
         </List>
         <List disablePadding>
           <ListItem disablePadding>
-            <ListItemButton onClick={() => props.setSection("projects")}>
+            <ListItemButton onClick={() => auth.signoutRedirect()}>
               <ListItemIcon>
                 <ExitToAppRounded />
               </ListItemIcon>
