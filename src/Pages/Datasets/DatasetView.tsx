@@ -1,5 +1,5 @@
 import { AccessTime, AccountCircle, Assignment, DataObject, Edit, HomeRepairService, Save } from "@mui/icons-material";
-import { Alert, Box, Button, Skeleton, Stack, TextField } from "@mui/material";
+import { Alert, Box, Button, Skeleton, Stack, Tab, TextField } from "@mui/material";
 import ContentHeader from "../../Components/ContentHeader";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -13,7 +13,7 @@ import { ViewModes } from "../../types/enums";
 import { Dataset, DatasetRequest, useAddDatasetMutation, useGetDatasetQuery, useUpdateDatasetMutation } from "../../Services/datasets";
 import { useGetSchemaQuery, useGetSchemasQuery } from "../../Services/schemas";
 import { Project, useGetProjectQuery } from "../../Services/projects";
-import { LoadingButton } from "@mui/lab";
+import { LoadingButton, TabContext, TabList, TabPanel } from "@mui/lab";
 import CodeEditor from '@uiw/react-textarea-code-editor';
 import { Facility } from "../../Services/facilities";
 import FilesActiveArea from "./FilesActiveArea";
@@ -33,6 +33,8 @@ const DatasetView = ({mode}: Props) => {
     const projectData = useGetProjectQuery(projectId as string).data
     
     const datasetData = useGetDatasetQuery(datasetId as string).data
+
+    const [ tabContent, setTabContent ] = useState<string>("0")
     
     const [ data, setData ] = useState<Dataset>({name: "", description: "", schema: projectData?.default_dataset_schema ? projectData?.default_dataset_schema.id : "", project: {id: "", name: ""}, metadata: {}} as Dataset);
 
@@ -144,62 +146,85 @@ const DatasetView = ({mode}: Props) => {
                         <TemplateSelect label="Select template" selectedId={data.schema as string} setSelectedId={(value) => handleChange("schema", value)} entities={schemas}/>
                     : <></>}
                 </ContentHeader>
-                <ContentCard title={"Metadata"} actions={
-                    <Button sx={{ml:2}} variant="contained" size="small" onClick={toggleEditor}>
-                        Switch Editor
-                    </Button>
-                }>
-                    {error ? (
-                        <Alert sx={{mb:2}} severity="warning">
-                            There might be a problem with metadata! Switch to the text editor instead?
+                <TabContext value={tabContent}>
+                    <ContentCard>
+                            <TabList onChange={(e, newValue) => setTabContent(newValue)} aria-label="lab API tabs example">
+                                <Tab label="Metadata" value={"0"} />
+                                <Tab label="Files" value={"1"} />
+                                <Tab label="Settings" value={"2"} />
+                            </TabList>
+                    </ContentCard>
+                    <TabPanel value="0" sx={{p:0}}>
+                        <ContentCard title={"Metadata"} actions={
                             <Button sx={{ml:2}} variant="contained" size="small" onClick={toggleEditor}>
-                                Switch
+                                Switch Editor
                             </Button>
-                        </Alert>
-                    ) : <></> }
-                    {editorMode==='form' ? (
-                        schema && schema.uischema ? (
-                            <FormsWrapped readonly={mode===ViewModes.View} schema={schema.schema} uischema={schema.uischema} data={data.metadata} setData={(value) => handleChange("metadata", value)} />
-                        ) : <><FormsWrapperSkeleton></FormsWrapperSkeleton></>
-                    ) : (
-                        <CodeEditor
-                            value={transform}
-                            readOnly={mode===ViewModes.View}
-                            language="js"
-                            placeholder="Please enter JS code."
-                            onChange={(e) => handleChange("metadata", JSON.parse(e.target.value))}
-                            padding={15}
-                            style={{
-                                width: "100%",
-                                fontSize: 14,
-                                backgroundColor: "#FFF",
-                                fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
-                            }}
-                        />        
-                    )}
-                </ContentCard>
-                <ContentCard paperProps={{elevation: 0}} sx={{mb: 2, p: 0}}>
-                    <Stack gap={2} direction="row" justifyContent="flex-start">
-                        {mode===ViewModes.View ? <></> : (
-                            <LoadingButton
-                                loading={loadingButtonState}
-                                loadingPosition="end"
-                                endIcon={<Save />}
-                                variant="contained"
-                                size="large"
-                                onClick={() => saveForm()}
-                            >
-                                Save
-                            </LoadingButton>
-                        )}
-                        <Button disabled={/*data.metadata==="{}"*/undefined} variant="contained" size="large" endIcon={<DataObject />} onClick={() => downloadMetadata()}>
-                            Download metadata
-                        </Button>
-                    </Stack>
-                </ContentCard>
-                <ContentCard paperProps={{elevation: 1}} sx={{mb: 1, p: 1, pt: 0}}>
-                    <FilesActiveArea id="1" changeId={() => {}}/>
-                </ContentCard>
+                        }>
+                            {error ? (
+                                <Alert sx={{mb:2}} severity="warning">
+                                    There might be a problem with metadata! Switch to the text editor instead?
+                                    <Button sx={{ml:2}} variant="contained" size="small" onClick={toggleEditor}>
+                                        Switch
+                                    </Button>
+                                </Alert>
+                            ) : <></> }
+                            {editorMode==='form' ? (
+                                schema && schema.uischema ? (
+                                    <FormsWrapped readonly={mode===ViewModes.View} schema={schema.schema} uischema={schema.uischema} data={data.metadata} setData={(value) => handleChange("metadata", value)} />
+                                ) : <><FormsWrapperSkeleton></FormsWrapperSkeleton></>
+                            ) : (
+                                <CodeEditor
+                                    value={transform}
+                                    readOnly={mode===ViewModes.View}
+                                    language="js"
+                                    placeholder="Please enter JS code."
+                                    onChange={(e) => handleChange("metadata", JSON.parse(e.target.value))}
+                                    padding={15}
+                                    style={{
+                                        width: "100%",
+                                        fontSize: 14,
+                                        backgroundColor: "#FFF",
+                                        fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
+                                    }}
+                                />        
+                            )}
+                        </ContentCard>
+                    </TabPanel>
+                    <TabPanel value="1" sx={{p:0}}>
+                        <ContentCard title={"Files"}>
+                            <FilesActiveArea id="sss" changeId={() => {}} />
+                        </ContentCard>
+                    </TabPanel>
+                    <TabPanel value="2" sx={{p:0}}>
+                        <ContentCard title={"Dataset lifecycle settings"}>
+                            <>
+                                    <TextField 
+                                        label="Dataset ID"
+                                        value={data.id}
+                                        disabled={true}
+                                        fullWidth
+                                        sx={{mb:2}}/>
+                                    <TextField 
+                                        label="Dataset Retention"
+                                        value={"3m"}
+                                        helperText="How long should the dataset be kept on hot storage?"
+                                        disabled={true}
+                                        fullWidth
+                                        sx={{mb:2}}/>
+                            </>
+                        </ContentCard>
+                        <ContentCard title={"Onedata settings"}>
+                            <>
+                                    <TextField 
+                                        label="Space ID"
+                                        value={data.id}
+                                        disabled={true}
+                                        fullWidth
+                                        sx={{mb:2}}/>
+                            </>
+                        </ContentCard>
+                    </TabPanel>
+                </TabContext>
             </Box>
         )
     } else {
