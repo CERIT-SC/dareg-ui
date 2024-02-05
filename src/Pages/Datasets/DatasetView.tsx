@@ -1,5 +1,5 @@
 import { AccessTime, AccountCircle, Assignment, DataObject, Edit, HomeRepairService, Save } from "@mui/icons-material";
-import { Alert, Box, Button, Skeleton, Stack, Tab, TextField } from "@mui/material";
+import { Alert, Box, Button, Skeleton, Stack, Tab, TextField, Typography } from "@mui/material";
 import ContentHeader from "../../Components/ContentHeader";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -125,7 +125,7 @@ const DatasetView = ({mode}: Props) => {
                             label="Dataset name"
                             fullWidth
                             required
-                            variant="filled"
+                            variant="outlined"
                             value={data.name}
                             onChange={(e) => handleChange("name", e.target.value)}
                             sx={{maxWidth: "33.33%", background: "#FFF"}}
@@ -135,10 +135,10 @@ const DatasetView = ({mode}: Props) => {
                             margin="dense"
                             label="Dataset description"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={data.description}
                             onChange={(e) => handleChange("description", e.target.value)}
-                            sx={{maxWidth: "66.67%", background: "#FFF"}}
+                            sx={{maxWidth: "66.67%", backgroundColor: "#FFF"}}
                             disabled={mode===ViewModes.View}
                             />
                     </Stack>
@@ -192,7 +192,9 @@ const DatasetView = ({mode}: Props) => {
                     </TabPanel>
                     <TabPanel value="1" sx={{p:0}}>
                         <ContentCard title={"Files"}>
-                            <FilesActiveArea id="sss" changeId={() => {}} />
+                            {true ? <Typography variant="subtitle1">No files available</Typography> :
+                                <FilesActiveArea id="sss" changeId={() => {}} />
+                            }
                         </ContentCard>
                     </TabPanel>
                     <TabPanel value="2" sx={{p:0}}>
@@ -244,7 +246,7 @@ const DatasetView = ({mode}: Props) => {
                             margin="dense"
                             label="Template name"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={""}
                             disabled={true}
                             sx={{maxWidth: "33.33%", background: "#FFF"}}
@@ -255,7 +257,7 @@ const DatasetView = ({mode}: Props) => {
                             margin="dense"
                             label="Template description"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={""}
                             disabled={true}
                             sx={{maxWidth: "66.67%", background: "#FFF"}}
@@ -271,7 +273,7 @@ const DatasetView = ({mode}: Props) => {
                     <Skeleton width={"50%"} height={"2em"}/>
                     <Skeleton width={"25%"} height={"2em"}/>
                 </ContentCard>
-                <ContentCard paperProps={{elevation: 0}} sx={{mb: 2, p: 0}}>
+                <ContentCard paperProps={{variant: "elevation", elevation: 0}} sx={{mb: 2, p: 0}}>
                     <Stack gap={2} direction="row" justifyContent="flex-start">
                         <Skeleton width={"5%"} height={"4em"}>
                         {mode===ViewModes.View ? <></> : (

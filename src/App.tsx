@@ -29,7 +29,10 @@ const App = () => {
   const [selectedTheme, setSelectedTheme] = useState<"dark"|"light"|"system">("system")
   const darkTheme = createTheme({
     palette: {
-      mode: selectedTheme==="system" ? (prefersDarkMode ? "light" : "dark") : selectedTheme
+      mode: selectedTheme==="system" ? (prefersDarkMode ? "light" : "dark") : selectedTheme,
+      primary: {main: "#2b8600"},
+      secondary: {main: "#2d3c25"}
+
     }
   })
 

@@ -50,13 +50,13 @@ const SchemeCard = () => {
             id="name"
             label="Název"
             fullWidth
-            variant="filled"
+            variant="outlined"
           />
           <TextField
             margin="dense"
             label="Popis"
             fullWidth
-            variant="filled"
+            variant="outlined"
             multiline
             rows="5"
             sx={{ mb: 2 }}

@@ -29,7 +29,7 @@ const ProjectsList = () => {
   return (
     <Box>
       <ContentHeader<Project> title={"Projects"} actions={
-        <Button variant="contained" size="small" endIcon={<PostAddRounded />} onClick={() => navigate("/projects/new")}>
+        <Button variant="contained" size="medium" endIcon={<PostAddRounded />} onClick={() => navigate("/projects/new")}>
           Add new
         </Button>
       }>

@@ -110,7 +110,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             margin="dense"
                             label="Project name"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={data?.name}
                             onChange={(e) => handleChange("name", e)}
                             sx={{maxWidth: "33.33%", background: "#FFF"}}
@@ -120,7 +120,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             margin="dense"
                             label="Project description"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={data?.description}
                             onChange={(e) => handleChange("description", e)}
                             sx={{maxWidth: "66.67%", background: "#FFF"}}
@@ -167,7 +167,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                     <FormsWrapped readonly schema={templateData?.schema || {}} uischema={templateData?.uischema || {}} data={{}} setData={() => {}} />
                     : <>No schema defined, use "Edit templates" section</>}
                 </ContentCard> */}
-                {mode===ViewModes.View ? <></> : (<ContentCard paperProps={{elevation: 0}} sx={{mb: 2, p: 0}}>
+                {mode===ViewModes.View ? <></> : (<ContentCard paperProps={{variant: "elevation", elevation: 0}} sx={{mb: 2, p: 0}}>
                     <LoadingButton
                         loading={loadingButtonState}
                         loadingPosition="end"
@@ -199,7 +199,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             margin="dense"
                             label="Template name"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={""}
                             disabled={true}
                             sx={{maxWidth: "33.33%", background: "#FFF"}}
@@ -210,7 +210,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             margin="dense"
                             label="Template description"
                             fullWidth
-                            variant="filled"
+                            variant="outlined"
                             value={""}
                             disabled={true}
                             sx={{maxWidth: "66.67%", background: "#FFF"}}

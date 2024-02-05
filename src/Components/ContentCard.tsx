@@ -12,7 +12,7 @@ type ContentCardProps = {
 
 const ContentCard = ({children, title, actions, sx, paperProps}: ContentCardProps) => {
     return (
-        <Paper sx={{p: 2, mt:2, ...sx}} {...paperProps}>
+        <Paper variant="outlined" sx={{p: 2, mt:2, ...sx}} {...paperProps}>
             {actions || title ? 
                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{mb:2}}>
                     <Typography variant="h5" color="text.primary">{title}</Typography>

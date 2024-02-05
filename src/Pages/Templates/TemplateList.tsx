@@ -29,7 +29,7 @@ const TemplateList = () => {
   return (
     <Box>
       <ContentHeader<Schema> title={"Templates"} actions={
-        <Button variant="contained" size="small" endIcon={<PostAddRounded />} onClick={() => navigate("/templates/new")}>
+        <Button variant="contained" size="medium" endIcon={<PostAddRounded />} onClick={() => navigate("/templates/new")}>
           Add new
         </Button>
       }>
