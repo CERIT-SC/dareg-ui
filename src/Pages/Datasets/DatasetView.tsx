@@ -189,6 +189,25 @@ const DatasetView = ({mode}: Props) => {
                                 />        
                             )}
                         </ContentCard>
+                        <ContentCard paperProps={{variant: "elevation", elevation: 0}} sx={{mb: 2, p: 0}}>
+                            <Stack gap={2} direction="row" justifyContent="flex-start">
+                                {mode===ViewModes.View ? <></> : (
+                                    <LoadingButton
+                                        loading={loadingButtonState}
+                                        loadingPosition="end"
+                                        endIcon={<Save />}
+                                        variant="contained"
+                                        size="large"
+                                        onClick={() => saveForm()}
+                                    >
+                                        Save
+                                    </LoadingButton>
+                                )}
+                                <Button disabled={/*data.metadata==="{}"*/undefined} variant="contained" size="large" endIcon={<DataObject />} onClick={() => downloadMetadata()}>
+                                    Download metadata
+                                </Button>
+                            </Stack>
+                        </ContentCard>
                     </TabPanel>
                     <TabPanel value="1" sx={{p:0}}>
                         <ContentCard title={"Files"}>
