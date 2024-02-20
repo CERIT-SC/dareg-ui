@@ -36,7 +36,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
 
     const [ loadingButtonState, setLoadingButtonState ] = useState<boolean>(false)
 
-    const projectData = useGetProjectQuery(projectId as string).data
+    const projectData = useGetProjectQuery(projectId as string, {skip: mode===ViewModes.New}).data
     useEffect(() => {
         if ((mode===ViewModes.Edit||mode===ViewModes.View) && projectData)
             setData({
