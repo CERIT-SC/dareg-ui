@@ -32,7 +32,7 @@ const DatasetView = ({mode}: Props) => {
     
     const projectData = useGetProjectQuery(projectId as string).data
     
-    const datasetData = useGetDatasetQuery(datasetId as string).data
+    const datasetData = useGetDatasetQuery(datasetId as string, {skip: mode===ViewModes.New}).data
 
     const [ tabContent, setTabContent ] = useState<string>("0")
     

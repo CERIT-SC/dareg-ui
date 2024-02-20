@@ -28,7 +28,7 @@ const TemplatesNew = ({mode}: Props) => {
 
     const [ loadingButtonState, setLoadingButtonState ] = useState<boolean>(false)
     
-    const schemaData = useGetSchemaQuery(templateId as string).data
+    const schemaData = useGetSchemaQuery(templateId as string, {skip: mode===ViewModes.New}).data
     const [data, setData] = useState<SchemasData>({id: "", created: "", name: "", description: "", uischema: {}, schema: {}})
     
     useEffect(() => {
