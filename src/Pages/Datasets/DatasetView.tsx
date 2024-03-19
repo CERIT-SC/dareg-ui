@@ -1,4 +1,4 @@
-import { AccessTime, AccountCircle, Assignment, DataObject, Edit, HomeRepairService, Save } from "@mui/icons-material";
+import { AccessTime, AccountCircle, Assignment, DataObject, Edit, GroupAdd, HomeRepairService, Save } from "@mui/icons-material";
 import { Alert, Box, Button, Skeleton, Stack, Tab, TextField, Typography } from "@mui/material";
 import ContentHeader from "../../Components/ContentHeader";
 import { useNavigate, useParams } from "react-router-dom";
@@ -8,16 +8,17 @@ import FormsWrapped, { FormsWrapperSkeleton } from "../../Components/FormsWrappe
 import useFetch from "use-http";
 import { ProjectDataStateKeys } from "../Projects/ProjectEdit";
 import { stringify } from 'yaml'
-import { DaregAPIMinimalNestedObject, FormData } from "../../types/global";
+import { DaregAPIMinimalNestedObject, FormData, SharesList } from "../../types/global";
 import { ViewModes } from "../../types/enums";
 import { Dataset, DatasetRequest, useAddDatasetMutation, useGetDatasetQuery, useUpdateDatasetMutation } from "../../Services/datasets";
-import { useGetSchemaQuery, useGetSchemasQuery } from "../../Services/schemas";
+import { Schema, useGetSchemaQuery, useGetSchemasQuery } from "../../Services/schemas";
 import { Project, useGetProjectQuery } from "../../Services/projects";
 import { LoadingButton, TabContext, TabList, TabPanel } from "@mui/lab";
 import CodeEditor from '@uiw/react-textarea-code-editor';
 import { Facility } from "../../Services/facilities";
 import FilesActiveArea from "./FilesActiveArea";
 import TemplateSelect from "../../Components/TemplateSelect";
+import PermissionsTable from "../../Components/PermissionsContainer/PermissionsTable";
 
 type Props = {
     mode: ViewModes
@@ -41,6 +42,8 @@ const DatasetView = ({mode}: Props) => {
     const {data: schemas, isLoading} = useGetSchemasQuery(1) // TODO: Implement pagination
 
     const schema = useGetSchemaQuery(data.schema as string).data
+
+    const [ currentShares, setCurrentShares ] = useState<SharesList>(data.shares)
     
     useEffect(() => {
         if ((mode===ViewModes.Edit||mode===ViewModes.View) && datasetData && projectData){
@@ -50,6 +53,7 @@ const DatasetView = ({mode}: Props) => {
             const dataset_schema = projectData?.default_dataset_schema ? projectData?.default_dataset_schema.id : ""
             setData({...data, project: projectData as Project, schema: dataset_schema || ""})
         }
+        if (datasetData) setCurrentShares(datasetData.shares)
     }, [datasetData, projectData])
 
     const [ error, setError ] = useState<boolean>(false)
@@ -68,7 +72,7 @@ const DatasetView = ({mode}: Props) => {
         setLoadingButtonState(true);
         switch(mode){
             case ViewModes.Edit:
-                updatedDataset = updateDataset({...data, schema: schema?.id, project: typeof data.project == "string" ? data.project : data.project.id})
+                updatedDataset = updateDataset({...data, schema: schema?.id, project: typeof data.project == "string" ? data.project : data.project.id, shares: currentShares})
                 break;
             case ViewModes.New:
                 updatedDataset = addDataset({...data, schema: schema?.id, project: typeof data.project == "string" ? data.project : data.project.id})
@@ -105,7 +109,7 @@ const DatasetView = ({mode}: Props) => {
         return (
             <Box>
                 <ContentHeader<Dataset & Facility> title={`Dataset: ${mode}`} actions={
-                            mode===ViewModes.View ? (<Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => navigate(`/collections/${projectId}/datasets/${datasetId}/edit`)}>
+                            mode===ViewModes.View && data.perms!=="viewer" ? (<Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => navigate(`/collections/${projectId}/datasets/${datasetId}/edit`)}>
                                 Edit
                             </Button>) : <></>
                         }
@@ -189,25 +193,6 @@ const DatasetView = ({mode}: Props) => {
                                 />        
                             )}
                         </ContentCard>
-                        <ContentCard paperProps={{variant: "elevation", elevation: 0}} sx={{mb: 2, p: 0}}>
-                            <Stack gap={2} direction="row" justifyContent="flex-start">
-                                {mode===ViewModes.View ? <></> : (
-                                    <LoadingButton
-                                        loading={loadingButtonState}
-                                        loadingPosition="end"
-                                        endIcon={<Save />}
-                                        variant="contained"
-                                        size="large"
-                                        onClick={() => saveForm()}
-                                    >
-                                        Save
-                                    </LoadingButton>
-                                )}
-                                <Button disabled={/*data.metadata==="{}"*/undefined} variant="contained" size="large" endIcon={<DataObject />} onClick={() => downloadMetadata()}>
-                                    Download metadata
-                                </Button>
-                            </Stack>
-                        </ContentCard>
                     </TabPanel>
                     <TabPanel value="1" sx={{p:0}}>
                         <ContentCard title={"Files"}>
@@ -244,8 +229,30 @@ const DatasetView = ({mode}: Props) => {
                                         sx={{mb:2}}/>
                             </>
                         </ContentCard>
+                        {mode!==ViewModes.New ? 
+                            <PermissionsTable perms={mode===ViewModes.Edit ? data.perms : "viewer"} currentShares={currentShares} setCurrentShares={setCurrentShares}/>
+                        : null }
                     </TabPanel>
                 </TabContext>
+                <ContentCard paperProps={{variant: "elevation", elevation: 0}} sx={{mb: 2, p: 0}}>
+                    <Stack gap={2} direction="row" justifyContent="flex-start">
+                        {mode===ViewModes.View ? <></> : (
+                            <LoadingButton
+                                loading={loadingButtonState}
+                                loadingPosition="end"
+                                endIcon={<Save />}
+                                variant="contained"
+                                size="large"
+                                onClick={() => saveForm()}
+                            >
+                                Save
+                            </LoadingButton>
+                        )}
+                        {tabContent==="0" ? <Button disabled={/*data.metadata==="{}"*/undefined} variant="contained" size="large" endIcon={<DataObject />} onClick={() => downloadMetadata()}>
+                            Download metadata
+                        </Button> : null} 
+                    </Stack>
+                </ContentCard>
             </Box>
         )
     } else {

@@ -3,8 +3,10 @@ import { BackupTableRounded, ExitToAppRounded, FolderCopyRounded, LibraryBooksRo
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
 import ceitec_logo from '../ceitec_logo.png'
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
+import { useGetProfileQuery } from '../Services/profile';
+import { useEffect } from 'react';
 
 const LeftBar = (props: {setSection: (value: string) => void}) => {
   const LeftButton = styled(ListItemButton)(({}) => ({
@@ -16,6 +18,21 @@ const LeftBar = (props: {setSection: (value: string) => void}) => {
   const auth = useAuth();
   const { t } = useTranslation()
   const location = useLocation();
+  const profile = useGetProfileQuery(1)
+
+  useEffect(() => {
+    if (profile.isSuccess) {
+      if (!(profile.data?.results[0].any_facilities || profile.data?.results[0].any_projects)) { // no projects and no facilities
+        if (!profile.data?.results[0].any_datasets) { // no datasets
+          props.setSection("templates")
+        }
+        else {
+          props.setSection("datasets")
+        }
+      }
+    }
+  }, [profile.isSuccess])
+
 
   return (
     <Stack direction="row" height="100vh">
@@ -28,22 +45,26 @@ const LeftBar = (props: {setSection: (value: string) => void}) => {
               width={300}
             />
           </Box>
-          <ListItem disablePadding>
-            <ListItemButton selected={location.pathname.startsWith('/collections') || location.pathname==="/"} onClick={() => props.setSection("collections")}>
-              <ListItemIcon>
-                <FolderCopyRounded />
-              </ListItemIcon>
-              <ListItemText primary={t('LeftBar.projects')} />
-            </ListItemButton>
-          </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton selected={location.pathname.startsWith('/datasets')} onClick={() => props.setSection("datasets")}>
-              <ListItemIcon>
-                <LibraryBooksRounded />
-              </ListItemIcon>
-              <ListItemText primary={t('LeftBar.datasets')} />
-            </ListItemButton>
-          </ListItem>
+          {profile.data?.results[0].any_facilities || profile.data?.results[0].any_projects ?
+            <ListItem disablePadding>
+              <ListItemButton selected={location.pathname.startsWith('/collections') || location.pathname==="/"} onClick={() => props.setSection("collections")}>
+                <ListItemIcon>
+                  <FolderCopyRounded />
+                </ListItemIcon>
+                <ListItemText primary={t('LeftBar.projects')} />
+              </ListItemButton>
+            </ListItem>
+          : null}
+          {profile.data?.results[0].any_datasets ?
+            <ListItem disablePadding>
+              <ListItemButton selected={location.pathname.startsWith('/datasets')} onClick={() => props.setSection("datasets")}>
+                <ListItemIcon>
+                  <LibraryBooksRounded />
+                </ListItemIcon>
+                <ListItemText primary={t('LeftBar.datasets')} />
+              </ListItemButton>
+            </ListItem>
+          : null}
           <ListItem disablePadding>
           <ListItemButton selected={location.pathname.startsWith('/templates')} onClick={() => props.setSection("templates")}>
               <ListItemIcon>

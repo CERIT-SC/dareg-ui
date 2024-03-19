@@ -5,3 +5,5 @@ const enum ViewModes {
 }
 
 export { ViewModes };
+
+export type PermissionModes = "owner" | "editor" | "viewer";

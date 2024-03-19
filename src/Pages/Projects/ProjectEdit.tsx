@@ -1,19 +1,20 @@
 import { useNavigate, useParams } from "react-router-dom"
-import { Box, Button, Chip, Skeleton, Stack, TextField } from "@mui/material";
-import { Add, Edit, Save } from "@mui/icons-material";
+import { Box, Button, Chip, Skeleton, Stack, Tab, TextField } from "@mui/material";
+import { Add, BackHand, Edit, GroupAdd, MultipleStop, Save } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import ContentCard from "../../Components/ContentCard";
 import ContentHeader from "../../Components/ContentHeader";
 import TemplateSelect from "../../Components/TemplateSelect";
-import { LoadingButton } from "@mui/lab";
+import { LoadingButton, TabContext, TabList, TabPanel } from "@mui/lab";
 import DaregTable, { Column } from "../../Components/EntityTable/EntityTable";
-import { DaregAPIResponse, ProjectsData } from "../../types/global";
+import { DaregAPIResponse, ProjectsData, SharesList } from "../../types/global";
 import { ViewModes } from "../../types/enums";
 import { useGetSchemaQuery, useGetSchemasQuery } from "../../Services/schemas";
-import { useAddProjectMutation, useGetProjectQuery, useUpdateProjectMutation } from "../../Services/projects";
+import { ProjectResponse, useAddProjectMutation, useGetProjectQuery, useUpdateProjectMutation } from "../../Services/projects";
 import { useGetFacilitiesQuery } from "../../Services/facilities";
 import { Dataset, useGetDatasetsQuery } from "../../Services/datasets";
 import DateTimeFormatter from "../../Components/DateTimeFormatter";
+import PermissionsTable from "../../Components/PermissionsContainer/PermissionsTable";
 
 export type ProjectDataStateKeys = keyof ProjectsData;
 
@@ -24,10 +25,12 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
 
     const {data: facilities} = useGetFacilitiesQuery(1) // TODO: Implement pagination
     
-    const [data, setData] = useState<ProjectsData>({name: "", description: "", default_dataset_schema: "", project_schema: undefined, metadata: {}, facility: facilities?.results[0].id})
+    const [data, setData] = useState<ProjectsData>({name: "", description: "", default_dataset_schema: "", project_schema: undefined, metadata: {}, facility: undefined, perms: "viewer", shares: []})
     const {data: schemas, isLoading} = useGetSchemasQuery(1) // TODO: Implement pagination
     
     const templateData = useGetSchemaQuery(data.default_dataset_schema as string).data
+
+    const [ tabContent, setTabContent ] = useState<string>(mode===ViewModes.New ? "1" : "0")
 
     const [ page, setPage ] = useState(1)
     const {data: datasets} = useGetDatasetsQuery({page: page, projId: projectId}, {skip: projectId===undefined})
@@ -35,6 +38,8 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
     const [loadingState, setLoadingState] = useState<boolean>(false)
 
     const [ loadingButtonState, setLoadingButtonState ] = useState<boolean>(false)
+
+    const [ currentShares, setCurrentShares ] = useState<SharesList>(data.shares)
 
     const projectData = useGetProjectQuery(projectId as string, {skip: mode===ViewModes.New}).data
     useEffect(() => {
@@ -44,6 +49,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                 default_dataset_schema: projectData.default_dataset_schema!==null ? projectData.default_dataset_schema.id : "", 
                 facility: projectData.facility.id!==null ? projectData.facility.id : "",
             } as ProjectsData)
+        if (projectData) setCurrentShares(projectData.shares)
     }, [projectData])
 
     const [
@@ -63,7 +69,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
         }
         switch(mode){
             case ViewModes.Edit:
-                updatedProject = updateProject(data)
+                updatedProject = updateProject({...data, shares: currentShares})
                 break;
             case ViewModes.New:
                 updatedProject = addProject(data)
@@ -100,10 +106,31 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
         return (
             <Box>
                 <ContentHeader title={`Collection: ${mode}`} actions={
-                            mode===ViewModes.View ? (<Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => navigate(`/collections/${data?.id}/edit`)}>
+                        data.perms!=="viewer" ?
+                            mode===ViewModes.View ? (
+                                <Button
+                                    variant={"contained"}
+                                    size="medium"
+                                    endIcon={<Edit />}
+                                    onClick={() => navigate(`/collections/${data?.id}/edit`)}
+                                >
                                 Edit
-                            </Button>) : <></>
-                        }>
+                                </Button>
+                            ) : (
+                                <>
+                                    <LoadingButton
+                                        loading={loadingButtonState}
+                                        loadingPosition="end"
+                                        endIcon={<Save />}
+                                        variant="contained"
+                                        size="medium"
+                                        onClick={() => saveForm()}
+                                    >
+                                        Save
+                                    </LoadingButton>
+                                </>
+                            )
+                        : undefined}>
                     <Stack direction="row" justifyContent="center" alignItems="baseline" gap={2}>
                         <TextField
                             autoFocus
@@ -128,39 +155,66 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             />
                     </Stack>
                 </ContentHeader>
-                {mode===ViewModes.View ? (
-                    <ContentCard title={"Datasets"} actions={
-                        <>
-                            {/* <TextField size="small" id="dataset-search" 
-                            InputProps={{
-                                startAdornment: <InputAdornment position="start"><SearchRounded></SearchRounded></InputAdornment>,
-                              }}/> */}
-                            <Button variant={"contained"} size="medium" endIcon={<Add />} onClick={() => navigate(`/collections/${data?.id}/datasets/new`)}>
-                                New Dataset
-                            </Button>
-                        </>
-                    }>
-                        <DaregTable
-                            columns={datasetsTable}
-                            data={datasets || {results: []} as unknown as DaregAPIResponse<Dataset>}
-                            size="small"
-                            page={page}
-                            setPage={setPage}
-                        />
-                    </ContentCard>
-                ) : <></>}
-                
-                {mode===ViewModes.View || !facilities ? <></> : (<ContentCard title={"Select facility"}>
-                    <Stack direction="row" justifyContent="flex-start" alignItems="baseline" spacing={3}>
-                        <TemplateSelect label="" selectedId={data.facility as string} setSelectedId={(value) => handleChange("facility", value)} entities={facilities}/>
-                    </Stack>
-                </ContentCard>)}
-
-                {mode===ViewModes.View || !schemas ? <></> : (<ContentCard title={"Select default template"}>
-                    <Stack direction="row" justifyContent="flex-start" alignItems="baseline" spacing={3}>
-                        <TemplateSelect label="" selectedId={data.default_dataset_schema as string} setSelectedId={(value) => handleChange("default_dataset_schema", value)} entities={schemas}/>
-                    </Stack>
-                </ContentCard>)}
+                <TabContext value={tabContent}>
+                    {mode!==ViewModes.New ? 
+                        <ContentCard>
+                            <TabList onChange={(e, newValue) => setTabContent(newValue)} aria-label="lab API tabs example">
+                                <Tab label="Datasets" value={"0"} />
+                                <Tab label="Settings" value={"1"} />
+                            </TabList>
+                        </ContentCard>
+                    : null
+                    }
+                    <TabPanel value="0" sx={{p:0}}>
+                        <ContentCard title={"Datasets"} actions={
+                            <>
+                                {/* <TextField size="small" id="dataset-search" 
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start"><SearchRounded></SearchRounded></InputAdornment>,
+                                }}/> */}
+                                {data.perms!=="viewer" ? 
+                                <Button variant={"contained"} size="medium" endIcon={<Add />} onClick={() => navigate(`/collections/${data?.id}/datasets/new`)}>
+                                    New Dataset
+                                </Button> : null}
+                            </>
+                        }>
+                            <DaregTable
+                                columns={datasetsTable}
+                                data={datasets || {results: []} as unknown as DaregAPIResponse<Dataset>}
+                                size="small"
+                                page={page}
+                                setPage={setPage}
+                            />
+                        </ContentCard>
+                    </TabPanel>
+                    <TabPanel value="1" sx={{p:0}}>
+                        {!facilities ? <></> : (<ContentCard title={"Select facility"}>
+                            <Stack direction="row" justifyContent="flex-start" alignItems="baseline" spacing={3}>
+                                <TemplateSelect 
+                                    disabled={mode===ViewModes.View}
+                                    label=""
+                                    selectedId={data.facility as string}
+                                    setSelectedId={(value) => handleChange("facility", value)}
+                                    entities={{...facilities, results: facilities.results.filter((fac) => fac.perms != "viewer")}}
+                                />
+                            </Stack>
+                        </ContentCard>)}
+                        {!schemas ? <></> : (<ContentCard title={"Select default template"}>
+                            <Stack direction="row" justifyContent="flex-start" alignItems="baseline" spacing={3}>
+                                <TemplateSelect
+                                    disabled={mode===ViewModes.View}
+                                    label=""
+                                    selectedId={data.default_dataset_schema as string}
+                                    setSelectedId={(value) => handleChange("default_dataset_schema", value)}
+                                    entities={schemas}
+                                />
+                            </Stack>
+                        </ContentCard>)}
+                        {mode!==ViewModes.New ? 
+                            <PermissionsTable perms={mode===ViewModes.Edit ? data.perms : "viewer"} currentShares={currentShares} setCurrentShares={setCurrentShares}/>
+                        : null }
+                    </TabPanel>
+                </TabContext>
 
                 {/* <ContentCard title={"Preview"}>
                     {(true) ? 
