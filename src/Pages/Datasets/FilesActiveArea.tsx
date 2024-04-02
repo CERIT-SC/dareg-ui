@@ -6,99 +6,154 @@
 import { AddRounded, ArrowBackRounded, CheckRounded, CloudUploadRounded, ContentCopyRounded, ContentCutRounded, ContentPasteRounded, CreateNewFolderRounded, DeleteRounded, DeselectRounded, DownloadRounded, DriveFileRenameOutlineRounded, DynamicFeedRounded, FilterListRounded, FolderCopyRounded, OpenWithRounded, PeopleAltRounded, PlusOneRounded, SelectAllRounded } from "@mui/icons-material"
 import FilesHeadItem from "./FilesHeadItem"
 import FilesRowItem from "./FilesRowItem"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import WindowTextInput from "./WindowTextInput"
 import { Box, Button, Dialog, Divider, IconButton, Modal, Stack, Tooltip, Typography } from "@mui/material"
 import { ExplorerItem } from "../../types/global"
+import { File, Files, useGetFilesQuery } from "../../Services/files"
 
-const data:{info: ExplorerItem, content: ExplorerItem[]} = {
-  info: {
-    id: "0",
-    addDate: 0,
-    name: "folder",
-    size: -1,
-    upper: "A"
-  },
-  content: [
-    {
-      id: "1",
-      addDate: 1,
-      name: "folder1",
-      size: -1,
-      upper: "0"
-    },
-    {
-      id: "2",
-      addDate: 5,
-      name: "folder2",
-      size: -1,
-      upper: "0"
-    },
-    {
-      id: "3",
-      addDate: 11,
-      name: "aa.img",
-      size: 3901892,
-      upper: "0"
-    },
-    {
-      id: "4",
-      addDate: 1,
-      name: "bb.mp4",
-      size: 47827,
-      upper: "0"
-    },
-    {
-      id: "5",
-      addDate: 112,
-      name: "cc.mov",
-      size: 10000,
-      upper: "0"
-    },
-    {
-      id: "3",
-      addDate: 11,
-      name: "plant.img",
-      size: 372893,
-      upper: "0"
-    },
-    {
-      id: "4",
-      addDate: 1,
-      name: "measurement01.mp4",
-      size: 98893,
-      upper: "0"
-    },
-    {
-      id: "5",
-      addDate: 112,
-      name: "2024-01-01.mov",
-      size: 4792898427987,
-      upper: "0"
-    },
-    {
-      id: "3",
-      addDate: 11,
-      name: "biodata.img",
-      size: 798387,
-      upper: "0"
-    },
-    {
-      id: "4",
-      addDate: 1,
-      name: "cupcake.mp4",
-      size: 7183,
-      upper: "0"
-    },
-    {
-      id: "5",
-      addDate: 112,
-      name: "hello.mov",
-      size: 4239874,
-      upper: "0"
-    },
-  ]
-}
+
+// const data:{info: ExplorerItem, content: ExplorerItem[]} = {
+//   info: {
+//     id: "0",
+//     addDate: 0,
+//     name: "folder",
+//     size: -1,
+//     upper: "A"
+//   },
+//   content: [
+//     {
+//       id: "1",
+//       addDate: 1,
+//       name: "folder1",
+//       size: -1,
+//       upper: "0"
+//     },
+//     {
+//       id: "2",
+//       addDate: 5,
+//       name: "folder2",
+//       size: -1,
+//       upper: "0"
+//     },
+//     {
+//       id: "3",
+//       addDate: 11,
+//       name: "aa.img",
+//       size: 3901892,
+//       upper: "0"
+//     },
+//     {
+//       id: "4",
+//       addDate: 1,
+//       name: "bb.mp4",
+//       size: 47827,
+//       upper: "0"
+//     },
+//     {
+//       id: "5",
+//       addDate: 112,
+//       name: "cc.mov",
+//       size: 10000,
+//       upper: "0"
+//     },
+//     {
+//       id: "3",
+//       addDate: 11,
+//       name: "plant.img",
+//       size: 372893,
+//       upper: "0"
+//     },
+//     {
+//       id: "4",
+//       addDate: 1,
+//       name: "measurement01.mp4",
+//       size: 98893,
+//       upper: "0"
+//     },
+//     {
+//       id: "5",
+//       addDate: 112,
+//       name: "2024-01-01.mov",
+//       size: 4792898427987,
+//       upper: "0"
+//     },
+//     {
+//       id: "3",
+//       addDate: 11,
+//       name: "biodata.img",
+//       size: 798387,
+//       upper: "0"
+//     },
+//     {
+//       id: "4",
+//       addDate: 1,
+//       name: "cupcake.mp4",
+//       size: 7183,
+//       upper: "0"
+//     },
+//     {
+//       id: "5",
+//       addDate: 112,
+//       name: "hello.mov",
+//       size: 4239874,
+//       upper: "0"
+//     },
+//   ]
+// }
+
+// export type Files = {
+//   files: [
+//     ['name', string],
+//     ['file_id', string],
+//     ['mode', string],
+//     ['size', number],
+//     ['atime', string],
+//     ['mtime', string],
+//     ['ctime', string],
+//     ['owner_id', string],
+//     ['parent_id', string],
+//     ['provider_id', string],
+//     ['shares', string[]],
+//     ['type', 'DIR | FILE | REG'],
+//     ['children', Files[] | null]
+//   ]
+
+// }
+
+// Make function that takes a Files object and return data object
+const convertFilesToData = (files: Files): { info: ExplorerItem, content: ExplorerItem[] } => {
+  console.log("Files", files)
+  const { files: fileInfo } = files;
+  const [ name, file_id, mode, size, hard_links_count, atime, mtime, ctime, owner_id, parent_id, provider_id, storage_user_id, storage_group_id, shares, index, type, children] = fileInfo;
+
+  const info: ExplorerItem = {
+    id: file_id[1],
+    addDate: (new Date(ctime[1])).getTime(),
+    name: name[1],
+    size: size[1],
+    upper: parent_id[1],
+  };
+
+  let content: ExplorerItem[] = [];
+  if (children !== null) {
+    console.log("Children info", children[1])
+  }
+
+  content = (children[1] as unknown as File[])?.map((child: File) => {
+    console.log("Child", child)
+    const [ name, file_id, mode, size, hard_links_count, atime, mtime, ctime, owner_id, parent_id, provider_id, storage_user_id, storage_group_id, shares, index, type] = child;
+    return {
+      id: file_id[1],
+      addDate: (new Date(ctime[1] as string)).getTime(),
+      name: name[1],
+      size: size[1],
+      upper: "0",
+    } as unknown as ExplorerItem
+  }) ?? [];
+
+  return { info, content };
+};
 
 // Returns a human readable time label
 export const displayTime = (milliseconds: number) => {
@@ -183,6 +238,16 @@ const FilesActiveArea = (props: {
   const [shareItemModalVisible, setShareItemModalVisible] = useState(false)
   const [externalModalVisible, setExternalModalVisible] = useState(false)
 
+  const [ currentFolderId, setCurrentFolderId ] = useState(props.id)
+  const { data: filesData, isLoading } = useGetFilesQuery(currentFolderId)
+
+  const data = useMemo(() => {
+    if (filesData) {
+      return convertFilesToData(filesData);
+    }
+    return null;
+  }, [filesData])
+
   const clickHeader = (column: Column) => {
     if (sortBy===column) {
       setSortReverse(!sortReverse)
@@ -195,7 +260,7 @@ const FilesActiveArea = (props: {
   const [sortedItems, setSortedItems] = useState<ExplorerItem[]>([])
   const lastSelect = useRef(-1)
   useEffect(() => {
-    setSortedItems(stableSort(data.content, getComparator(sortReverse, sortBy)))
+    setSortedItems(stableSort(data?.content || [], getComparator(sortReverse, sortBy)))
   }, [sortReverse, sortBy, data])
 
   // Browse folders using arrow keys
@@ -250,6 +315,7 @@ const FilesActiveArea = (props: {
     else if (e.detail === 2) {
       if (item.size===-1) {
         props.changeId(item.id)
+        setCurrentFolderId(item.id)
         setSelectedItems([])
         lastSelect.current = -1
       }
@@ -261,169 +327,170 @@ const FilesActiveArea = (props: {
   }
 
   const handleBackButton = () => {
-    props.changeId(data.info.upper)
+    props.changeId(data?.info.upper || "")
     setSelectedItems([])
     lastSelect.current = -1
   }
-
-  return (
-    <>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
-        <Stack direction="row" overflow="auto" width={1} alignItems="center" spacing={2}>
-          <IconButton disabled={!data.info.upper} onClick={handleBackButton}><ArrowBackRounded/></IconButton>
-          <Typography noWrap variant="h6">{data.info.name==="" ? "My files" : data.info.name}</Typography>
-        </Stack>
-          <Stack direction="row" alignItems="center" spacing={2}>
-            
-            <Stack direction="row" alignItems="center" spacing={1} display={"flex"}>
-              <Tooltip title="New folder">
-                <IconButton onClick={() => setNewFolderModalVisible(true)} size="small">
-                  <CreateNewFolderRounded fontSize="small" />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title="Upload">
-                <IconButton onClick={() => {}} size="small">
-                  <CloudUploadRounded fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </Stack>
-
-
-            {selectedItems.length===1 ?
-              <>
-                <Stack direction="row" alignItems="center" spacing={1} display={"flex"}>
-                  
-                    <Tooltip title="Rename">
-                      <IconButton onClick={() => setRenameItemModalVisible(true)} size="small">
-                        <DriveFileRenameOutlineRounded fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Share">
-                      <IconButton onClick={() => setShareItemModalVisible(true)} size="small">
-                        <PeopleAltRounded fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    {selectedItems.filter((item) => item.size===-1).length===0 ? 
-                      <Tooltip title="Open with external application">
-                        <IconButton onClick={() => setExternalModalVisible(true)} size="small">
-                          <DynamicFeedRounded fontSize="small" />
-                        </IconButton>
-                      </Tooltip> 
-                    : null}
-                  
-                </Stack>
-              </>
-            : null}
-
-            {selectedItems.length > 0 && selectedItems.filter((item) => item.size===-1).length===0 ?
-              <>
-                <Tooltip title="Download">
-                  <IconButton onClick={() => {}} size="small">
-                    <DownloadRounded fontSize="small" />
+  if (data) {
+      return (
+      <>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
+          <Stack direction="row" overflow="auto" width={1} alignItems="center" spacing={2}>
+            <IconButton disabled={!data?.info.upper} onClick={handleBackButton}><ArrowBackRounded/></IconButton>
+            <Typography noWrap variant="h6">{data?.info.name==="" ? "My files" : data?.info.name}</Typography>
+          </Stack>
+            <Stack direction="row" alignItems="center" spacing={2}>
+              
+              <Stack direction="row" alignItems="center" spacing={1} display={"flex"}>
+                <Tooltip title="New folder">
+                  <IconButton onClick={() => setNewFolderModalVisible(true)} size="small">
+                    <CreateNewFolderRounded fontSize="small" />
                   </IconButton>
                 </Tooltip>
-              </>
-            : null}
 
-            {selectedItems.length > 0 ? // || itemSelection.mode!=="" ?
-              <>
-                <Stack direction="row" alignItems="center" spacing={1} display={"flex"}>
-                  {false ? //itemSelection.mode!=="" ? 
-                    <>
-                      <Tooltip title="Paste">
-                        <IconButton onClick={() => {}} size="small">
-                          <ContentPasteRounded fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Cancel selection">
-                        <IconButton onClick={() => {}} size="small">
-                          <DeselectRounded fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </>
-                  :
-                    <>
-                      <Tooltip title="Cut">
-                        <IconButton onClick={() => {}} size="small">
-                          <ContentCutRounded fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Copy">
-                        <IconButton onClick={() => {}} size="small">
-                          <ContentCopyRounded fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </>
-                  }
-                    <Tooltip title="Delete">
-                      <IconButton size="small">
-                        <DeleteRounded fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
+                <Tooltip title="Upload">
+                  <IconButton onClick={() => {}} size="small">
+                    <CloudUploadRounded fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+
+
+              {selectedItems.length===1 ?
+                <>
+                  <Stack direction="row" alignItems="center" spacing={1} display={"flex"}>
                     
-                </Stack>
-              </>
-            : null}
+                      <Tooltip title="Rename">
+                        <IconButton onClick={() => setRenameItemModalVisible(true)} size="small">
+                          <DriveFileRenameOutlineRounded fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Share">
+                        <IconButton onClick={() => setShareItemModalVisible(true)} size="small">
+                          <PeopleAltRounded fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      {selectedItems.filter((item) => item.size===-1).length===0 ? 
+                        <Tooltip title="Open with external application">
+                          <IconButton onClick={() => setExternalModalVisible(true)} size="small">
+                            <DynamicFeedRounded fontSize="small" />
+                          </IconButton>
+                        </Tooltip> 
+                      : null}
+                    
+                  </Stack>
+                </>
+              : null}
+
+              {selectedItems.length > 0 && selectedItems.filter((item) => item.size===-1).length===0 ?
+                <>
+                  <Tooltip title="Download">
+                    <IconButton onClick={() => {}} size="small">
+                      <DownloadRounded fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              : null}
+
+              {selectedItems.length > 0 ? // || itemSelection.mode!=="" ?
+                <>
+                  <Stack direction="row" alignItems="center" spacing={1} display={"flex"}>
+                    {false ? //itemSelection.mode!=="" ? 
+                      <>
+                        <Tooltip title="Paste">
+                          <IconButton onClick={() => {}} size="small">
+                            <ContentPasteRounded fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Cancel selection">
+                          <IconButton onClick={() => {}} size="small">
+                            <DeselectRounded fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </>
+                    :
+                      <>
+                        <Tooltip title="Cut">
+                          <IconButton onClick={() => {}} size="small">
+                            <ContentCutRounded fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Copy">
+                          <IconButton onClick={() => {}} size="small">
+                            <ContentCopyRounded fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </>
+                    }
+                      <Tooltip title="Delete">
+                        <IconButton size="small">
+                          <DeleteRounded fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      
+                  </Stack>
+                </>
+              : null}
+            </Stack>
+        </Stack>
+
+        {/*Drag&drop zone expanding div, also registers keyboard events*/}
+        <div
+          tabIndex={-1}
+          onKeyDown={keyDown}
+          style={{ outline: "none", flex: 1, flexDirection: "column", display: "flex", minWidth: "0", minHeight: "0" }}
+          //onDrop={handleFileDrop}
+          onDragOver={e => e.preventDefault()}
+          onDragLeave={e => e.preventDefault()} 
+        >
+          {/*Table headers*/}
+          <Stack direction="row" pl={1} pr={1} pb={0.5}>
+            <FilesHeadItem onClick={() => clickHeader("name")} sx={{ flex: 1 }} sort={sortBy==="name"?(sortReverse?"up":"down"):"none"} anchor="left" label="Name"/>
+            <FilesHeadItem onClick={() => clickHeader("addDate")} sx={{ width: 101 }} sort={sortBy==="addDate"?(sortReverse?"up":"down"):"none"} anchor="right" label="Date added"/>
+            <FilesHeadItem onClick={() => clickHeader("size")} sx={{ width: 80 }} sort={sortBy==="size"?(sortReverse?"up":"down"):"none"} anchor="right" label="Size"/>
           </Stack>
-      </Stack>
+          <Stack direction="column" height={1} overflow={"auto"}>
 
-      {/*Drag&drop zone expanding div, also registers keyboard events*/}
-      <div
-        tabIndex={-1}
-        onKeyDown={keyDown}
-        style={{ outline: "none", flex: 1, flexDirection: "column", display: "flex", minWidth: "0", minHeight: "0" }}
-        //onDrop={handleFileDrop}
-        onDragOver={e => e.preventDefault()}
-        onDragLeave={e => e.preventDefault()} 
-      >
-        {/*Table headers*/}
-        <Stack direction="row" pl={1} pr={1} pb={0.5}>
-          <FilesHeadItem onClick={() => clickHeader("name")} sx={{ flex: 1 }} sort={sortBy==="name"?(sortReverse?"up":"down"):"none"} anchor="left" label="Name"/>
-          <FilesHeadItem onClick={() => clickHeader("addDate")} sx={{ width: 101 }} sort={sortBy==="addDate"?(sortReverse?"up":"down"):"none"} anchor="right" label="Date added"/>
-          <FilesHeadItem onClick={() => clickHeader("size")} sx={{ width: 80 }} sort={sortBy==="size"?(sortReverse?"up":"down"):"none"} anchor="right" label="Size"/>
-        </Stack>
-        <Stack direction="column" height={1} overflow={"auto"}>
+            {sortedItems.map((item, index) =>
+              <>
+                <div onClick={(e) => handleClick(e, item, index)}>
+                  <Divider />
+                  <Box pb={0.35} pt={0.35} sx={{ backgroundColor: selectedItems.includes(item) ? (theme) => theme.palette.grey[300] : null }}>
+                      <Stack direction="row" pl={1} pr={1}>
+                        <FilesRowItem sx={{ flex: 1 }} anchor="left">{item.name}</FilesRowItem>
+                        <FilesRowItem sx={{ width: 101 }} anchor="right">{displayTime(Date.now()-(new Date (item.addDate).getTime()))}</FilesRowItem>
+                        <FilesRowItem sx={{ width: 80 }} anchor="right">{displaySize(item.size)}</FilesRowItem>
+                      </Stack>
+                  </Box>
+                </div>
+              </>
+            )}
+            <div onClick={() => setSelectedItems([])} style={{ flex: 1 }}/>
+          </Stack>
+        </div>
+        
 
-          {sortedItems.map((item, index) =>
-            <>
-              <div onClick={(e) => handleClick(e, item, index)}>
-                <Divider />
-                <Box pb={0.35} pt={0.35} sx={{ backgroundColor: selectedItems.includes(item) ? (theme) => theme.palette.grey[300] : null }}>
-                    <Stack direction="row" pl={1} pr={1}>
-                      <FilesRowItem sx={{ flex: 1 }} anchor="left">{item.name}</FilesRowItem>
-                      <FilesRowItem sx={{ width: 101 }} anchor="right">{displayTime(Date.now()-(new Date (item.addDate).getTime()))}</FilesRowItem>
-                      <FilesRowItem sx={{ width: 80 }} anchor="right">{displaySize(item.size)}</FilesRowItem>
-                    </Stack>
-                </Box>
-              </div>
-            </>
-          )}
-          <div onClick={() => setSelectedItems([])} style={{ flex: 1 }}/>
-        </Stack>
-      </div>
-      
+        <Dialog open={newFolderModalVisible} onClose={() => setNewFolderModalVisible(false)}>
+          <WindowTextInput 
+            item={{id: props.id}}
+            closeSelf={() => setNewFolderModalVisible(false)}
+            type="new"
+          />
+        </Dialog>
 
-      <Dialog open={newFolderModalVisible} onClose={() => setNewFolderModalVisible(false)}>
-        <WindowTextInput 
-          item={{id: props.id}}
-          closeSelf={() => setNewFolderModalVisible(false)}
-          type="new"
-        />
-      </Dialog>
-
-      <Dialog open={renameItemModalVisible} onClose={() => setRenameItemModalVisible(false)}>
-        <WindowTextInput
-          item={selectedItems[0]}
-          closeSelf={() => setRenameItemModalVisible(false)}
-          type="rename"
-        />
-      </Dialog>
+        <Dialog open={renameItemModalVisible} onClose={() => setRenameItemModalVisible(false)}>
+          <WindowTextInput
+            item={selectedItems[0]}
+            closeSelf={() => setRenameItemModalVisible(false)}
+            type="rename"
+          />
+        </Dialog>
 
 
-    </>
-
-  )
+      </>)
+  } else {
+    return <div>loading</div>
+  }
 }
 
 export default FilesActiveArea;

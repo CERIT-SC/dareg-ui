@@ -10,6 +10,7 @@ export type Project = DaregAPIObjectBase & {
   project_schema: string
   metadata: Object
   facility: string
+  onedata_space_id: string
 }
 
 export type ProjectsResponse = DaregAPIResponse<Project>
