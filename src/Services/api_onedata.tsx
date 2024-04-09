@@ -14,7 +14,7 @@ const getUser = () => {
 
 // Create our baseQuery instance
 const baseQuery = fetchBaseQuery({
-    baseUrl: config.REACT_APP_BASE_API_URL.replace("api", "onedata-api"),
+    baseUrl: config.REACT_APP_BASE_API_URL.replace("api/v1", "onedata-api/v1"),
     prepareHeaders: (headers, { getState }) => {
       const token = getUser()?.access_token
       console.log(token)
