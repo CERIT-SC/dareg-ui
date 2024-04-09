@@ -139,19 +139,19 @@ const convertFilesToData = (files: Files): { info: ExplorerItem, content: Explor
   if (children !== null) {
     console.log("Children info", children[1])
   }
-
-  content = (children[1] as unknown as File[])?.map((child: File) => {
-    console.log("Child", child)
-    const [ name, file_id, mode, size, hard_links_count, atime, mtime, ctime, owner_id, parent_id, provider_id, storage_user_id, storage_group_id, shares, index, type] = child;
-    return {
-      id: file_id[1],
-      addDate: (new Date(ctime[1] as string)).getTime(),
-      name: name[1],
-      size: size[1],
-      upper: "0",
-    } as unknown as ExplorerItem
-  }) ?? [];
-
+  if (children) {
+    content = (children[1] as unknown as File[])?.map((child: File) => {
+      console.log("Child", child)
+      const [ name, file_id, mode, size, hard_links_count, atime, mtime, ctime, owner_id, parent_id, provider_id, storage_user_id, storage_group_id, shares, index, type] = child;
+      return {
+        id: file_id[1],
+        addDate: (new Date(ctime[1] as string)).getTime(),
+        name: name[1],
+        size: size[1],
+        upper: parent_id[1],
+      } as unknown as ExplorerItem
+    }) ?? [];
+  }
   return { info, content };
 };
 
@@ -238,8 +238,8 @@ const FilesActiveArea = (props: {
   const [shareItemModalVisible, setShareItemModalVisible] = useState(false)
   const [externalModalVisible, setExternalModalVisible] = useState(false)
 
-  const [ currentFolderId, setCurrentFolderId ] = useState(props.id)
-  const { data: filesData, isLoading } = useGetFilesQuery(currentFolderId)
+  const [ currentFolderId, setCurrentFolderId ] = useState<string | null>(null)
+  const { data: filesData, isLoading } = useGetFilesQuery({ dataset_id: props.id, file_id: currentFolderId})
 
   const data = useMemo(() => {
     if (filesData) {
@@ -313,9 +313,10 @@ const FilesActiveArea = (props: {
       }
     }
     else if (e.detail === 2) {
+      console.log("Single click", item)
+      setCurrentFolderId(item.id)
       if (item.size===-1) {
         props.changeId(item.id)
-        setCurrentFolderId(item.id)
         setSelectedItems([])
         lastSelect.current = -1
       }
@@ -328,6 +329,7 @@ const FilesActiveArea = (props: {
 
   const handleBackButton = () => {
     props.changeId(data?.info.upper || "")
+    setCurrentFolderId(null)
     setSelectedItems([])
     lastSelect.current = -1
   }

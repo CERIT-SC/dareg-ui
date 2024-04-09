@@ -34,10 +34,13 @@ const OBJECT_NAME = 'files'
 
 export const filesApi = onedata_api.injectEndpoints({
   endpoints: (build) => ({
-    getFiles: build.query<Files, string>({
-      query: (dataset_id) => ({ url: `${OBJECT_NAME}/?dataset_id=${dataset_id}` }),
+    getFiles: build.query<Files, {dataset_id: string, file_id: string | null}>({
+      query: (arg) => {
+        const { dataset_id, file_id } = arg
+        return { url: `${OBJECT_NAME}`, params: {dataset_id, file_id}}
+      },
       providesTags: ['Files'],
-    })
+      })
   }),
 })
 

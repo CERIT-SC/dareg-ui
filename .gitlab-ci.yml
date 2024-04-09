@@ -84,19 +84,37 @@ build_image:
       - $CI_PROJECT_DIR/manifests/prepared/$APP_COMPONENT
     expire_in: 1 week
 
-review:
+# review:
+#   <<: *deploy
+#   stage: review
+#   variables:
+#     APP_COMPONENT: web
+#     APP: review-$CI_COMMIT_REF_SLUG
+#     APP_ID: review-$CI_COMMIT_REF_SLUG
+#     APP_HOST: $CI_COMMIT_REF_SLUG.${DEPLOYMENT_TLD}
+#     APP_HOST_FIX: test.${DEPLOYMENT_TLD_FIX}
+#   environment:
+#     name: review/$CI_COMMIT_REF_SLUG
+#     url: https://$CI_COMMIT_REF_SLUG.${DEPLOYMENT_TLD}
+#     on_stop: stop-review
+#   only:
+#     - branches
+#   except:
+#     - master
+
+dev:
   <<: *deploy
   stage: review
   variables:
     APP_COMPONENT: web
-    APP: review-$CI_COMMIT_REF_SLUG
-    APP_ID: review-$CI_COMMIT_REF_SLUG
-    APP_HOST: $CI_COMMIT_REF_SLUG.${DEPLOYMENT_TLD}
-    APP_HOST_FIX: test.${DEPLOYMENT_TLD_FIX}
+    APP_ID: dev
+    APP: dev
+    APP_HOST: dev.${DEPLOYMENT_TLD}
+    APP_HOST_FIX: dev.${DEPLOYMENT_TLD_FIX}
   environment:
-    name: review/$CI_COMMIT_REF_SLUG
-    url: https://$CI_COMMIT_REF_SLUG.${DEPLOYMENT_TLD}
-    on_stop: stop-review
+    name: staging
+    url: https://dev.${DEPLOYMENT_TLD_FIX}
+  when: manual
   only:
     - branches
   except:
@@ -143,10 +161,10 @@ stop-review:
     - kubectl delete deployments,services,ingresses,configmaps,secrets -n ${K8S_NAMESPACE} -l deployment-id=$APP
   when: manual
   variables:
-    APP: review-$CI_COMMIT_REF_SLUG
+    APP: dev
     GIT_STRATEGY: none
   environment:
-    name: review/$CI_COMMIT_REF_SLUG
+    name: dev
     action: stop
   only:
     - branches
