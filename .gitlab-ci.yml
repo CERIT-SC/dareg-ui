@@ -109,11 +109,11 @@ dev:
     APP_COMPONENT: web
     APP_ID: dev
     APP: dev
-    APP_HOST: dev.${DEPLOYMENT_TLD}
-    APP_HOST_FIX: dev.${DEPLOYMENT_TLD_FIX}
+    APP_HOST: devel.${DEPLOYMENT_TLD}
+    APP_HOST_FIX: devel.${DEPLOYMENT_TLD_FIX}
   environment:
     name: staging
-    url: https://dev.${DEPLOYMENT_TLD_FIX}
+    url: https://devel.${DEPLOYMENT_TLD_FIX}
   when: manual
   only:
     - branches
