@@ -19,6 +19,7 @@ import { Facility } from "../../Services/facilities";
 import FilesActiveArea from "./FilesActiveArea";
 import TemplateSelect from "../../Components/TemplateSelect";
 import PermissionsTable from "../../Components/PermissionsContainer/PermissionsTable";
+import SkeletonView from "../../Components/SkeletonView";
 
 type Props = {
     mode: ViewModes
@@ -33,7 +34,7 @@ const DatasetView = ({mode}: Props) => {
     
     const projectData = useGetProjectQuery(projectId as string).data
     
-    const datasetData = useGetDatasetQuery(datasetId as string, {skip: mode===ViewModes.New}).data
+    const {data: datasetData, isLoading: datasetLoading} = useGetDatasetQuery(datasetId as string, {skip: mode===ViewModes.New})
 
     const [ tabContent, setTabContent ] = useState<string>("0")
     
@@ -105,7 +106,7 @@ const DatasetView = ({mode}: Props) => {
         element.click();
     }
 
-    if (!loading){
+    if (!datasetLoading){
         return (
             <Box>
                 <ContentHeader<Dataset & Facility> title={`Dataset: ${mode}`} actions={
@@ -257,72 +258,7 @@ const DatasetView = ({mode}: Props) => {
         )
     } else {
         return (
-            <Box>
-                <ContentHeader title={`Dataset: ${mode}`} actions={
-                    <Skeleton>
-                        <Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => {}}>
-                            Edit
-                        </Button>
-                    </Skeleton>
-                    }>
-                    <Stack direction="row" justifyContent="center" alignItems="baseline" gap={2}>
-                        <Skeleton width={"33%"}>
-                            <TextField
-                            autoFocus
-                            margin="dense"
-                            label="Template name"
-                            fullWidth
-                            variant="outlined"
-                            value={""}
-                            disabled={true}
-                            sx={{maxWidth: "33.33%", background: "#FFF"}}
-                            />
-                        </Skeleton>
-                        <Skeleton width={"67%"}>
-                        <TextField
-                            margin="dense"
-                            label="Template description"
-                            fullWidth
-                            variant="outlined"
-                            value={""}
-                            disabled={true}
-                            sx={{maxWidth: "66.67%", background: "#FFF"}}
-                            />
-                        </Skeleton>
-                    </Stack>
-                </ContentHeader>
-                <ContentCard title={"Metadata"}>
-                    <Skeleton width={"100%"} height={"4em"}/>
-                    <Skeleton width={"100%"} height={"3em"}/>
-                    <Skeleton width={"100%"} height={"3em"}/>
-                    <Skeleton width={"75%"} height={"2em"}/>
-                    <Skeleton width={"50%"} height={"2em"}/>
-                    <Skeleton width={"25%"} height={"2em"}/>
-                </ContentCard>
-                <ContentCard paperProps={{variant: "elevation", elevation: 0}} sx={{mb: 2, p: 0}}>
-                    <Stack gap={2} direction="row" justifyContent="flex-start">
-                        <Skeleton width={"5%"} height={"4em"}>
-                        {mode===ViewModes.View ? <></> : (
-                            <LoadingButton
-                                loading={loadingButtonState}
-                                loadingPosition="end"
-                                endIcon={<Save />}
-                                variant="contained"
-                                size="large"
-                                onClick={() => saveForm()}
-                            >
-                                Save
-                            </LoadingButton>
-                        )}
-                        </Skeleton>
-                        <Skeleton>
-                            <Button variant="contained" size="large" endIcon={<DataObject />} onClick={() => downloadMetadata()}>
-                                Download metadata
-                            </Button>
-                        </Skeleton>
-                    </Stack>
-                </ContentCard>
-            </Box>
+            <SkeletonView name={"Dataset"} mode={mode}/>
         )
     }
 }

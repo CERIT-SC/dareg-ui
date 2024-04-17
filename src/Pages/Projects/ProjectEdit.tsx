@@ -15,6 +15,7 @@ import { useGetFacilitiesQuery } from "../../Services/facilities";
 import { Dataset, useGetDatasetsQuery } from "../../Services/datasets";
 import DateTimeFormatter from "../../Components/DateTimeFormatter";
 import PermissionsTable from "../../Components/PermissionsContainer/PermissionsTable";
+import SkeletonView from "../../Components/SkeletonView";
 
 export type ProjectDataStateKeys = keyof ProjectsData;
 
@@ -40,8 +41,8 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
     const [ loadingButtonState, setLoadingButtonState ] = useState<boolean>(false)
 
     const [ currentShares, setCurrentShares ] = useState<SharesList>(data.shares)
+    const {data: projectData, isLoading: projectDataLoading} = useGetProjectQuery(projectId as string, {skip: mode===ViewModes.New})
 
-    const projectData = useGetProjectQuery(projectId as string, {skip: mode===ViewModes.New}).data
     useEffect(() => {
         if ((mode===ViewModes.Edit||mode===ViewModes.View) && projectData)
             setData({
@@ -102,7 +103,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
         )}
     ]
 
-    if (data){
+    if (!projectDataLoading){
         return (
             <Box>
                 <ContentHeader title={`Collection: ${mode}`} actions={
@@ -238,44 +239,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
         )
     } else {
         return (
-            <Box>
-                <ContentHeader title={`Template: ${mode}`} actions={
-                    <Skeleton>
-                        <Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => {}}>
-                            Edit
-                        </Button>
-                    </Skeleton>
-                    }>
-                    <Stack direction="row" justifyContent="center" alignItems="baseline" gap={2}>
-                        <Skeleton width={"33%"}>
-                            <TextField
-                            autoFocus
-                            margin="dense"
-                            label="Template name"
-                            fullWidth
-                            variant="outlined"
-                            value={""}
-                            disabled={true}
-                            sx={{maxWidth: "33.33%", background: "#FFF"}}
-                            />
-                        </Skeleton>
-                        <Skeleton width={"67%"}>
-                        <TextField
-                            margin="dense"
-                            label="Template description"
-                            fullWidth
-                            variant="outlined"
-                            value={""}
-                            disabled={true}
-                            sx={{maxWidth: "66.67%", background: "#FFF"}}
-                            />
-                        </Skeleton>
-                    </Stack>
-                </ContentHeader>
-                <ContentCard title={"Form"}>
-                    <Skeleton />
-                </ContentCard>
-            </Box>
+            <SkeletonView name="Collection" mode={mode} />
         )
     }
 }
