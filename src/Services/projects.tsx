@@ -82,7 +82,3 @@ export const {
 export const {
     endpoints: { getProjects, addProject, updateProject, deleteProject, getErrorProne },
 } = projectsApi
-
-export const {
-  endpoints: { getProject },
-} = projectsApi

@@ -1,3 +1,5 @@
+import { PermissionModes } from "./enums"
+
 export type FacilityData = {
     id?: string,
     name: string,
@@ -6,11 +8,15 @@ export type FacilityData = {
     url: string,
 }
 
+export type SharesList = {id: string, name: string, perms: string}[]
+
 export interface DaregAPIResponse<T> {
     count: number,
     next: string,
     previous: string,
     results: T[],
+    perms: PermissionModes,
+    shares: SharesList,
 }
 
 export type DaregAPIObjectBase = {
@@ -19,6 +25,8 @@ export type DaregAPIObjectBase = {
     modified: string,
     created_by?: {id: number, full_name: string},
     modified_by: string,
+    perms: PermissionModes,
+    shares: SharesList,
 }
 
 export type DaregAPIMinimalNestedObject = {
@@ -46,7 +54,9 @@ export type ProjectsData = {
     project_schema: string | undefined,
     metadata: Object,
     created?: string,
-    facility: string | undefined
+    facility: string | undefined,
+    perms: PermissionModes,
+    shares: SharesList,
   }
 
 export type FormData = {
@@ -81,6 +91,20 @@ export type ExplorerItem = {
     upper: string,
     addDate: number, 
     size: number
+}
+
+export type UserData = {
+    id: string,
+    name: string,
+}
+
+export type ProfileData = {
+    id: string,
+    full_name: string,
+    default_data_rows: number,
+    any_datasets: boolean,
+    any_facilities: boolean,
+    any_projects: boolean,
 }
 
 module.exports = {

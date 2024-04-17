@@ -45,7 +45,7 @@ const baseQuery = fetchBaseQuery({
      * Tag types must be defined in the original API definition
      * for any tags that would be provided by injected endpoints
      */
-    tagTypes: ['Projects', 'Datasets', 'Schemas', 'Facilities', 'Metadata'],
+    tagTypes: ['Projects', 'Datasets', 'Schemas', 'Facilities', 'Metadata', 'Users', 'Profile'],
     /**
      * This api has endpoints injected in adjacent files,
      * which is why no endpoints are shown below.
