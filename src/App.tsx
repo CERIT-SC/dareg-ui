@@ -30,7 +30,7 @@ const App = () => {
     palette: {
       mode: selectedTheme==="system" ? (prefersDarkMode ? "light" : "dark") : selectedTheme,
       primary: {main: "#2b8600"},
-      secondary: {main: "#2d3c25"}
+      secondary: {main: "#54604d"}
 
     }
   })

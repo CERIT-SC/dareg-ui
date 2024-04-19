@@ -213,7 +213,7 @@ const DatasetView = ({mode}: Props) => {
                         </ContentCard>
                     </TabPanel>
                     <TabPanel value="1" sx={{p:0}}>
-                        <ContentCard title={"Files Preview"} actions={
+                        <ContentCard title={"Files preview"} actions={
                             <Button variant="contained" size="small" onClick={() => window.open(`"${config.REACT_APP_BASE_ONEZONE_URL}/i#/onedata/spaces/${projectData?.onedata_space_id}/data`, "_blank")}>
                                 Open folder in Onedata
                             </Button>

@@ -3,14 +3,15 @@
  */
 
 
-import { AddRounded, ArrowBackRounded, CheckRounded, CloudUploadRounded, ContentCopyRounded, ContentCutRounded, ContentPasteRounded, CreateNewFolderRounded, DeleteRounded, DeselectRounded, DownloadRounded, DriveFileRenameOutlineRounded, DynamicFeedRounded, FilterListRounded, FolderCopyRounded, OpenWithRounded, PeopleAltRounded, PlusOneRounded, SelectAllRounded } from "@mui/icons-material"
+import { AddRounded, ArrowBackRounded, CheckRounded, CloudUploadRounded, ContentCopyRounded, ContentCutRounded, ContentPasteRounded, CreateNewFolderRounded, DeleteRounded, DeselectRounded, DownloadRounded, DriveFileRenameOutlineRounded, DynamicFeedRounded, FilterListRounded, Folder, FolderCopyRounded, InsertDriveFile, OpenWithRounded, PeopleAltRounded, PlusOneRounded, RestartAlt, SelectAllRounded } from "@mui/icons-material"
 import FilesHeadItem from "./FilesHeadItem"
 import FilesRowItem from "./FilesRowItem"
 import { useEffect, useMemo, useRef, useState } from "react"
 import WindowTextInput from "./WindowTextInput"
-import { Box, Button, Dialog, Divider, IconButton, Modal, Stack, Tooltip, Typography } from "@mui/material"
+import { Box, Button, ButtonProps, Dialog, Divider, IconButton, Modal, Stack, Tooltip, Typography, styled } from "@mui/material"
 import { ExplorerItem } from "../../types/global"
 import { File, Files, useGetFilesQuery } from "../../Services/files"
+import MyIconButton from "./MyIconButton"
 
 
 // const data:{info: ExplorerItem, content: ExplorerItem[]} = {
@@ -257,10 +258,10 @@ const FilesActiveArea = (props: {
       setSortReverse(false)
     }
   }
-  const [sortedItems, setSortedItems] = useState<ExplorerItem[]>([])
   const lastSelect = useRef(-1)
-  useEffect(() => {
-    setSortedItems(stableSort(data?.content || [], getComparator(sortReverse, sortBy)))
+
+  const sortedItems = useMemo(() => {
+    return stableSort(data?.content || [], getComparator(sortReverse, sortBy))
   }, [sortReverse, sortBy, data])
 
   // Browse folders using arrow keys
@@ -339,45 +340,35 @@ const FilesActiveArea = (props: {
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
           <Stack direction="row" overflow="auto" width={1} alignItems="center" spacing={2}>
             <IconButton disabled={!data?.info.upper} onClick={handleBackButton}><ArrowBackRounded/></IconButton>
-            <Typography noWrap variant="h6">{data?.info.name==="" ? "My files" : data?.info.name}</Typography>
+            <Typography noWrap variant="h6" fontSize={22}>{data?.info.name==="" ? "My files" : data?.info.name}</Typography>
           </Stack>
-            <Stack direction="row" alignItems="center" spacing={2}>
+            <Stack sx={{ border: "solid", borderWidth: "1px", borderRadius: 1, borderColor: (theme) => theme.palette.grey[300], paddingLeft: 1, paddingRight: 1 }} direction="row" alignItems="center" spacing={1} divider={<Divider sx={{ color: "black", height: 32 }} orientation="vertical"/>}>
               
-              <Stack direction="row" alignItems="center" spacing={1} display={"flex"}>
-                <Tooltip title="New folder">
-                  <IconButton onClick={() => setNewFolderModalVisible(true)} size="small">
-                    <CreateNewFolderRounded fontSize="small" />
-                  </IconButton>
-                </Tooltip>
+              <Stack direction="row" alignItems="center" display={"flex"}>
+                <MyIconButton tooltip="New folder" onClick={() => setNewFolderModalVisible(true)}>
+                  <CreateNewFolderRounded fontSize="inherit" />
+                </MyIconButton>
 
-                <Tooltip title="Upload">
-                  <IconButton onClick={() => {}} size="small">
-                    <CloudUploadRounded fontSize="small" />
-                  </IconButton>
-                </Tooltip>
+                  <MyIconButton tooltip="Upload" onClick={() => {}}>
+                    <CloudUploadRounded fontSize="inherit" />
+                  </MyIconButton>
               </Stack>
 
 
               {selectedItems.length===1 ?
                 <>
-                  <Stack direction="row" alignItems="center" spacing={1} display={"flex"}>
+                  <Stack direction="row" alignItems="center" display={"flex"}>
                     
-                      <Tooltip title="Rename">
-                        <IconButton onClick={() => setRenameItemModalVisible(true)} size="small">
-                          <DriveFileRenameOutlineRounded fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Share">
-                        <IconButton onClick={() => setShareItemModalVisible(true)} size="small">
-                          <PeopleAltRounded fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+                      <MyIconButton tooltip="Rename" onClick={() => setRenameItemModalVisible(true)}>
+                        <DriveFileRenameOutlineRounded fontSize="inherit" />
+                      </MyIconButton>
+                        <MyIconButton tooltip="Share" onClick={() => setShareItemModalVisible(true)}>
+                          <PeopleAltRounded fontSize="inherit" />
+                        </MyIconButton>
                       {selectedItems.filter((item) => item.size===-1).length===0 ? 
-                        <Tooltip title="Open with external application">
-                          <IconButton onClick={() => setExternalModalVisible(true)} size="small">
-                            <DynamicFeedRounded fontSize="small" />
-                          </IconButton>
-                        </Tooltip> 
+                          <MyIconButton tooltip="Open with external application" onClick={() => setExternalModalVisible(true)}>
+                            <DynamicFeedRounded fontSize="inherit" />
+                          </MyIconButton>
                       : null}
                     
                   </Stack>
@@ -386,49 +377,37 @@ const FilesActiveArea = (props: {
 
               {selectedItems.length > 0 && selectedItems.filter((item) => item.size===-1).length===0 ?
                 <>
-                  <Tooltip title="Download">
-                    <IconButton onClick={() => {}} size="small">
-                      <DownloadRounded fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
+                  <MyIconButton tooltip="Download" onClick={() => {}}>
+                    <DownloadRounded fontSize="inherit" />
+                  </MyIconButton>
                 </>
               : null}
 
               {selectedItems.length > 0 ? // || itemSelection.mode!=="" ?
                 <>
-                  <Stack direction="row" alignItems="center" spacing={1} display={"flex"}>
+                  <Stack direction="row" alignItems="center" display={"flex"}>
                     {false ? //itemSelection.mode!=="" ? 
                       <>
-                        <Tooltip title="Paste">
-                          <IconButton onClick={() => {}} size="small">
-                            <ContentPasteRounded fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Cancel selection">
-                          <IconButton onClick={() => {}} size="small">
-                            <DeselectRounded fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                        <MyIconButton tooltip="Paste" onClick={() => {}}>
+                          <ContentPasteRounded fontSize="inherit" />
+                        </MyIconButton>
+                        <MyIconButton tooltip="Cancel selection" onClick={() => {}}>
+                          <DeselectRounded fontSize="inherit" />
+                        </MyIconButton>
                       </>
                     :
                       <>
-                        <Tooltip title="Cut">
-                          <IconButton onClick={() => {}} size="small">
-                            <ContentCutRounded fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Copy">
-                          <IconButton onClick={() => {}} size="small">
-                            <ContentCopyRounded fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                        <MyIconButton tooltip="Cut" onClick={() => {}}>
+                          <ContentCutRounded fontSize="inherit" />
+                        </MyIconButton>
+                        <MyIconButton tooltip="Copy" onClick={() => {}}>
+                          <ContentCopyRounded fontSize="inherit" />
+                        </MyIconButton>
                       </>
                     }
-                      <Tooltip title="Delete">
-                        <IconButton size="small">
-                          <DeleteRounded fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+                      <MyIconButton tooltip="Delete">
+                        <DeleteRounded fontSize="inherit" />
+                      </MyIconButton>
                       
                   </Stack>
                 </>
@@ -446,9 +425,10 @@ const FilesActiveArea = (props: {
           onDragLeave={e => e.preventDefault()} 
         >
           {/*Table headers*/}
-          <Stack direction="row" pl={1} pr={1} pb={0.5}>
+          <Stack direction="row" p={1}>
+            <Folder sx={{ marginRight: 1.5, visibility: "hidden" }} fontSize="small"></Folder>
             <FilesHeadItem onClick={() => clickHeader("name")} sx={{ flex: 1 }} sort={sortBy==="name"?(sortReverse?"up":"down"):"none"} anchor="left" label="Name"/>
-            <FilesHeadItem onClick={() => clickHeader("addDate")} sx={{ width: 101 }} sort={sortBy==="addDate"?(sortReverse?"up":"down"):"none"} anchor="right" label="Date added"/>
+            <FilesHeadItem onClick={() => clickHeader("addDate")} sx={{ width: 103 }} sort={sortBy==="addDate"?(sortReverse?"up":"down"):"none"} anchor="right" label="Date added"/>
             <FilesHeadItem onClick={() => clickHeader("size")} sx={{ width: 80 }} sort={sortBy==="size"?(sortReverse?"up":"down"):"none"} anchor="right" label="Size"/>
           </Stack>
           <Stack direction="column" height={1} overflow={"auto"}>
@@ -456,11 +436,16 @@ const FilesActiveArea = (props: {
             {sortedItems.map((item, index) =>
               <>
                 <div onClick={(e) => handleClick(e, item, index)}>
-                  <Divider />
-                  <Box pb={0.35} pt={0.35} sx={{ backgroundColor: selectedItems.includes(item) ? (theme) => theme.palette.grey[300] : null }}>
-                      <Stack direction="row" pl={1} pr={1}>
+                  <Divider/>
+                  <Box pb={0.35} pt={0.35} sx={{ backgroundColor: selectedItems.includes(item) ? (theme) => theme.palette.grey[200] : null }}>
+                      <Stack direction="row" pl={1} pr={1} alignItems={"center"}>
+                        {item.name.includes(".") ?
+                          <InsertDriveFile sx={{ marginRight: 1.5, opacity: 0.7 }} fontSize="small"></InsertDriveFile>
+                          :
+                          <Folder sx={{ marginRight: 1.5, opacity: 0.7 }} fontSize="small"></Folder>
+                        }
                         <FilesRowItem sx={{ flex: 1 }} anchor="left">{item.name}</FilesRowItem>
-                        <FilesRowItem sx={{ width: 101 }} anchor="right">{displayTime(Date.now()-(new Date (item.addDate).getTime()))}</FilesRowItem>
+                        <FilesRowItem sx={{ width: 103 }} anchor="right">{displayTime(Date.now()-(new Date (item.addDate).getTime()))}</FilesRowItem>
                         <FilesRowItem sx={{ width: 80 }} anchor="right">{displaySize(item.size)}</FilesRowItem>
                       </Stack>
                   </Box>
