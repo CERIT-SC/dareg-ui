@@ -3,12 +3,12 @@
  */
 
 
-import { AddRounded, ArrowBackRounded, CheckRounded, CloudUploadRounded, ContentCopyRounded, ContentCutRounded, ContentPasteRounded, CreateNewFolderRounded, DeleteRounded, DeselectRounded, DownloadRounded, DriveFileRenameOutlineRounded, DynamicFeedRounded, FilterListRounded, Folder, FolderCopyRounded, InsertDriveFile, OpenWithRounded, PeopleAltRounded, PlusOneRounded, RestartAlt, SelectAllRounded } from "@mui/icons-material"
+import { AddRounded, ArrowBackRounded, CheckRounded, CloudUploadRounded, ContentCopyRounded, ContentCutRounded, ContentPasteRounded, CreateNewFolderRounded, DeleteRounded, DeselectRounded, DownloadRounded, DriveFileRenameOutlineRounded, DynamicFeedRounded, FilterListRounded, Folder, FolderCopyRounded, InsertDriveFile, OpenWithRounded, PeopleAltRounded, PlusOneRounded, RestartAlt, Search, SelectAllRounded } from "@mui/icons-material"
 import FilesHeadItem from "./FilesHeadItem"
 import FilesRowItem from "./FilesRowItem"
 import { useEffect, useMemo, useRef, useState } from "react"
 import WindowTextInput from "./WindowTextInput"
-import { Box, Button, ButtonProps, Dialog, Divider, IconButton, Modal, Stack, Tooltip, Typography, styled } from "@mui/material"
+import { Box, Button, ButtonProps, Dialog, Divider, IconButton, InputAdornment, Modal, Stack, TextField, Tooltip, Typography, styled } from "@mui/material"
 import { ExplorerItem } from "../../types/global"
 import { File, Files, useGetFilesQuery } from "../../Services/files"
 import MyIconButton from "./MyIconButton"
@@ -131,6 +131,7 @@ const convertFilesToData = (files: Files): { info: ExplorerItem, content: Explor
   const info: ExplorerItem = {
     id: file_id[1],
     addDate: (new Date(ctime[1])).getTime(),
+    modDate: (new Date(mtime[1])).getTime(),
     name: name[1],
     size: size[1],
     upper: parent_id[1],
@@ -147,6 +148,7 @@ const convertFilesToData = (files: Files): { info: ExplorerItem, content: Explor
       return {
         id: file_id[1],
         addDate: (new Date(ctime[1] as string)).getTime(),
+        modDate: (new Date(mtime[1] as string)).getTime(),
         name: name[1],
         size: size[1],
         upper: parent_id[1],
@@ -225,6 +227,7 @@ export function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => n
 const FilesActiveArea = (props: {
   id: string,
   changeId: (id: string) => void,
+  autoRefresh: boolean,
   //isSelector: boolean | undefined
 }) => {
 
@@ -238,9 +241,11 @@ const FilesActiveArea = (props: {
   const [renameItemModalVisible, setRenameItemModalVisible] = useState(false)
   const [shareItemModalVisible, setShareItemModalVisible] = useState(false)
   const [externalModalVisible, setExternalModalVisible] = useState(false)
+  const [ searchTerm, setSearchTerm ] = useState<string>("")
 
   const [ currentFolderId, setCurrentFolderId ] = useState<string | null>(null)
-  const { data: filesData, isLoading } = useGetFilesQuery({ dataset_id: props.id, file_id: currentFolderId})
+  const { data: filesData, isLoading } = useGetFilesQuery({ dataset_id: props.id, file_id: currentFolderId}, {pollingInterval: props.autoRefresh ? 10000 : 0})
+
 
   const data = useMemo(() => {
     if (filesData) {
@@ -261,8 +266,13 @@ const FilesActiveArea = (props: {
   const lastSelect = useRef(-1)
 
   const sortedItems = useMemo(() => {
-    return stableSort(data?.content || [], getComparator(sortReverse, sortBy))
-  }, [sortReverse, sortBy, data])
+    if (searchTerm.length === 0){
+      return stableSort(data?.content || [], getComparator(sortReverse, sortBy))
+    } else {
+      const filtered = data?.content.filter((item: any) => item.name.includes(searchTerm))
+      return stableSort(filtered || [], getComparator(sortReverse, sortBy))
+    }
+  }, [sortReverse, sortBy, data, searchTerm])
 
   // Browse folders using arrow keys
   const keyDown = (e: any) => {
@@ -334,16 +344,21 @@ const FilesActiveArea = (props: {
     setSelectedItems([])
     lastSelect.current = -1
   }
+
+  const [searchFocus, setSearchFocus] = useState(false);
+  const [itemDetail, setItemDetail] = useState(true);
+
   if (data) {
       return (
       <>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
           <Stack direction="row" overflow="auto" width={1} alignItems="center" spacing={2}>
             <IconButton disabled={!data?.info.upper} onClick={handleBackButton}><ArrowBackRounded/></IconButton>
-            <Typography noWrap variant="h6" fontSize={22}>{data?.info.name==="" ? "My files" : data?.info.name}</Typography>
+            <Typography noWrap variant="h5" fontWeight={500}>{data?.info.name==="" ? "My files" : data?.info.name}</Typography>
           </Stack>
-            <Stack sx={{ border: "solid", borderWidth: "1px", borderRadius: 1, borderColor: (theme) => theme.palette.grey[300], paddingLeft: 1, paddingRight: 1 }} direction="row" alignItems="center" spacing={1} divider={<Divider sx={{ color: "black", height: 32 }} orientation="vertical"/>}>
-              
+          {selectedItems.length > 0 && selectedItems.filter((item) => item.size===-1).length===0 ?
+            <Stack sx={{ minHeight: 34, border: "solid", borderWidth: "1px", borderRadius: 1, borderColor: (theme) => theme.palette.grey[300], paddingLeft: 1, paddingRight: 1 }} direction="row" alignItems="center" spacing={1} divider={<Divider sx={{ color: "black", height: 32 }} orientation="vertical"/>}>
+              {true?null:<>
               <Stack direction="row" alignItems="center" display={"flex"}>
                 <MyIconButton tooltip="New folder" onClick={() => setNewFolderModalVisible(true)}>
                   <CreateNewFolderRounded fontSize="inherit" />
@@ -372,14 +387,6 @@ const FilesActiveArea = (props: {
                       : null}
                     
                   </Stack>
-                </>
-              : null}
-
-              {selectedItems.length > 0 && selectedItems.filter((item) => item.size===-1).length===0 ?
-                <>
-                  <MyIconButton tooltip="Download" onClick={() => {}}>
-                    <DownloadRounded fontSize="inherit" />
-                  </MyIconButton>
                 </>
               : null}
 
@@ -412,49 +419,130 @@ const FilesActiveArea = (props: {
                   </Stack>
                 </>
               : null}
+
+              </>}
+              
+                <>
+                  <MyIconButton tooltip="Download" onClick={() => {}}>
+                    <DownloadRounded fontSize="inherit" />
+                  </MyIconButton>
+                </>
+
             </Stack>
+            : null}
+            <Box sx={{ display: 'flex', alignItems: 'flex-end', ml: 3, fontSize: 22 }}>
+
+            <TextField
+              margin="dense"
+              size="small"
+              variant="outlined"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              sx={{ width: searchFocus ? 350 : 50, transition: "0.25s", m: 0 }}
+              onFocus={() => setSearchFocus(true)}
+              onBlur={() => searchTerm==="" ? setSearchFocus(false) : null}
+              InputLabelProps={{sx: {fontSize: 15, mt: -0.4}}}
+              InputProps={{ sx: {height: 34},
+                startAdornment: (
+                  <div style={{width: 36, pointerEvents: "none"}}>
+                    <InputAdornment sx={{width: 0, height: 0}} position="start">
+                      <Search />
+                    </InputAdornment>
+                  </div>
+                ),
+              }}
+          />
+          </Box>
         </Stack>
 
-        {/*Drag&drop zone expanding div, also registers keyboard events*/}
-        <div
-          tabIndex={-1}
-          onKeyDown={keyDown}
-          style={{ outline: "none", flex: 1, flexDirection: "column", display: "flex", minWidth: "0", minHeight: "0" }}
-          //onDrop={handleFileDrop}
-          onDragOver={e => e.preventDefault()}
-          onDragLeave={e => e.preventDefault()} 
-        >
-          {/*Table headers*/}
-          <Stack direction="row" p={1}>
-            <Folder sx={{ marginRight: 1.5, visibility: "hidden" }} fontSize="small"></Folder>
-            <FilesHeadItem onClick={() => clickHeader("name")} sx={{ flex: 1 }} sort={sortBy==="name"?(sortReverse?"up":"down"):"none"} anchor="left" label="Name"/>
-            <FilesHeadItem onClick={() => clickHeader("addDate")} sx={{ width: 103 }} sort={sortBy==="addDate"?(sortReverse?"up":"down"):"none"} anchor="right" label="Date added"/>
-            <FilesHeadItem onClick={() => clickHeader("size")} sx={{ width: 80 }} sort={sortBy==="size"?(sortReverse?"up":"down"):"none"} anchor="right" label="Size"/>
-          </Stack>
-          <Stack direction="column" height={1} overflow={"auto"}>
-
-            {sortedItems.map((item, index) =>
+      
+        <Stack direction="row">
+          {/*Drag&drop zone expanding div, also registers keyboard events*/}
+          <div
+            tabIndex={-1}
+            onKeyDown={keyDown}
+            style={{ outline: "none", flex: 1, flexDirection: "column", display: "flex", minWidth: "0", minHeight: "0" }}
+            //onDrop={handleFileDrop}
+            onDragOver={e => e.preventDefault()}
+            onDragLeave={e => e.preventDefault()} 
+          >
+            {/*Table headers*/}
+            <Stack direction="row" p={1}>
+              <Folder sx={{ marginRight: 3, visibility: "hidden" }} fontSize="medium"></Folder>
+              <FilesHeadItem onClick={() => clickHeader("name")} sx={{ flex: 1 }} sort={sortBy==="name"?(sortReverse?"up":"down"):"none"} anchor="left" label="Name"/>
+              {itemDetail && selectedItems.length !== 0 ? null :
               <>
-                <div onClick={(e) => handleClick(e, item, index)}>
-                  <Divider/>
-                  <Box pb={0.35} pt={0.35} sx={{ backgroundColor: selectedItems.includes(item) ? (theme) => theme.palette.grey[200] : null }}>
-                      <Stack direction="row" pl={1} pr={1} alignItems={"center"}>
-                        {item.name.includes(".") ?
-                          <InsertDriveFile sx={{ marginRight: 1.5, opacity: 0.7 }} fontSize="small"></InsertDriveFile>
-                          :
-                          <Folder sx={{ marginRight: 1.5, opacity: 0.7 }} fontSize="small"></Folder>
-                        }
-                        <FilesRowItem sx={{ flex: 1 }} anchor="left">{item.name}</FilesRowItem>
-                        <FilesRowItem sx={{ width: 103 }} anchor="right">{displayTime(Date.now()-(new Date (item.addDate).getTime()))}</FilesRowItem>
-                        <FilesRowItem sx={{ width: 80 }} anchor="right">{displaySize(item.size)}</FilesRowItem>
-                      </Stack>
-                  </Box>
-                </div>
+                <FilesHeadItem onClick={() => clickHeader("addDate")} sx={{ width: 103 }} sort={sortBy==="addDate"?(sortReverse?"up":"down"):"none"} anchor="right" label="Date added"/>
+                <FilesHeadItem onClick={() => clickHeader("size")} sx={{ width: 80 }} sort={sortBy==="size"?(sortReverse?"up":"down"):"none"} anchor="right" label="Size"/>
               </>
-            )}
-            <div onClick={() => setSelectedItems([])} style={{ flex: 1 }}/>
-          </Stack>
-        </div>
+              }
+            </Stack>
+            <Stack direction="column" height={1} overflow={"auto"}>
+
+              {sortedItems.map((item, index) =>
+                <>
+                  <div onClick={(e) => handleClick(e, item, index)}>
+                    <Divider/>
+                    <Box pb={1} pt={1} sx={{ backgroundColor: selectedItems.includes(item) ? (theme) => theme.palette.grey[200] : null }}>
+                        <Stack direction="row" pl={1} pr={1} alignItems={"center"}>
+                          {item.name.includes(".") ?
+                            <InsertDriveFile sx={{ marginRight: 3, opacity: 0.7 }} fontSize="medium"></InsertDriveFile>
+                            :
+                            <Folder sx={{ marginRight: 3, opacity: 0.7 }} fontSize="medium"></Folder>
+                          }
+                          <FilesRowItem sx={{ flex: 1 }} anchor="left">{item.name}</FilesRowItem>
+                          {itemDetail && selectedItems.length !== 0 ? null :
+                          <>
+                            <FilesRowItem sx={{ width: 103 }} anchor="right">{displayTime(Date.now()-(new Date (item.addDate).getTime()))}</FilesRowItem>
+                            <FilesRowItem sx={{ width: 80 }} anchor="right">{displaySize(item.size)}</FilesRowItem>
+                          </>
+                          }
+                        </Stack>
+                    </Box>
+                  </div>
+                </>
+              )}
+              <div onClick={() => setSelectedItems([])} style={{ flex: 1 }}/>
+            </Stack>
+          </div>
+          {itemDetail && selectedItems.length !== 0 ?
+            <Stack direction="row" pl={3}>
+              <Divider orientation="vertical" />
+              <Stack direction="column" width={400} px={3} py={2} spacing={0.5}>
+                <Typography variant="h5" fontWeight={500} pb={1}>Detail</Typography>
+
+                <Stack direction={"row"} justifyContent="space-between" spacing={3}>
+                  <Typography variant="body1">Name:</Typography>
+                  <Typography variant="body1">{selectedItems[0].name}</Typography>
+                </Stack>
+
+                <Stack direction={"row"} justifyContent="space-between" spacing={3}>
+                  <Typography variant="body1">ID:</Typography>
+                  <Typography textOverflow="ellipsis" overflow={"clip"} variant="body1">{selectedItems[0].id}</Typography>
+                </Stack>
+
+                <Stack direction={"row"} justifyContent="space-between" spacing={3}>
+                  <Typography variant="body1">Date added:</Typography>
+                  <Typography variant="body1">{displayTime(Date.now()-(new Date (selectedItems[0].addDate).getTime()))}</Typography>
+                </Stack>
+
+                <Stack direction={"row"} justifyContent="space-between" spacing={3}>
+                  <Typography variant="body1">Date modified:</Typography>
+                  <Typography variant="body1">{displayTime(Date.now()-(new Date (selectedItems[0].modDate).getTime()))}</Typography>
+                </Stack>
+
+                <Stack direction={"row"} justifyContent="space-between" spacing={3}>
+                  <Typography variant="body1">Size:</Typography>
+                  <Typography variant="body1">{displaySize(selectedItems[0].size)}</Typography>
+                </Stack>
+
+                <img src="https://lekarnacz.vshcdn.net/upload/dn/a-/dna-deoxyribonukleova-kyselina-zaklad-zivota-2362830-700x467-fit.jpg" alt="W3Schools.com"/>
+
+              </Stack>
+            </Stack>
+          : null}
+        
+        </Stack>
         
 
         <Dialog open={newFolderModalVisible} onClose={() => setNewFolderModalVisible(false)}>

@@ -1,5 +1,5 @@
-import { AccessTime, AccountCircle, Assignment, DataObject, Edit, HomeRepairService, Save } from "@mui/icons-material";
-import { Alert, Box, Button, Skeleton, Stack, Tab, TextField, Typography } from "@mui/material";
+import { AccessTime, AccountCircle, Assignment, Autorenew, DataObject, Edit, HomeRepairService, Save } from "@mui/icons-material";
+import { Alert, Box, Button, FormControlLabel, FormGroup, Skeleton, Stack, Switch, Tab, TextField, Typography } from "@mui/material";
 import ContentHeader from "../../Components/ContentHeader";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -103,6 +103,8 @@ const DatasetView = ({mode}: Props) => {
         document.body.appendChild(element); // Required for this to work in FireFox
         element.click();
     }
+
+    const [autoRefresh, setAutoRefresh] = useState(true)
 
     if (!loading){
         return (
@@ -214,11 +216,16 @@ const DatasetView = ({mode}: Props) => {
                     </TabPanel>
                     <TabPanel value="1" sx={{p:0}}>
                         <ContentCard title={"Files preview"} actions={
-                            <Button variant="contained" size="small" onClick={() => window.open(`"${config.REACT_APP_BASE_ONEZONE_URL}/i#/onedata/spaces/${projectData?.onedata_space_id}/data`, "_blank")}>
-                                Open folder in Onedata
-                            </Button>
+                            <>
+                                <FormGroup>
+                                    <FormControlLabel sx={{ width: 130 }} control={<Switch defaultChecked size="small" checked={autoRefresh} onChange={(e) => setAutoRefresh(e.target.checked)} />} label="Auto refresh" />
+                                </FormGroup>
+                                <Button variant="contained" size="small" onClick={() => window.open(`"${config.REACT_APP_BASE_ONEZONE_URL}/i#/onedata/spaces/${projectData?.onedata_space_id}/data`, "_blank")}>
+                                    Open folder in Onedata
+                                </Button>
+                            </>
                         }>
-                            <FilesActiveArea id={datasetId || ""} changeId={() => {}} />
+                            <FilesActiveArea id={datasetId || ""} changeId={() => {}} autoRefresh={autoRefresh} />
                         </ContentCard>
                     </TabPanel>
                     <TabPanel value="2" sx={{p:0}}>

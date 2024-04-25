@@ -80,7 +80,8 @@ export type ExplorerItem = {
     name: string,
     upper: string,
     addDate: number, 
-    size: number
+    modDate: number, 
+    size: number,
 }
 
 module.exports = {
