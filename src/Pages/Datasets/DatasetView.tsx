@@ -1,5 +1,5 @@
-import { AccessTime, AccountCircle, Assignment, DataObject, Edit, GroupAdd, HomeRepairService, Save } from "@mui/icons-material";
-import { Alert, Box, Button, Skeleton, Stack, Tab, TextField, Typography } from "@mui/material";
+import { AccessTime, AccountCircle, Assignment, DataObject, Delete, Edit, GroupAdd, HomeRepairService, Save } from "@mui/icons-material";
+import { Alert, Box, Button, Checkbox, Dialog, DialogContent, Divider, FormControl, Grid, IconButton, InputLabel, ListItemText, MenuItem, OutlinedInput, Paper, Select, SelectChangeEvent, Skeleton, Stack, Step, StepContent, StepLabel, Stepper, Tab, TextField, Typography } from "@mui/material";
 import ContentHeader from "../../Components/ContentHeader";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -106,6 +106,56 @@ const DatasetView = ({mode}: Props) => {
         element.click();
     }
 
+    const repos = [
+        "CF repo",
+        "CF plants",
+        "Test repo"
+    ]
+
+    const [ activeStep, setActiveStep ] = useState(0)
+    const [ loadingBttn, setLoadingBttn ] = useState(false)
+    const [ doiFailed, setDoiFailed ] = useState(false)
+    const [ repo, setRepo ] = useState<string[]>([])
+
+    const repoChange = (event: SelectChangeEvent<typeof repos>) => {
+        const { target: {value}, } = event
+        setRepo(typeof value === 'string' ? value.split(',') : value)
+    }
+
+    const requestDoi = () => {
+        setLoadingBttn(true);
+        setTimeout(() => {
+            if (doiFailed) {
+                setActiveStep(1)
+            }
+            else {
+                setLoadingBttn(false)
+                setDoiFailed(true)
+            }
+        }, 2000);
+    }
+
+    const MenuProps = {
+        PaperProps: {
+          style: {
+            maxHeight: 48 * 4.5 + 8,
+            width: 250,
+          },
+        },
+      };
+
+    const [newLinkWindow, setNewLinkWindow] = useState(false)
+    const [newLinkLabel, setNewLinkLabel] = useState("")
+    const [newLinkLevel, setNewLinkLevel] = useState("read")
+    const [shares, setShares] = useState<{id: number, level:"read"|"readwrite"|"full", label:string}[]>([])
+
+    const handleNewShare = () => {
+        setNewLinkWindow(false)
+        setShares([...shares, {id:Math.floor(Math.random() * 1000), level:newLinkLevel as "read"|"readwrite"|"full", label: newLinkLabel}])
+        setNewLinkLabel("")
+        setNewLinkLevel("read")
+    }
+
     if (!datasetLoading){
         return (
             <Box>
@@ -156,7 +206,9 @@ const DatasetView = ({mode}: Props) => {
                             <TabList onChange={(e, newValue) => setTabContent(newValue)} aria-label="lab API tabs example">
                                 <Tab label="Metadata" value={"0"} />
                                 <Tab label="Files" value={"1"} />
-                                <Tab label="Settings" value={"2"} />
+                                <Tab label="Pre-share" value={"2"} />
+                                <Tab label="Settings" value={"3"} />
+                                <Tab label="Publish" value={"4"} />
                             </TabList>
                     </ContentCard>
                     <TabPanel value="0" sx={{p:0}}>
@@ -203,6 +255,89 @@ const DatasetView = ({mode}: Props) => {
                         </ContentCard>
                     </TabPanel>
                     <TabPanel value="2" sx={{p:0}}>
+                        <ContentCard title={"Pre-share"} actions={
+                            <Button size="small" variant="contained" onClick={() => setNewLinkWindow(true)}>Add new</Button>
+                        }>
+                            <>
+                                {shares.length > 0 ? shares.map((share) => (
+                                <>
+                                    <Divider/>
+                                    <Stack direction="row" alignItems={"center"} spacing={2} py={1} justifyContent={"space-between"}>
+                                        <IconButton size="small" onClick={() => setShares(shares.filter((item) => item.id != share.id))}>
+                                            <Delete/>
+                                        </IconButton>
+                                        <Box flex={2} overflow="auto">
+                                            <Typography noWrap >https://devel.dareg.biodata.ceitec.cz/api/v1/share/fj2h2eo20wiojerigjeirg</Typography>
+                                        </Box>
+                                        <Box flex={1}>
+                                            <TextField label="Label" fullWidth size="small" value={share.label} onChange={(e) => setShares(shares.map((item) => item.id === share.id ? {...item, label: e.target.value} : item))}></TextField>
+                                        </Box>
+                                        <FormControl sx={{width: 200}}>
+                                            <InputLabel id={`${share.id}-label`}>Permissions</InputLabel>
+                                            <Select
+                                                labelId={`${share.id}-label`}
+                                                value={share.level}
+                                                label="Permissions"
+                                                size="small"
+                                                onChange={(e) => setShares(shares.map((item) => item.id === share.id ? {...item, level: e.target.value as "read"|"readwrite"|"full"} : item))}
+                                            >
+                                                <MenuItem value={"read"}>Read-only</MenuItem>
+                                                <MenuItem value={"readwrite"}>Read-write</MenuItem>
+                                                <MenuItem value={"full"}>Full access</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Stack>
+                                </>
+                                )) : <Typography>No active shares links</Typography>}
+                                <Dialog open={newLinkWindow} onClose={() => setNewLinkWindow(false)}>
+                                <DialogContent sx={{ width: 400 }}>
+                                        <Stack>
+                                                <Box>
+                                                    <Typography variant="h6">
+                                                        Add a new link share
+                                                    </Typography>
+                                                    <Typography variant="body2">
+                                                        You can add a label for later identification
+                                                    </Typography>
+                                                </Box>
+                                                <TextField
+                                                    autoFocus
+                                                    margin="dense"
+                                                    name="name"
+                                                    label="Label"
+                                                    type="text"
+                                                    fullWidth
+                                                    variant="filled"
+                                                    size="small"
+                                                    sx={{mt:1}}
+                                                    value={newLinkLabel}
+                                                    onChange={(e) => setNewLinkLabel(e.target.value)}
+                                                />
+                                                <FormControl sx={{mt:2}}>
+                                                <InputLabel id={"newshare-label"}>Permissions</InputLabel>
+                                                <Select
+                                                    labelId={"newshare-label"}
+                                                    value={newLinkLevel}
+                                                    label="Permissions"
+                                                    size="small"
+                                                    onChange={(e) => setNewLinkLevel(e.target.value)}
+                                                >
+                                                    <MenuItem value={"read"}>Read-only</MenuItem>
+                                                    <MenuItem value={"readwrite"}>Read-write</MenuItem>
+                                                    <MenuItem value={"full"}>Full access</MenuItem>
+                                                </Select>
+                                                </FormControl>
+
+                                            <Stack direction="row-reverse" spacing={2} sx={{mt:2}}>
+                                                <Button type="submit" onClick={handleNewShare} variant="contained">Submit</Button>
+                                            </Stack>
+                                        </Stack>
+                                </DialogContent>
+                                </Dialog>
+                            </>
+                        </ContentCard>
+                    </TabPanel>
+                    <TabPanel value="3" sx={{p:0}}>
                         <ContentCard title={"Dataset lifecycle settings"}>
                             <>
                                     <TextField 
@@ -233,6 +368,65 @@ const DatasetView = ({mode}: Props) => {
                         {mode!==ViewModes.New ? 
                             <PermissionsTable perms={mode===ViewModes.Edit ? data.perms : "viewer"} currentShares={currentShares} setCurrentShares={setCurrentShares}/>
                         : null }
+                    </TabPanel>
+                    <TabPanel value="4" sx={{p:0}}>
+                        <Grid container spacing={2}>
+                            <Grid item flex={1}>
+                                <ContentCard title={"Request DOI"}>
+                                    <Stepper activeStep={activeStep} orientation="vertical" sx={{pb: 1}}>
+                                        <Step key={"Request DOI"}>
+                                            <StepLabel>Request DOI</StepLabel>
+                                            <StepContent>
+                                                <Typography sx={{mt:1}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
+                                                <Stack direction="row" alignItems="baseline">
+                                                    <LoadingButton sx={{mt:1.5, mr: 2}} loading={loadingBttn} onClick={requestDoi} variant="contained">Request DOI</LoadingButton>
+                                                    {doiFailed ? 
+                                                        <Typography variant="overline" color="error" fontWeight={600} fontSize={13}>Request failed</Typography>
+                                                    : null}
+                                                </Stack>
+                                            </StepContent>
+                                        </Step>
+                                        <Step key={"Lock"}>
+                                            <StepLabel>DOI registered</StepLabel>
+                                            <StepContent>
+                                                <TextField label={"DOI"} sx={{mt:1}} onFocus={(e) => e.target.select()} fullWidth size="small" variant="outlined" value="https://doi.org/10.3352/jeehp.2013.10.3"></TextField>
+                                                <Typography sx={{mt:1.5}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
+                                                <Button onClick={() => setActiveStep(2)} sx={{mt:1.5}} variant="contained">Finalize</Button>
+                                            </StepContent>
+                                        </Step>
+                                        <Step key={"Finalized"} completed={activeStep===2}>
+                                            <StepLabel>Finalized</StepLabel>
+                                            <StepContent>
+                                                <TextField label={"DOI"} sx={{mt:1}} onFocus={(e) => e.target.select()} fullWidth size="small" variant="outlined" value="https://doi.org/10.3352/jeehp.2013.10.3"></TextField>
+                                                <Typography sx={{mt:1.5}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
+                                            </StepContent>
+                                        </Step>
+                                    </Stepper>
+                                </ContentCard>
+                            </Grid>
+                            <Grid item flex={1}>
+                                <ContentCard title={"Publication"}>
+                                    <>
+                                        <Typography sx={{mt:1.5}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
+                                        <FormControl fullWidth sx={{mt: 2.5}}>
+                                            <InputLabel id="repo-select">Select repositories</InputLabel>
+                                            <Select input={<OutlinedInput label="Select repositories" />} labelId="repo-select" fullWidth multiple value={repo} onChange={repoChange} renderValue={(selected) => selected.join(', ')} MenuProps={MenuProps}>
+                                                {repos.map((name) => (
+                                                    <MenuItem key={name} value={name}>
+                                                        <Checkbox checked={repo.indexOf(name) > -1}/>
+                                                        <ListItemText primary={name}/>
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                        <Box sx={{display: "flex", flexDirection:"row-reverse"}}>
+                                            <Button fullWidth sx={{mt:2.5}} variant="contained">Publish</Button>
+                                        </Box>
+                                    </>
+                                </ContentCard>
+                            </Grid>
+                        </Grid>
+
                     </TabPanel>
                 </TabContext>
                 <ContentCard paperProps={{variant: "elevation", elevation: 0}} sx={{mb: 2, p: 0}}>
