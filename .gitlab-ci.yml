@@ -54,14 +54,19 @@ build_app:
 
 build_image:
   stage: publish
-  image: docker:latest
-  services:
-    - docker:dind
+  image:
+    name: gcr.io/kaniko-project/executor:v1.14.0-debug
+    entrypoint: [""]
   before_script:
-    - docker login -u $HUB_REGISTRY_USER -p $HARBOR_PASSWORD $HARBOR_URL
+    - echo "{\"auths\":{\"${HARBOR_URL}\":{\"auth\":\"$(printf "%s:%s" "${HUB_REGISTRY_USER}" "${HARBOR_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+  #   - docker login -u $HUB_REGISTRY_USER -p $HARBOR_PASSWORD $HARBOR_URL
   script:
-    - docker build --tag $DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA --tag latest --tag $CI_COMMIT_REF_SLUG -f $CI_PROJECT_DIR/Dockerfile .
-    - docker push --all-tags $DOCKER_IMAGE_NAME
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "${DOCKER_IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+    # - docker build --tag $DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA --tag latest --tag $CI_COMMIT_REF_SLUG -f $CI_PROJECT_DIR/Dockerfile .
+    # - docker push --all-tags $DOCKER_IMAGE_NAME
   except:
     - tags
 
