@@ -1,4 +1,4 @@
-import { Avatar, Button, Table, TableCell, TableRow, Grid, Typography, Stack, Divider, Box } from '@mui/material';
+import { Button, Table, TableCell, TableRow, Grid, Typography, Stack, Divider, Box } from '@mui/material';
 import { useTranslation } from "react-i18next";
 import { useAuth } from "react-oidc-context";
 import ceitecLogo from "../ceitec_logo.png"
@@ -6,13 +6,12 @@ import useAvatar from '../Utils/useAvatar';
 import { User } from 'oidc-client-ts';
 import ContentHeader from '../Components/ContentHeader';
 import ContentCard from '../Components/ContentCard';
-import { Settings } from '@mui/icons-material';
 import SettingsMenu from '../Components/SettingsMenu';
 
 type AdvancedUser = User & {organization: string}
 const Profile = (props: {selectedTheme: string, setSelectedTheme: (theme: "light"|"dark"|"system") => void}) => {
     const auth = useAuth();
-    const { avatarUrl} = useAvatar();
+    const { avatarComponent} = useAvatar({size: 220});
     const { t, i18n } = useTranslation()
     const langDict:{[key: string]: string} = {
       "en-US": "English",
@@ -24,7 +23,7 @@ const Profile = (props: {selectedTheme: string, setSelectedTheme: (theme: "light
         </ContentHeader>
         <ContentCard title={`${t('auth.welcome')} ${auth.user?.profile.given_name},`}>
             <Stack alignItems={"center"} direction={"row"} spacing={3} divider={<Divider orientation="vertical" flexItem />}>
-                <Avatar sx={{width:200,height:200}} variant={"circular"} src={avatarUrl+"?s=200"} alt="Profile picture, gravatar of the logged in user" />
+                {avatarComponent}
                 <Table>
                         <TableRow>
                             <TableCell>

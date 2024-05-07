@@ -12,6 +12,11 @@ const config = {
     REACT_APP_OIDC_METADATA_token_endpoint: process.env.REACT_APP_OIDC_METADATA_token_endpoint || window.REACT_APP_OIDC_METADATA_token_endpoint,
     REACT_APP_OIDC_METADATA_userinfo_endpoint: process.env.REACT_APP_OIDC_METADATA_userinfo_endpoint || window.REACT_APP_OIDC_METADATA_userinfo_endpoint,
     REACT_APP_OIDC_METADATA_end_session_endpoint: process.env.REACT_APP_OIDC_METADATA_end_session_endpoint || window.REACT_APP_OIDC_METADATA_end_session_endpoint,
+
+    REACT_APP_VERSION: process.env.REACT_APP_VERSION || window.REACT_APP_VERSION,
+    REACT_APP_BUILD: process.env.REACT_APP_VERSION_DATE || window.REACT_APP_VERSION_DATE,
+    REACT_APP_ENVIRONMENT: process.env.REACT_APP_ENVIRONMENT || window.REACT_APP_ENVIRONMENT,
+
 }
 
 export default config;

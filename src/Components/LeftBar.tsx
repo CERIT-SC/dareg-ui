@@ -6,7 +6,9 @@ import ceitec_logo from '../ceitec_logo.png'
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
 import { useGetProfileQuery } from '../Services/profile';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import config from '../Config';
+import useAvatar from '../Utils/useAvatar';
 
 const LeftBar = (props: {setSection: (value: string) => void}) => {
   const LeftButton = styled(ListItemButton)(({}) => ({
@@ -19,6 +21,8 @@ const LeftBar = (props: {setSection: (value: string) => void}) => {
   const { t } = useTranslation()
   const location = useLocation();
   const profile = useGetProfileQuery(1)
+
+  const {avatarUrl, avatarComponent} = useAvatar({size: 48});
 
   useEffect(() => {
     if (profile.isSuccess) {
@@ -83,13 +87,16 @@ const LeftBar = (props: {setSection: (value: string) => void}) => {
               <ListItemText primary={t('LeftBar.logout')} />
             </ListItemButton>
           </ListItem>
-          <ListItem disablePadding>
+          <ListItem disablePadding sx={{border: "1px", borderStyle: "solid", borderColor: "#A5D46E", borderRadius: "4px", backgroundColor: "#DCF1D2"}}>
           <ListItemButton onClick={() => props.setSection("account")}>
               <ListItemIcon>
-                <Avatar sx={{width: "24px", height: "24px"}} />
+                {avatarComponent}
               </ListItemIcon>
               <ListItemText primary={auth.user?.profile.name || t('LeftBar.account')} />
             </ListItemButton>
+          </ListItem>
+          <ListItem>
+            <ListItemText primary={`Client ${config.REACT_APP_VERSION} (${config.REACT_APP_BUILD})`} secondary={`Server ${profile.data?.results[0]?.app_version?.version}-${profile.data?.results[0]?.app_version?.environment}`} />
           </ListItem>
         </List>
       </Box>

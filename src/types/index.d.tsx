@@ -15,5 +15,8 @@ declare global {
         REACT_APP_OIDC_METADATA_token_endpoint: string,
         REACT_APP_OIDC_METADATA_userinfo_endpoint: string,
         REACT_APP_OIDC_METADATA_end_session_endpoint: string
+        REACT_APP_VERSION_DATE: string,
+        REACT_APP_VERSION: string,
+        REACT_APP_ENVIRONMENT: string,
     }
 }
