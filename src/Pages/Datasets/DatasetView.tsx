@@ -1,5 +1,5 @@
-import { AccessTime, AccountCircle, Assignment, DataObject, Delete, Edit, GroupAdd, HomeRepairService, Save } from "@mui/icons-material";
-import { Alert, Box, Button, Checkbox, Dialog, DialogContent, Divider, FormControl, FormControlLabel, FormGroup, Grid, IconButton, InputLabel, ListItemText, MenuItem, OutlinedInput, Paper, Select, SelectChangeEvent, Skeleton, Stack, Step, StepContent, StepLabel, Stepper, Switch, Tab, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Checkbox, Dialog, DialogContent, Divider, FormControl, FormControlLabel, FormGroup, Grid, IconButton, Input, InputAdornment, InputLabel, ListItemText, MenuItem, OutlinedInput, Paper, Select, SelectChangeEvent, Skeleton, Stack, Step, StepContent, StepLabel, Stepper, Switch, Tab, TextField, Typography } from "@mui/material";
+import { AccessTime, AccountCircle, Assignment, Cancel, CheckCircle, ContentPaste, DataObject, Delete, Edit, GroupAdd, HomeRepairService, Save } from "@mui/icons-material";
 import ContentHeader from "../../Components/ContentHeader";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -160,6 +160,8 @@ const DatasetView = ({mode}: Props) => {
         setNewLinkLevel("read")
     }
 
+    const [formCorrect, setFormCorrect] = useState(false);
+
     const [autoRefresh, setAutoRefresh] = useState(true)
 
     if (!datasetLoading){
@@ -241,7 +243,7 @@ const DatasetView = ({mode}: Props) => {
                             ) : <></> }
                             {editorMode==='form' ? (
                                 schema && schema.uischema ? (
-                                    <FormsWrapped readonly={mode===ViewModes.View} schema={schema.schema} uischema={schema.uischema} data={data.metadata} setData={(value) => handleChange("metadata", value)} />
+                                    <FormsWrapped setErrors={(errors) => setFormCorrect(errors.length===0)} readonly={mode===ViewModes.View} schema={schema.schema} uischema={schema.uischema} data={data.metadata} setData={(value) => handleChange("metadata", value)} />
                                 ) : <><FormsWrapperSkeleton></FormsWrapperSkeleton></>
                             ) : (
                                 <CodeEditor
@@ -405,6 +407,7 @@ const DatasetView = ({mode}: Props) => {
                                             <StepLabel>Request DOI</StepLabel>
                                             <StepContent>
                                                 <Typography sx={{mt:1}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
+
                                                 <Stack direction="row" alignItems="baseline">
                                                     <LoadingButton sx={{mt:1.5, mr: 2}} loading={loadingBttn} onClick={requestDoi} variant="contained">Request DOI</LoadingButton>
                                                     {doiFailed ? 
@@ -416,16 +419,23 @@ const DatasetView = ({mode}: Props) => {
                                         <Step key={"Lock"}>
                                             <StepLabel>DOI registered</StepLabel>
                                             <StepContent>
-                                                <TextField label={"DOI"} sx={{mt:1}} onFocus={(e) => e.target.select()} fullWidth size="small" variant="outlined" value="https://doi.org/10.3352/jeehp.2013.10.3"></TextField>
+                                                <FormControl fullWidth>
+                                                    <Input endAdornment={<InputAdornment position="end"><IconButton><ContentPaste/></IconButton></InputAdornment>} disabled id="doiReg" sx={{mt:1}} fullWidth value="https://doi.org/10.3352/jeehp.2013.10.3"></Input>
+                                                </FormControl>
                                                 <Typography sx={{mt:1.5}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
-                                                <Button onClick={() => setActiveStep(2)} sx={{mt:1.5}} variant="contained">Finalize</Button>
+                                                <Stack direction="row" alignItems="baseline">
+                                                    <Button color="error" onClick={() => setActiveStep(2)} sx={{mt:1.5, mr:2}} variant="contained">Finalize</Button>
+                                                    <Typography variant="overline" color="error" fontWeight={600} fontSize={13}>This action is irreversible</Typography>
+                                                </Stack>
                                             </StepContent>
                                         </Step>
                                         <Step key={"Finalized"} completed={activeStep===2}>
                                             <StepLabel>Finalized</StepLabel>
                                             <StepContent>
-                                                <TextField label={"DOI"} sx={{mt:1}} onFocus={(e) => e.target.select()} fullWidth size="small" variant="outlined" value="https://doi.org/10.3352/jeehp.2013.10.3"></TextField>
-                                                <Typography sx={{mt:1.5}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
+                                            <FormControl fullWidth>
+                                                <Input endAdornment={<InputAdornment position="end"><IconButton><ContentPaste/></IconButton></InputAdornment>} disabled id="doiReg" sx={{mt:1}} fullWidth value="https://doi.org/10.3352/jeehp.2013.10.3"></Input>
+                                            </FormControl>
+                                            <Typography sx={{mt:1.5}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
                                             </StepContent>
                                         </Step>
                                     </Stepper>
@@ -435,9 +445,44 @@ const DatasetView = ({mode}: Props) => {
                                 <ContentCard title={"Publication"}>
                                     <>
                                         <Typography sx={{mt:1.5}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
+                                        {formCorrect ? 
+                                            <Stack direction="row" alignItems="center" mb={-1}>
+                                                <CheckCircle color="success" fontSize="small"></CheckCircle>
+                                                <Typography sx={{ml:1, mt: 0.25}} color="success" variant="overline">Metadata</Typography>
+                                            </Stack>
+                                        :
+                                            <Stack direction="row" alignItems="center" mb={-1}>
+                                                <Cancel color="error" fontSize="small"></Cancel>
+                                                <Typography sx={{ml:1, mt: 0.25}} color="error" variant="overline">Metadata incorrect</Typography>
+                                            </Stack>
+                                        }
+
+                                        {true ?
+                                            <Stack direction="row" alignItems="center" mb={-1}>
+                                                <CheckCircle color="success" fontSize="small"></CheckCircle>
+                                                <Typography sx={{ml:1, mt: 0.25}} color="success" variant="overline">Files</Typography>
+                                            </Stack>
+                                        :
+                                            <Stack direction="row" alignItems="center" mb={-1}>
+                                                <Cancel color="error" fontSize="small"></Cancel>
+                                                <Typography sx={{ml:1, mt: 0.25}} color="error" variant="overline">Files missing</Typography>
+                                            </Stack>
+                                        }
+                                        {activeStep===2 ?
+                                            <Stack direction="row" alignItems="center" mb={-1}>
+                                                <CheckCircle color="success" fontSize="small"></CheckCircle>
+                                                <Typography sx={{ml:1, mt: 0.25}} color="success" variant="overline">DOI</Typography>
+                                            </Stack>
+                                        :
+                                            <Stack direction="row" alignItems="center" mb={-1}>
+                                                <Cancel color="error" fontSize="small"></Cancel>
+                                                <Typography sx={{ml:1, mt: 0.25}} color="error" variant="overline">DOI missing</Typography>
+                                            </Stack>
+                                        }
+
                                         <FormControl fullWidth sx={{mt: 2.5}}>
                                             <InputLabel id="repo-select">Select repositories</InputLabel>
-                                            <Select input={<OutlinedInput label="Select repositories" />} labelId="repo-select" fullWidth multiple value={repo} onChange={repoChange} renderValue={(selected) => selected.join(', ')} MenuProps={MenuProps}>
+                                            <Select disabled={!formCorrect || !(activeStep===2)} input={<OutlinedInput label="Select repositories" />} labelId="repo-select" fullWidth multiple value={repo} onChange={repoChange} renderValue={(selected) => selected.join(', ')} MenuProps={MenuProps}>
                                                 {repos.map((name) => (
                                                     <MenuItem key={name} value={name}>
                                                         <Checkbox checked={repo.indexOf(name) > -1}/>
@@ -447,7 +492,7 @@ const DatasetView = ({mode}: Props) => {
                                             </Select>
                                         </FormControl>
                                         <Box sx={{display: "flex", flexDirection:"row-reverse"}}>
-                                            <Button fullWidth sx={{mt:2.5}} variant="contained">Publish</Button>
+                                            <Button disabled={!formCorrect || !(activeStep===2)} fullWidth sx={{mt:2.5}} variant="contained">Publish</Button>
                                         </Box>
                                     </>
                                 </ContentCard>
