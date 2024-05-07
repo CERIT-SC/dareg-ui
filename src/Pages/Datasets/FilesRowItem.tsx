@@ -13,8 +13,8 @@ const FilesRowItem = (props: {
 }) => {
 
   return (
-    <Box display="flex" sx={props.sx} flexDirection="row" justifyContent={props.anchor==="right"?"flex-end":"flex-start"} overflow="auto">
-      <Typography noWrap variant="body2" sx={{ userSelect: "none", MozUserSelect: "none" }}>
+    <Box display="flex" sx={props.sx} flexDirection="row" justifyContent={props.anchor==="right"?"flex-end":"flex-start"} overflow="auto" marginTop={0.5} marginBottom={0.5}>
+      <Typography noWrap variant="body2" sx={{ userSelect: "none", MozUserSelect: "none", fontSize: 15 }}>
         {props.children}
       </Typography>
     </Box>

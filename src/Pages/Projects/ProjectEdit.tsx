@@ -79,6 +79,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
         updatedProject?.then((response) => {
         setLoadingButtonState(false)
         navigate(`/collections/${(response as {data: {id: string}}).data.id}`)
+        navigate(`/collections/${(response as {data: {id: string}}).data.id}`)
         })
     }
 

@@ -22,6 +22,7 @@ import ProjectEdit from './Pages/Projects/ProjectEdit';
 import DatasetView from './Pages/Datasets/DatasetView';
 import { ViewModes } from './types/enums';
 import DatasetList from './Pages/Datasets/DatasetList';
+import DatasetList from './Pages/Datasets/DatasetList';
 
 const App = () => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
@@ -30,7 +31,7 @@ const App = () => {
     palette: {
       mode: selectedTheme==="system" ? (prefersDarkMode ? "light" : "dark") : selectedTheme,
       primary: {main: "#2b8600"},
-      secondary: {main: "#2d3c25"}
+      secondary: {main: "#54604d"}
 
     }
   })
@@ -75,14 +76,20 @@ const options = {
                     <Route index element={<ProjectsList />} />
 
                     <Route path='collections'>
+                    <Route path='collections'>
                       <Route index element={<ProjectsList />} />
                       <Route path='new' element={<ProjectEdit mode={ViewModes.New} />} />
                       <Route path=':projectId' element={<ProjectEdit mode={ViewModes.View} />} />
                       <Route path=':projectId/edit' element={<ProjectEdit mode={ViewModes.Edit} />} />
                       <Route path=':projectId/datasets' element={<Navigate to="../" relative="path" />} />
+                      <Route path=':projectId/datasets' element={<Navigate to="../" relative="path" />} />
                       <Route path=':projectId/datasets/new' element={<DatasetView mode={ViewModes.New} />} />
                       <Route path=':projectId/datasets/:datasetId' element={<DatasetView mode={ViewModes.View} />} />
                       <Route path=':projectId/datasets/:datasetId/edit' element={<DatasetView mode={ViewModes.Edit} />} />
+                    </Route>
+
+                    <Route path='datasets'>
+                      <Route index element={<DatasetList />} />
                     </Route>
 
                     <Route path='datasets'>

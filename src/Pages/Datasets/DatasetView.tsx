@@ -1,5 +1,5 @@
-import { AccessTime, AccountCircle, Assignment, DataObject, Edit, GroupAdd, HomeRepairService, Save } from "@mui/icons-material";
-import { Alert, Box, Button, Skeleton, Stack, Tab, TextField, Typography } from "@mui/material";
+import { AccessTime, AccountCircle, Assignment, Autorenew, DataObject, Edit, GroupAdd, HomeRepairService, Save } from "@mui/icons-material";
+import { Alert, Box, Button, FormControlLabel, FormGroup, Skeleton, Stack, Tab, Switch, Tab, TextField, Typography, Typography } from "@mui/material";
 import ContentHeader from "../../Components/ContentHeader";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -16,6 +16,7 @@ import { Project, useGetProjectQuery } from "../../Services/projects";
 import { LoadingButton, TabContext, TabList, TabPanel } from "@mui/lab";
 import CodeEditor from '@uiw/react-textarea-code-editor';
 import { Facility } from "../../Services/facilities";
+import config from "../../Config";
 import FilesActiveArea from "./FilesActiveArea";
 import TemplateSelect from "../../Components/TemplateSelect";
 import PermissionsTable from "../../Components/PermissionsContainer/PermissionsTable";
@@ -71,20 +72,24 @@ const DatasetView = ({mode}: Props) => {
     const saveForm = (): void => {
         let updatedDataset;
         setLoadingButtonState(true);
+        const { id, name, description, schema, project, metadata } = data;
+        const datasetRequest: DatasetRequest = { name, description, schema: typeof schema === "string" ? schema : schema.id, project: typeof project === "string" ? project : project.id, metadata }
         switch(mode){
             case ViewModes.Edit:
                 updatedDataset = updateDataset({...data, schema: schema?.id, project: typeof data.project == "string" ? data.project : data.project.id, shares: currentShares})
                 break;
             case ViewModes.New:
-                updatedDataset = addDataset({...data, schema: schema?.id, project: typeof data.project == "string" ? data.project : data.project.id})
+                updatedDataset = addDataset(datasetRequest);
                 break;
         }
         updatedDataset?.then((response) => {
         setLoadingButtonState(false)
         navigate(`/collections/${projectId}/datasets/${(response as {data: Dataset}).data.id}`)
+        navigate(`/collections/${projectId}/datasets/${(response as {data: Dataset}).data.id}`)
         })
     }
 
+    const handleChange = (inputId: ProjectDataStateKeys | keyof FormData | "schema", e: any): void => {
     const handleChange = (inputId: ProjectDataStateKeys | keyof FormData | "schema", e: any): void => {
         if(!inputId){ 
             return 
@@ -105,6 +110,10 @@ const DatasetView = ({mode}: Props) => {
         document.body.appendChild(element); // Required for this to work in FireFox
         element.click();
     }
+
+    const [autoRefresh, setAutoRefresh] = useState(true)
+
+    const [autoRefresh, setAutoRefresh] = useState(true)
 
     if (!datasetLoading){
         return (
@@ -131,6 +140,7 @@ const DatasetView = ({mode}: Props) => {
                             fullWidth
                             required
                             variant="outlined"
+                            variant="outlined"
                             value={data.name}
                             onChange={(e) => handleChange("name", e.target.value)}
                             sx={{maxWidth: "33.33%", background: "#FFF"}}
@@ -141,12 +151,17 @@ const DatasetView = ({mode}: Props) => {
                             label="Dataset description"
                             fullWidth
                             variant="outlined"
+                            variant="outlined"
                             value={data.description}
                             onChange={(e) => handleChange("description", e.target.value)}
+                            sx={{maxWidth: "66.67%", backgroundColor: "#FFF"}}
                             sx={{maxWidth: "66.67%", backgroundColor: "#FFF"}}
                             disabled={mode===ViewModes.View}
                             />
                     </Stack>
+                    {mode===ViewModes.New && schemas ?
+                        <TemplateSelect label="Select template" selectedId={data.schema as string} setSelectedId={(value) => handleChange("schema", value)} entities={schemas}/>
+                    : <></>}
                     {mode===ViewModes.New && schemas ?
                         <TemplateSelect label="Select template" selectedId={data.schema as string} setSelectedId={(value) => handleChange("schema", value)} entities={schemas}/>
                     : <></>}
@@ -196,38 +211,34 @@ const DatasetView = ({mode}: Props) => {
                         </ContentCard>
                     </TabPanel>
                     <TabPanel value="1" sx={{p:0}}>
-                        <ContentCard title={"Files"}>
-                            {true ? <Typography variant="subtitle1">No files available</Typography> :
-                                <FilesActiveArea id="sss" changeId={() => {}} />
-                            }
+                        <ContentCard title={"Files preview"} actions={
+                            <>
+                                <FormGroup>
+                                    <FormControlLabel sx={{ width: 130 }} control={<Switch defaultChecked size="small" checked={autoRefresh} onChange={(e) => setAutoRefresh(e.target.checked)} />} label="Auto refresh" />
+                                </FormGroup>
+                                <Button variant="contained" size="small" onClick={() => window.open(`"${config.REACT_APP_BASE_ONEZONE_URL}/i#/onedata/spaces/${projectData?.onedata_space_id}/data`, "_blank")}>
+                                    Open folder in Onedata
+                                </Button>
+                            </>
+                        }>
+                            <FilesActiveArea id={datasetId || ""} changeId={() => {}} autoRefresh={autoRefresh} />
                         </ContentCard>
                     </TabPanel>
                     <TabPanel value="2" sx={{p:0}}>
-                        <ContentCard title={"Dataset lifecycle settings"}>
-                            <>
-                                    <TextField 
-                                        label="Dataset ID"
-                                        value={data.id}
-                                        disabled={true}
-                                        fullWidth
-                                        sx={{mb:2}}/>
-                                    <TextField 
-                                        label="Dataset Retention"
-                                        value={"3m"}
-                                        helperText="How long should the dataset be kept on hot storage?"
-                                        disabled={true}
-                                        fullWidth
-                                        sx={{mb:2}}/>
-                            </>
-                        </ContentCard>
                         <ContentCard title={"Onedata settings"}>
                             <>
-                                    <TextField 
-                                        label="Space ID"
-                                        value={data.id}
-                                        disabled={true}
-                                        fullWidth
-                                        sx={{mb:2}}/>
+                                <TextField 
+                                    label="Space ID"
+                                    value={projectData?.onedata_space_id}
+                                    disabled={true}
+                                    fullWidth
+                                    sx={{mb:2}}/>
+                                <TextField 
+                                    label="File ID"
+                                    value={datasetData?.onedata_file_id}
+                                    disabled={true}
+                                    fullWidth
+                                    sx={{mb:2}}/>
                             </>
                         </ContentCard>
                         {mode!==ViewModes.New ? 
