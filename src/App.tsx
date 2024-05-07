@@ -22,7 +22,6 @@ import ProjectEdit from './Pages/Projects/ProjectEdit';
 import DatasetView from './Pages/Datasets/DatasetView';
 import { ViewModes } from './types/enums';
 import DatasetList from './Pages/Datasets/DatasetList';
-import DatasetList from './Pages/Datasets/DatasetList';
 
 const App = () => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
@@ -36,35 +35,36 @@ const App = () => {
     }
   })
 
-const getUser = () => {
-  const oidcStorage = sessionStorage.getItem(`oidc.user:${config.REACT_APP_OIDC_AUTHORITY}:${config.REACT_APP_OIDC_CLIENT_ID}`)
-  if (!oidcStorage) {
-      return null;
-    }
-  return User.fromStorageString(oidcStorage);
-}
-
-const options = {
-  interceptors: {
-    request: ({ options }: any) => {
-      const u = getUser();
-      options.headers.Authorization = `Bearer ${u?.access_token}`
-      return options
-    }
-  },
-  "headers": {
-    "Content-Type": "application/json"
-  },
-  cachePolicy: CachePolicies.NO_CACHE,
-  retries: 1,
-  retryOn: async ({ error, response }: any) => {
-    return error || (response && response.status >= 300)
-  },
-
-  retryDelay: ({ attempt }: any) => {
-    return Math.min(attempt > 1 ? 2 ** attempt * 1000 : 1000, 30 * 1000)
+  const getUser = () => {
+    const oidcStorage = sessionStorage.getItem(`oidc.user:${config.REACT_APP_OIDC_AUTHORITY}:${config.REACT_APP_OIDC_CLIENT_ID}`)
+    if (!oidcStorage) {
+        return null;
+      }
+    return User.fromStorageString(oidcStorage);
   }
-}
+
+  const options = {
+    interceptors: {
+      request: ({ options }: any) => {
+        const u = getUser();
+        options.headers.Authorization = `Bearer ${u?.access_token}`
+        return options
+      }
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    cachePolicy: CachePolicies.NO_CACHE,
+    retries: 1,
+    retryOn: async ({ error, response }: any) => {
+      return error || (response && response.status >= 300)
+    },
+
+    retryDelay: ({ attempt }: any) => {
+      return Math.min(attempt > 1 ? 2 ** attempt * 1000 : 1000, 30 * 1000)
+    }
+  }
+
   return (
     <Provider url={config.REACT_APP_BASE_API_URL} options={options}>
       <BrowserRouter>
@@ -76,12 +76,10 @@ const options = {
                     <Route index element={<ProjectsList />} />
 
                     <Route path='collections'>
-                    <Route path='collections'>
                       <Route index element={<ProjectsList />} />
                       <Route path='new' element={<ProjectEdit mode={ViewModes.New} />} />
                       <Route path=':projectId' element={<ProjectEdit mode={ViewModes.View} />} />
                       <Route path=':projectId/edit' element={<ProjectEdit mode={ViewModes.Edit} />} />
-                      <Route path=':projectId/datasets' element={<Navigate to="../" relative="path" />} />
                       <Route path=':projectId/datasets' element={<Navigate to="../" relative="path" />} />
                       <Route path=':projectId/datasets/new' element={<DatasetView mode={ViewModes.New} />} />
                       <Route path=':projectId/datasets/:datasetId' element={<DatasetView mode={ViewModes.View} />} />
@@ -98,8 +96,7 @@ const options = {
                     
                     <Route path='templates'>
                       <Route index element={<TemplateList />} />
-                      <Route path=':templateId' element={<TemplateView />}>
-                      </Route>
+                      <Route path=':templateId' element={<TemplateView />} />
                       <Route path=':templateId/edit' element={<TemplatesNew mode={ViewModes.Edit} />} />
                       <Route path='new' element={<TemplatesNew mode={ViewModes.New} />} />
                     </Route>

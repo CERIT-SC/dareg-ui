@@ -1,5 +1,5 @@
 import { AccessTime, AccountCircle, Assignment, Autorenew, DataObject, Edit, GroupAdd, HomeRepairService, Save } from "@mui/icons-material";
-import { Alert, Box, Button, FormControlLabel, FormGroup, Skeleton, Stack, Tab, Switch, Tab, TextField, Typography, Typography } from "@mui/material";
+import { Alert, Box, Button, FormControlLabel, FormGroup, Skeleton, Stack, Switch, Tab, TextField, Typography } from "@mui/material";
 import ContentHeader from "../../Components/ContentHeader";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -29,10 +29,9 @@ type Props = {
 const DatasetView = ({mode}: Props) => {
 
     const navigate = useNavigate();
-    const { get, post, patch, loading } = useFetch();
 
     const { projectId, datasetId } = useParams();
-    
+
     const projectData = useGetProjectQuery(projectId as string).data
     
     const {data: datasetData, isLoading: datasetLoading} = useGetDatasetQuery(datasetId as string, {skip: mode===ViewModes.New})
@@ -50,8 +49,7 @@ const DatasetView = ({mode}: Props) => {
     useEffect(() => {
         if ((mode===ViewModes.Edit||mode===ViewModes.View) && datasetData && projectData){
             setData(datasetData)
-        }
-        else{
+        } else {
             const dataset_schema = projectData?.default_dataset_schema ? projectData?.default_dataset_schema.id : ""
             setData({...data, project: projectData as Project, schema: dataset_schema || ""})
         }
@@ -85,11 +83,9 @@ const DatasetView = ({mode}: Props) => {
         updatedDataset?.then((response) => {
         setLoadingButtonState(false)
         navigate(`/collections/${projectId}/datasets/${(response as {data: Dataset}).data.id}`)
-        navigate(`/collections/${projectId}/datasets/${(response as {data: Dataset}).data.id}`)
         })
     }
 
-    const handleChange = (inputId: ProjectDataStateKeys | keyof FormData | "schema", e: any): void => {
     const handleChange = (inputId: ProjectDataStateKeys | keyof FormData | "schema", e: any): void => {
         if(!inputId){ 
             return 
@@ -113,9 +109,8 @@ const DatasetView = ({mode}: Props) => {
 
     const [autoRefresh, setAutoRefresh] = useState(true)
 
-    const [autoRefresh, setAutoRefresh] = useState(true)
 
-    if (!datasetLoading){
+    if (!datasetLoading) {
         return (
             <Box>
                 <ContentHeader<Dataset & Facility> title={`Dataset: ${mode}`} actions={
@@ -140,7 +135,6 @@ const DatasetView = ({mode}: Props) => {
                             fullWidth
                             required
                             variant="outlined"
-                            variant="outlined"
                             value={data.name}
                             onChange={(e) => handleChange("name", e.target.value)}
                             sx={{maxWidth: "33.33%", background: "#FFF"}}
@@ -151,10 +145,8 @@ const DatasetView = ({mode}: Props) => {
                             label="Dataset description"
                             fullWidth
                             variant="outlined"
-                            variant="outlined"
                             value={data.description}
                             onChange={(e) => handleChange("description", e.target.value)}
-                            sx={{maxWidth: "66.67%", backgroundColor: "#FFF"}}
                             sx={{maxWidth: "66.67%", backgroundColor: "#FFF"}}
                             disabled={mode===ViewModes.View}
                             />
