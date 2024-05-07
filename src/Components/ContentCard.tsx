@@ -16,7 +16,7 @@ const ContentCard = ({children, title, actions, sx, paperProps}: ContentCardProp
             {actions || title ? 
                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{mb:2}}>
                     <Typography variant="h5" color="text.primary">{title}</Typography>
-                    <Stack direction="row" spacing={1} justifyContent="end" alignItems="baseline">
+                    <Stack direction="row" spacing={1} justifyContent="end" alignItems="center">
                         {actions}
                     </Stack>
                 </Stack>

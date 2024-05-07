@@ -1,6 +1,5 @@
 import { DaregAPIMinimalNestedObject, DaregAPIObjectBase, DaregAPIResponse } from '../types/global'
 import { api } from './api'
-import { Schema } from './schemas'
 
 export type Dataset = DaregAPIObjectBase & {
   name: string,
@@ -8,15 +7,18 @@ export type Dataset = DaregAPIObjectBase & {
   schema: string | DaregAPIMinimalNestedObject,
   metadata: Object,
   project: string | DaregAPIMinimalNestedObject
-  tags: string[]
+  tags: string[],
+  onedata_file_id: string
 }
 
 export type DatasetRequest = {
+  id?: string,
   name: string,
   description: string,
   metadata: Object,
   project: string,
-  schema: string
+  schema: string,
+  one_data_file_id?: string
 }
 
 export type DatasetsResponse = DaregAPIResponse<Dataset>
@@ -32,7 +34,7 @@ export const datasetsApi = api.injectEndpoints({
         { type: 'Datasets' as const, id: 'LIST' },
       ],
     }),
-    addDataset: build.mutation<DatasetsResponse, Partial<Dataset>>({
+    addDataset: build.mutation<DatasetsResponse, DatasetRequest>({
       query: (body) => ({
         url: `${OBJECT_NAME}/`,
         method: 'POST',
@@ -44,7 +46,7 @@ export const datasetsApi = api.injectEndpoints({
       query: (id) => `${OBJECT_NAME}/${id}`,
       providesTags: (_post, _err, id) => [{ type: 'Datasets', id }],
     }),
-    updateDataset: build.mutation<Dataset, Partial<Dataset>>({
+    updateDataset: build.mutation<Dataset, DatasetRequest>({
       query(data) {
         const { id, ...body } = data
         return {

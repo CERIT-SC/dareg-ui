@@ -1,6 +1,7 @@
 window.REACT_APP_BASE_URL="http://localhost:3000"
 window.REACT_APP_OIDC_REDIRECT_URL="auth"
 window.REACT_APP_BASE_API_URL="/api"
+window.REACT_APP_BASE_ONEZONE_URL="https://ip-147-251-21-190.flt.cloud.muni.cz/ozw/onezone"
 window.REACT_APP_OIDC_AUTHORITY="https://oidc.muni.cz/oidc"
 window.REACT_APP_OIDC_CLIENT_ID="9016cb62-acb6-4b73-b7af-93b773c6fc22"
 window.REACT_APP_OIDC_SCOPE="openid profile email eduperson_entitlement"

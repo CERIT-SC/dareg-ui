@@ -21,7 +21,7 @@ const FilesHeadItem = (props: {
         underline="none"
         color='primary.plainColor'
         component="button"
-        fontSize={14}
+        fontSize={15}
         onClick={props.onClick}
         sx={{
           fontWeight: 500,
@@ -37,11 +37,11 @@ const FilesHeadItem = (props: {
         >
         <Stack direction="row" alignItems="center">
           {props.anchor==="right" ? (
-            <ArrowDownwardRounded fontSize="small" />
+            <ArrowDownwardRounded sx={{ marginRight: 0.5, fontSize: 20}} fontSize="inherit" />
           ) : null}
           {props.label}
           {props.anchor==="left" ? (
-            <ArrowDownwardRounded fontSize="small" />
+            <ArrowDownwardRounded sx={{ marginLeft: 0.5, fontSize: 20}} fontSize="inherit" />
           ) : null}
         </Stack>
       </Link>

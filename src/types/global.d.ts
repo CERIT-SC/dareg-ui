@@ -90,6 +90,7 @@ export type ExplorerItem = {
     name: string,
     upper: string,
     addDate: number, 
+    modDate: number,
     size: number
 }
 
