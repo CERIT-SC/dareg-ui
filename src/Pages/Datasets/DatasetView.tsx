@@ -407,6 +407,7 @@ const DatasetView = ({mode}: Props) => {
                                             <StepLabel>Request DOI</StepLabel>
                                             <StepContent>
                                                 <Typography sx={{mt:1}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
+
                                                 <Stack direction="row" alignItems="baseline">
                                                     <LoadingButton sx={{mt:1.5, mr: 2}} loading={loadingBttn} onClick={requestDoi} variant="contained">Request DOI</LoadingButton>
                                                     {doiFailed ? 
