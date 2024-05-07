@@ -38,7 +38,7 @@ const DatasetView = ({mode}: Props) => {
 
     const [ tabContent, setTabContent ] = useState<string>("0")
     
-    const [ data, setData ] = useState<Dataset>({name: "", description: "", schema: projectData?.default_dataset_schema ? projectData?.default_dataset_schema.id : "", project: {id: "", name: ""}, metadata: {}} as Dataset);
+    const [ data, setData ] = useState<Dataset>({name: "", description: "", schema: projectData?.default_dataset_schema ? projectData?.default_dataset_schema.id : "", project: {id: "", name: ""}, metadata: {}, shares: {}} as Dataset);
 
     const {data: schemas, isLoading} = useGetSchemasQuery(1) // TODO: Implement pagination
 
@@ -74,7 +74,7 @@ const DatasetView = ({mode}: Props) => {
         const datasetRequest: DatasetRequest = { name, description, schema: typeof schema === "string" ? schema : schema.id, project: typeof project === "string" ? project : project.id, metadata }
         switch(mode){
             case ViewModes.Edit:
-                updatedDataset = updateDataset({...data, schema: schema?.id, project: typeof data.project == "string" ? data.project : data.project.id, shares: currentShares})
+                updatedDataset = updateDataset({...data, schema: schema as string, project: typeof data.project == "string" ? data.project : data.project.id, shares: currentShares})
                 break;
             case ViewModes.New:
                 updatedDataset = addDataset(datasetRequest);

@@ -1,4 +1,4 @@
-import { DaregAPIMinimalNestedObject, DaregAPIObjectBase, DaregAPIResponse } from '../types/global'
+import { DaregAPIMinimalNestedObject, DaregAPIObjectBase, DaregAPIResponse, SharesList } from '../types/global'
 import { api } from './api'
 
 export type Dataset = DaregAPIObjectBase & {
@@ -19,6 +19,7 @@ export type DatasetRequest = {
   project: string,
   schema: string,
   one_data_file_id?: string
+  shares?: SharesList
 }
 
 export type DatasetsResponse = DaregAPIResponse<Dataset>
