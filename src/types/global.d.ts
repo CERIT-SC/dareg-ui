@@ -106,6 +106,13 @@ export type ProfileData = {
     any_datasets: boolean,
     any_facilities: boolean,
     any_projects: boolean,
+    avatar: string,
+    app_version: {
+        version: string,
+        date: string,
+        environment: string,
+    }
+    last_login: string
 }
 
 module.exports = {

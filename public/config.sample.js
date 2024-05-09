@@ -11,3 +11,6 @@ window.REACT_APP_OIDC_METADATA_authorization_endpoint="https://oidc.muni.cz/oidc
 window.REACT_APP_OIDC_METADATA_token_endpoint="https://oidc.muni.cz/oidc/token"
 window.REACT_APP_OIDC_METADATA_userinfo_endpoint="https://oidc.muni.cz/oidc/userinfo"
 window.REACT_APP_OIDC_METADATA_end_session_endpoint="https://oidc.muni.cz/oidc/endsession"
+window.REACT_APP_VERSION="1.0.0"
+window.REACT_APP_VERSION_DATE="01-01-1970"
+window.REACT_APP_ENVIRONMENT="production"
