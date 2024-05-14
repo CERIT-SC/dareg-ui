@@ -22,6 +22,7 @@ import TemplateSelect from "../../Components/TemplateSelect";
 import PermissionsTable from "../../Components/PermissionsContainer/PermissionsTable";
 import SkeletonView from "../../Components/SkeletonView";
 import { useTranslation } from "react-i18next";
+import { useGetFilesQuery } from "../../Services/files";
 
 type Props = {
     mode: ViewModes
@@ -163,6 +164,8 @@ const DatasetView = ({mode}: Props) => {
     const [formCorrect, setFormCorrect] = useState(false);
 
     const [autoRefresh, setAutoRefresh] = useState(true)
+
+    const { data: filesData } = useGetFilesQuery({ dataset_id: datasetId as string, file_id: null })
 
     if (!datasetLoading){
         return (
@@ -453,8 +456,7 @@ const DatasetView = ({mode}: Props) => {
                                                 <Typography sx={{ml:1, mt: 0.25}} color="error" variant="overline">Metadata incorrect</Typography>
                                             </Stack>
                                         }
-
-                                        {true ?
+                                        {filesData && (filesData.files[16][1] as any).length > 0 ?
                                             <Stack direction="row" alignItems="center" mb={-1}>
                                                 <CheckCircle color="success" fontSize="small"></CheckCircle>
                                                 <Typography sx={{ml:1, mt: 0.25}} color="success" variant="overline">Files</Typography>
