@@ -518,7 +518,7 @@ const FilesActiveArea = (props: {
 
                 <Stack direction={"row"} justifyContent="space-between" spacing={3}>
                   <Typography variant="body1">ID:</Typography>
-                  <Typography textOverflow="ellipsis" overflow={"clip"} variant="body1">{selectedItems[0].id}</Typography>
+                  <Typography textOverflow="ellipsis" overflow={"hidden"} variant="body1">{selectedItems[0].id}</Typography>
                 </Stack>
 
                 <Stack direction={"row"} justifyContent="space-between" spacing={3}>
