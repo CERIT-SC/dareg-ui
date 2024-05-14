@@ -208,9 +208,6 @@ const DatasetView = ({mode}: Props) => {
                     {mode===ViewModes.New && schemas ?
                         <TemplateSelect label={t('DatasetView.selectTemplate')} selectedId={data.schema as string} setSelectedId={(value) => handleChange("schema", value)} entities={schemas}/>
                     : <></>}
-                    {mode===ViewModes.New && schemas ?
-                        <TemplateSelect label={t('DatasetView.selectTemplate')} selectedId={data.schema as string} setSelectedId={(value) => handleChange("schema", value)} entities={schemas}/>
-                    : <></>}
                 </ContentHeader>
                 <TabContext value={tabContent}>
                     <ContentCard>
