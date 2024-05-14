@@ -22,7 +22,7 @@ export type ProjectDataStateKeys = keyof ProjectsData;
 const ProjectEdit = ({mode}: {mode: ViewModes}) => {
 
     const navigate = useNavigate();
-    const { projectId } = useParams();
+    const { projectId, tab } = useParams();
 
     const {data: facilities} = useGetFacilitiesQuery(1) // TODO: Implement pagination
     
@@ -31,7 +31,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
     
     const templateData = useGetSchemaQuery(data.default_dataset_schema as string).data
 
-    const [ tabContent, setTabContent ] = useState<string>(mode===ViewModes.New ? "1" : "0")
+    const [ tabContent, setTabContent ] = useState<string>(mode===ViewModes.New ? "settigns" : tab ? tab as string : "datasets")
 
     const [ page, setPage ] = useState(1)
     const {data: datasets} = useGetDatasetsQuery({page: page, projId: projectId}, {skip: projectId===undefined})
@@ -78,8 +78,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
         }
         updatedProject?.then((response) => {
         setLoadingButtonState(false)
-        navigate(`/collections/${(response as {data: {id: string}}).data.id}`)
-        navigate(`/collections/${(response as {data: {id: string}}).data.id}`)
+        navigate(`/collections/${(response as {data: {id: string}}).data.id}/${tabContent}`)
         })
     }
 
@@ -160,14 +159,19 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                 <TabContext value={tabContent}>
                     {mode!==ViewModes.New ? 
                         <ContentCard>
-                            <TabList onChange={(e, newValue) => setTabContent(newValue)} aria-label="lab API tabs example">
-                                <Tab label="Datasets" value={"0"} />
-                                <Tab label="Settings" value={"1"} />
+                            <TabList onChange={(e, newValue) => {
+                                    setTabContent(newValue)
+                                    window.history.replaceState(null, "CEITEC Dataset Register", `/collections/${projectId}/${newValue}`)
+                                }}
+                                    aria-label="lab API tabs example"
+                                >
+                                <Tab label="Datasets" value={"datasets"} />
+                                <Tab label="Settings" value={"settings"} />
                             </TabList>
                         </ContentCard>
                     : null
                     }
-                    <TabPanel value="0" sx={{p:0}}>
+                    <TabPanel value="datasets" sx={{p:0}}>
                         <ContentCard title={"Datasets"} actions={
                             <>
                                 {/* <TextField size="small" id="dataset-search" 
@@ -189,7 +193,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             />
                         </ContentCard>
                     </TabPanel>
-                    <TabPanel value="1" sx={{p:0}}>
+                    <TabPanel value="settings" sx={{p:0}}>
                         {!facilities ? <></> : (<ContentCard title={"Select facility"}>
                             <Stack direction="row" justifyContent="flex-start" alignItems="baseline" spacing={3}>
                                 <TemplateSelect 

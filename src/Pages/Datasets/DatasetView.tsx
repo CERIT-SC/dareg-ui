@@ -30,13 +30,13 @@ const DatasetView = ({mode}: Props) => {
 
     const navigate = useNavigate();
 
-    const { projectId, datasetId } = useParams();
+    const { projectId, datasetId, tab } = useParams();
 
     const projectData = useGetProjectQuery(projectId as string).data
     
     const {data: datasetData, isLoading: datasetLoading} = useGetDatasetQuery(datasetId as string, {skip: mode===ViewModes.New})
 
-    const [ tabContent, setTabContent ] = useState<string>("0")
+    const [ tabContent, setTabContent ] = useState<string>(tab ? tab as string : "metadata")
     
     const [ data, setData ] = useState<Dataset>({name: "", description: "", schema: projectData?.default_dataset_schema ? projectData?.default_dataset_schema.id : "", project: {id: "", name: ""}, metadata: {}, shares: {}} as Dataset);
 
@@ -82,7 +82,7 @@ const DatasetView = ({mode}: Props) => {
         }
         updatedDataset?.then((response) => {
         setLoadingButtonState(false)
-        navigate(`/collections/${projectId}/datasets/${(response as {data: Dataset}).data.id}`)
+        navigate(`/collections/${projectId}/datasets/${(response as {data: Dataset}).data.id}/${tabContent}`)
         })
     }
 
@@ -160,13 +160,18 @@ const DatasetView = ({mode}: Props) => {
                 </ContentHeader>
                 <TabContext value={tabContent}>
                     <ContentCard>
-                            <TabList onChange={(e, newValue) => setTabContent(newValue)} aria-label="lab API tabs example">
-                                <Tab label="Metadata" value={"0"} />
-                                <Tab label="Files" value={"1"} />
-                                <Tab label="Settings" value={"2"} />
+                            <TabList onChange={(e, newValue) => {
+                                    setTabContent(newValue)
+                                    window.history.replaceState(null, "CEITEC Dataset Register", `/collections/${projectId}/datasets/${datasetId}/${newValue}`)
+                                }} 
+                                    aria-label="lab API tabs example"
+                                >
+                                <Tab label="Metadata" value={"metadata"} />
+                                <Tab label="Files" value={"files"} />
+                                <Tab label="Settings" value={"settings"} />
                             </TabList>
                     </ContentCard>
-                    <TabPanel value="0" sx={{p:0}}>
+                    <TabPanel value="metadata" sx={{p:0}}>
                         <ContentCard title={"Metadata"} actions={
                             <Button sx={{ml:2}} variant="contained" size="small" onClick={toggleEditor}>
                                 Switch Editor
@@ -202,7 +207,7 @@ const DatasetView = ({mode}: Props) => {
                             )}
                         </ContentCard>
                     </TabPanel>
-                    <TabPanel value="1" sx={{p:0}}>
+                    <TabPanel value="files" sx={{p:0}}>
                         <ContentCard title={"Files preview"} actions={
                             <>
                                 <FormGroup>
@@ -216,7 +221,7 @@ const DatasetView = ({mode}: Props) => {
                             <FilesActiveArea id={datasetId || ""} changeId={() => {}} autoRefresh={autoRefresh} />
                         </ContentCard>
                     </TabPanel>
-                    <TabPanel value="2" sx={{p:0}}>
+                    <TabPanel value="settings" sx={{p:0}}>
                         <ContentCard title={"Onedata settings"}>
                             <>
                                 <TextField 
@@ -233,7 +238,7 @@ const DatasetView = ({mode}: Props) => {
                                     sx={{mb:2}}/>
                             </>
                         </ContentCard>
-                        {mode!==ViewModes.New ? 
+                        {mode!==ViewModes.New && Object.keys(data.shares).length !== 0 ? 
                             <PermissionsTable perms={mode===ViewModes.Edit ? data.perms : "viewer"} currentShares={currentShares} setCurrentShares={setCurrentShares}/>
                         : null }
                     </TabPanel>
