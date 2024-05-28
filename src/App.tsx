@@ -80,9 +80,11 @@ const App = () => {
                       <Route path='new' element={<ProjectEdit mode={ViewModes.New} />} />
                       <Route path=':projectId' element={<ProjectEdit mode={ViewModes.View} />} />
                       <Route path=':projectId/edit' element={<ProjectEdit mode={ViewModes.Edit} />} />
+                      <Route path=':projectId/:tab' element={<ProjectEdit mode={ViewModes.View} />} />
                       <Route path=':projectId/datasets' element={<Navigate to="../" relative="path" />} />
                       <Route path=':projectId/datasets/new' element={<DatasetView mode={ViewModes.New} />} />
                       <Route path=':projectId/datasets/:datasetId' element={<DatasetView mode={ViewModes.View} />} />
+                      <Route path=':projectId/datasets/:datasetId/:tab' element={<DatasetView mode={ViewModes.View} />} />
                       <Route path=':projectId/datasets/:datasetId/edit' element={<DatasetView mode={ViewModes.Edit} />} />
                     </Route>
 
