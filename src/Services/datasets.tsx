@@ -8,7 +8,8 @@ export type Dataset = DaregAPIObjectBase & {
   metadata: Object,
   project: string | DaregAPIMinimalNestedObject
   tags: string[],
-  onedata_file_id: string
+  onedata_file_id: string,
+  doi: string,
 }
 
 export type DatasetRequest = {
@@ -18,8 +19,8 @@ export type DatasetRequest = {
   metadata: Object,
   project: string,
   schema: string,
-  one_data_file_id?: string
-  shares?: SharesList
+  one_data_file_id?: string,
+  shares?: SharesList,
 }
 
 export type DatasetsResponse = DaregAPIResponse<Dataset>

@@ -2,6 +2,7 @@ import { ConfigureStoreOptions, configureStore } from '@reduxjs/toolkit'
 import authSlice from '../Reducers/authSlice'
 import { api } from './api'
 import { onedata_api } from './api_onedata'
+import { datacite_api } from './api_datacite'
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
 
 export const createStore = (
@@ -11,10 +12,11 @@ export const createStore = (
       reducer: {
         [api.reducerPath]: api.reducer,
         [onedata_api.reducerPath]: onedata_api.reducer,
+        [datacite_api.reducerPath]: datacite_api.reducer,
         auth: authSlice,
       },
       middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(api.middleware).concat(onedata_api.middleware),
+        getDefaultMiddleware().concat(api.middleware).concat(onedata_api.middleware).concat(datacite_api.middleware),
       ...options,
     })
   

@@ -1,5 +1,5 @@
-import { Alert, Box, Button, Checkbox, Dialog, DialogContent, Divider, FormControl, FormControlLabel, FormGroup, Grid, IconButton, Input, InputAdornment, InputLabel, ListItemText, MenuItem, OutlinedInput, Paper, Select, SelectChangeEvent, Skeleton, Stack, Step, StepContent, StepLabel, Stepper, Switch, Tab, TextField, Typography } from "@mui/material";
 import { AccessTime, AccountCircle, Assignment, Cancel, CheckCircle, ContentPaste, DataObject, Delete, Edit, GroupAdd, HomeRepairService, Save } from "@mui/icons-material";
+import { Alert, Box, Button, Checkbox, Dialog, DialogContent, Divider, FormControl, FormControlLabel, FormGroup, Grid, IconButton, Input, InputAdornment, InputLabel, Link, ListItemText, MenuItem, OutlinedInput, Paper, Select, SelectChangeEvent, Skeleton, Stack, Step, StepContent, StepLabel, Stepper, Switch, Tab, TextField, Typography } from "@mui/material";
 import ContentHeader from "../../Components/ContentHeader";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -22,7 +22,9 @@ import TemplateSelect from "../../Components/TemplateSelect";
 import PermissionsTable from "../../Components/PermissionsContainer/PermissionsTable";
 import SkeletonView from "../../Components/SkeletonView";
 import { useTranslation } from "react-i18next";
+import { Doi, useGetDoiQuery } from "../../Services/dois";
 import { useGetFilesQuery } from "../../Services/files";
+import PublishTab from "./PublishTab";
 
 type Props = {
     mode: ViewModes
@@ -43,6 +45,8 @@ const DatasetView = ({mode}: Props) => {
     const [ tabContent, setTabContent ] = useState<string>(tab ? tab as string : "metadata")
     
     const [ data, setData ] = useState<Dataset>({name: "", description: "", schema: projectData?.default_dataset_schema ? projectData?.default_dataset_schema.id : "", project: {id: "", name: ""}, metadata: {}, shares: {}} as Dataset);
+    
+    const doi = useGetDoiQuery(datasetId as string, {skip: tabContent !== "4"}).data
 
     const {data: schemas, isLoading} = useGetSchemasQuery(1) // TODO: Implement pagination
 
@@ -110,44 +114,6 @@ const DatasetView = ({mode}: Props) => {
         document.body.appendChild(element); // Required for this to work in FireFox
         element.click();
     }
-
-    const repos = [
-        "CF repo",
-        "CF plants",
-        "Test repo"
-    ]
-
-    const [ activeStep, setActiveStep ] = useState(0)
-    const [ loadingBttn, setLoadingBttn ] = useState(false)
-    const [ doiFailed, setDoiFailed ] = useState(false)
-    const [ repo, setRepo ] = useState<string[]>([])
-
-    const repoChange = (event: SelectChangeEvent<typeof repos>) => {
-        const { target: {value}, } = event
-        setRepo(typeof value === 'string' ? value.split(',') : value)
-    }
-
-    const requestDoi = () => {
-        setLoadingBttn(true);
-        setTimeout(() => {
-            if (doiFailed) {
-                setActiveStep(1)
-            }
-            else {
-                setLoadingBttn(false)
-                setDoiFailed(true)
-            }
-        }, 2000);
-    }
-
-    const MenuProps = {
-        PaperProps: {
-          style: {
-            maxHeight: 48 * 4.5 + 8,
-            width: 250,
-          },
-        },
-      };
 
     const [newLinkWindow, setNewLinkWindow] = useState(false)
     const [newLinkLabel, setNewLinkLabel] = useState("")
@@ -399,105 +365,13 @@ const DatasetView = ({mode}: Props) => {
                         : null }
                     </TabPanel>
                     <TabPanel value="publish" sx={{p:0}}>
-                        <Grid container spacing={2}>
-                            <Grid item flex={1}>
-                                <ContentCard title={"Request DOI"}>
-                                    <Stepper activeStep={activeStep} orientation="vertical" sx={{pb: 1}}>
-                                        <Step key={"Request DOI"}>
-                                            <StepLabel>Request DOI</StepLabel>
-                                            <StepContent>
-                                                <Typography sx={{mt:1}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
-
-                                                <Stack direction="row" alignItems="baseline">
-                                                    <LoadingButton sx={{mt:1.5, mr: 2}} loading={loadingBttn} onClick={requestDoi} variant="contained">Request DOI</LoadingButton>
-                                                    {doiFailed ? 
-                                                        <Typography variant="overline" color="error" fontWeight={600} fontSize={13}>Request failed</Typography>
-                                                    : null}
-                                                </Stack>
-                                            </StepContent>
-                                        </Step>
-                                        <Step key={"Lock"}>
-                                            <StepLabel>DOI registered</StepLabel>
-                                            <StepContent>
-                                                <FormControl fullWidth>
-                                                    <Input endAdornment={<InputAdornment position="end"><IconButton><ContentPaste/></IconButton></InputAdornment>} disabled id="doiReg" sx={{mt:1}} fullWidth value="https://doi.org/10.3352/jeehp.2013.10.3"></Input>
-                                                </FormControl>
-                                                <Typography sx={{mt:1.5}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
-                                                <Stack direction="row" alignItems="baseline">
-                                                    <Button color="error" onClick={() => setActiveStep(2)} sx={{mt:1.5, mr:2}} variant="contained">Finalize</Button>
-                                                    <Typography variant="overline" color="error" fontWeight={600} fontSize={13}>This action is irreversible</Typography>
-                                                </Stack>
-                                            </StepContent>
-                                        </Step>
-                                        <Step key={"Finalized"} completed={activeStep===2}>
-                                            <StepLabel>Finalized</StepLabel>
-                                            <StepContent>
-                                            <FormControl fullWidth>
-                                                <Input endAdornment={<InputAdornment position="end"><IconButton><ContentPaste/></IconButton></InputAdornment>} disabled id="doiReg" sx={{mt:1}} fullWidth value="https://doi.org/10.3352/jeehp.2013.10.3"></Input>
-                                            </FormControl>
-                                            <Typography sx={{mt:1.5}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
-                                            </StepContent>
-                                        </Step>
-                                    </Stepper>
-                                </ContentCard>
-                            </Grid>
-                            <Grid item flex={1}>
-                                <ContentCard title={"Publication"}>
-                                    <>
-                                        <Typography sx={{mt:1.5}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
-                                        {formCorrect ? 
-                                            <Stack direction="row" alignItems="center" mb={-1}>
-                                                <CheckCircle color="success" fontSize="small"></CheckCircle>
-                                                <Typography sx={{ml:1, mt: 0.25}} color="success" variant="overline">Metadata</Typography>
-                                            </Stack>
-                                        :
-                                            <Stack direction="row" alignItems="center" mb={-1}>
-                                                <Cancel color="error" fontSize="small"></Cancel>
-                                                <Typography sx={{ml:1, mt: 0.25}} color="error" variant="overline">Metadata incorrect</Typography>
-                                            </Stack>
-                                        }
-                                        {filesData && (filesData.files[16][1] as any).length > 0 ?
-                                            <Stack direction="row" alignItems="center" mb={-1}>
-                                                <CheckCircle color="success" fontSize="small"></CheckCircle>
-                                                <Typography sx={{ml:1, mt: 0.25}} color="success" variant="overline">Files</Typography>
-                                            </Stack>
-                                        :
-                                            <Stack direction="row" alignItems="center" mb={-1}>
-                                                <Cancel color="error" fontSize="small"></Cancel>
-                                                <Typography sx={{ml:1, mt: 0.25}} color="error" variant="overline">Files missing</Typography>
-                                            </Stack>
-                                        }
-                                        {activeStep===2 ?
-                                            <Stack direction="row" alignItems="center" mb={-1}>
-                                                <CheckCircle color="success" fontSize="small"></CheckCircle>
-                                                <Typography sx={{ml:1, mt: 0.25}} color="success" variant="overline">DOI</Typography>
-                                            </Stack>
-                                        :
-                                            <Stack direction="row" alignItems="center" mb={-1}>
-                                                <Cancel color="error" fontSize="small"></Cancel>
-                                                <Typography sx={{ml:1, mt: 0.25}} color="error" variant="overline">DOI missing</Typography>
-                                            </Stack>
-                                        }
-
-                                        <FormControl fullWidth sx={{mt: 2.5}}>
-                                            <InputLabel id="repo-select">Select repositories</InputLabel>
-                                            <Select disabled={!formCorrect || !(activeStep===2)} input={<OutlinedInput label="Select repositories" />} labelId="repo-select" fullWidth multiple value={repo} onChange={repoChange} renderValue={(selected) => selected.join(', ')} MenuProps={MenuProps}>
-                                                {repos.map((name) => (
-                                                    <MenuItem key={name} value={name}>
-                                                        <Checkbox checked={repo.indexOf(name) > -1}/>
-                                                        <ListItemText primary={name}/>
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
-                                        <Box sx={{display: "flex", flexDirection:"row-reverse"}}>
-                                            <Button disabled={!formCorrect || !(activeStep===2)} fullWidth sx={{mt:2.5}} variant="contained">Publish</Button>
-                                        </Box>
-                                    </>
-                                </ContentCard>
-                            </Grid>
-                        </Grid>
-
+                        {doi ?
+                            <PublishTab
+                                doi={doi as Doi}
+                                filesData={filesData}
+                                formCorrect={formCorrect}
+                            />
+                        : null}
                     </TabPanel>
                 </TabContext>
                 <ContentCard paperProps={{variant: "elevation", elevation: 0}} sx={{mb: 2, p: 0}}>
