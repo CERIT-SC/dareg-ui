@@ -12,6 +12,7 @@ import { Box, Button, ButtonProps, Dialog, Divider, IconButton, InputAdornment, 
 import { ExplorerItem } from "../../types/global"
 import { File, Files, useGetFilesQuery } from "../../Services/files"
 import MyIconButton from "./MyIconButton"
+import { useTranslation } from "react-i18next"
 
 
 // const data:{info: ExplorerItem, content: ExplorerItem[]} = {
@@ -158,22 +159,6 @@ const convertFilesToData = (files: Files): { info: ExplorerItem, content: Explor
   return { info, content };
 };
 
-// Returns a human readable time label
-export const displayTime = (milliseconds: number) => {
-  const seconds = Math.floor(milliseconds / 1000)
-  const minutes = Math.floor(seconds / 60)
-  const hours = Math.floor(minutes / 60)
-  const days = Math.floor(hours / 24)
-  const months = Math.floor(days / 30.4)
-  const years = Math.floor(days / 365)
-  if (years > 0) return `${years} y ago`
-  if (months > 0) return `${months} mon ago`
-  if (days > 0) return `${days} d ago`
-  if (hours > 0) return `${hours} h ago`
-  if (minutes > 0) return `${minutes} min ago`
-  return `${seconds} s ago`
-}
-
 // Returns human readable size of a file
 export const displaySize = (bytes: number) => {
   if (bytes===-1) return ""
@@ -230,6 +215,7 @@ const FilesActiveArea = (props: {
   autoRefresh: boolean,
   //isSelector: boolean | undefined
 }) => {
+  const { t } = useTranslation()
 
   type Column = "name" | "addDate" | "size"
   const [sortBy, setSortBy] = useState<Column>("name")
@@ -246,6 +232,21 @@ const FilesActiveArea = (props: {
   const [ currentFolderId, setCurrentFolderId ] = useState<string | null>(null)
   const { data: filesData, isLoading } = useGetFilesQuery({ dataset_id: props.id, file_id: currentFolderId}, {pollingInterval: props.autoRefresh ? 10000 : 0})
 
+  // Returns a human readable time label
+  const displayTime = (milliseconds: number) => {
+    const seconds = Math.floor(milliseconds / 1000)
+    const minutes = Math.floor(seconds / 60)
+    const hours = Math.floor(minutes / 60)
+    const days = Math.floor(hours / 24)
+    const months = Math.floor(days / 30.4)
+    const years = Math.floor(days / 365)
+    if (years > 0) return `${t('FilesActiveArea.head')}${years}${t('FilesActiveArea.yTail')}` /// y ago
+    if (months > 0) return `${t('FilesActiveArea.head')}${months}${t('FilesActiveArea.monTail')}` /// mon ago
+    if (days > 0) return `${t('FilesActiveArea.head')}${days}${t('FilesActiveArea.dTail')}` /// d ago
+    if (hours > 0) return `${t('FilesActiveArea.head')}${hours}${t('FilesActiveArea.hTail')}` /// h ago
+    if (minutes > 0) return `${t('FilesActiveArea.head')}${minutes}${t('FilesActiveArea.minTail')}` /// min ago
+    return `${t('FilesActiveArea.head')}${seconds}${t('FilesActiveArea.sTail')}` /// s ago
+  }
 
   const data = useMemo(() => {
     if (filesData) {
@@ -354,17 +355,17 @@ const FilesActiveArea = (props: {
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={1}>
           <Stack direction="row" overflow="auto" width={1} alignItems="center" spacing={2}>
             <IconButton disabled={!data?.info.upper} onClick={handleBackButton}><ArrowBackRounded/></IconButton>
-            <Typography noWrap variant="h5" fontWeight={500}>{data?.info.name==="" ? "My files" : data?.info.name}</Typography>
+            <Typography noWrap variant="h5" fontWeight={500}>{data?.info.name==="" ? t('FilesActiveArea.myFiles') : data?.info.name}</Typography>
           </Stack>
           {selectedItems.length > 0 && selectedItems.filter((item) => item.size===-1).length===0 ?
             <Stack sx={{ minHeight: 34, border: "solid", borderWidth: "1px", borderRadius: 1, borderColor: (theme) => theme.palette.grey[300], paddingLeft: 1, paddingRight: 1 }} direction="row" alignItems="center" spacing={1} divider={<Divider sx={{ color: "black", height: 32 }} orientation="vertical"/>}>
               {true?null:<>
               <Stack direction="row" alignItems="center" display={"flex"}>
-                <MyIconButton tooltip="New folder" onClick={() => setNewFolderModalVisible(true)}>
+                <MyIconButton tooltip={t('FilesActiveArea.newFolder')} onClick={() => setNewFolderModalVisible(true)}>
                   <CreateNewFolderRounded fontSize="inherit" />
                 </MyIconButton>
 
-                  <MyIconButton tooltip="Upload" onClick={() => {}}>
+                  <MyIconButton tooltip={t('FilesActiveArea.upload')} onClick={() => {}}>
                     <CloudUploadRounded fontSize="inherit" />
                   </MyIconButton>
               </Stack>
@@ -374,14 +375,14 @@ const FilesActiveArea = (props: {
                 <>
                   <Stack direction="row" alignItems="center" display={"flex"}>
                     
-                      <MyIconButton tooltip="Rename" onClick={() => setRenameItemModalVisible(true)}>
+                      <MyIconButton tooltip={t('FilesActiveArea.rename')} onClick={() => setRenameItemModalVisible(true)}>
                         <DriveFileRenameOutlineRounded fontSize="inherit" />
                       </MyIconButton>
-                        <MyIconButton tooltip="Share" onClick={() => setShareItemModalVisible(true)}>
+                        <MyIconButton tooltip={t('FilesActiveArea.share')} onClick={() => setShareItemModalVisible(true)}>
                           <PeopleAltRounded fontSize="inherit" />
                         </MyIconButton>
                       {selectedItems.filter((item) => item.size===-1).length===0 ? 
-                          <MyIconButton tooltip="Open with external application" onClick={() => setExternalModalVisible(true)}>
+                          <MyIconButton tooltip={t('FilesActiveArea.openWithExternal')} onClick={() => setExternalModalVisible(true)}>
                             <DynamicFeedRounded fontSize="inherit" />
                           </MyIconButton>
                       : null}
@@ -395,24 +396,24 @@ const FilesActiveArea = (props: {
                   <Stack direction="row" alignItems="center" display={"flex"}>
                     {false ? //itemSelection.mode!=="" ? 
                       <>
-                        <MyIconButton tooltip="Paste" onClick={() => {}}>
+                        <MyIconButton tooltip={t('FilesActiveArea.paste')} onClick={() => {}}>
                           <ContentPasteRounded fontSize="inherit" />
                         </MyIconButton>
-                        <MyIconButton tooltip="Cancel selection" onClick={() => {}}>
+                        <MyIconButton tooltip={t('FilesActiveArea.cancelSelection')} onClick={() => {}}>
                           <DeselectRounded fontSize="inherit" />
                         </MyIconButton>
                       </>
                     :
                       <>
-                        <MyIconButton tooltip="Cut" onClick={() => {}}>
+                        <MyIconButton tooltip={t('FilesActiveArea.cut')} onClick={() => {}}>
                           <ContentCutRounded fontSize="inherit" />
                         </MyIconButton>
-                        <MyIconButton tooltip="Copy" onClick={() => {}}>
+                        <MyIconButton tooltip={t('FilesActiveArea.copy')} onClick={() => {}}>
                           <ContentCopyRounded fontSize="inherit" />
                         </MyIconButton>
                       </>
                     }
-                      <MyIconButton tooltip="Delete">
+                      <MyIconButton tooltip={t('FilesActiveArea.delete')}>
                         <DeleteRounded fontSize="inherit" />
                       </MyIconButton>
                       
@@ -423,7 +424,7 @@ const FilesActiveArea = (props: {
               </>}
               
                 <>
-                  <MyIconButton tooltip="Download" onClick={() => {}}>
+                  <MyIconButton tooltip={t('FilesActiveArea.download')} onClick={() => {}}>
                     <DownloadRounded fontSize="inherit" />
                   </MyIconButton>
                 </>
@@ -469,11 +470,11 @@ const FilesActiveArea = (props: {
             {/*Table headers*/}
             <Stack direction="row" p={1}>
               <Folder sx={{ marginRight: 3, visibility: "hidden" }} fontSize="medium"></Folder>
-              <FilesHeadItem onClick={() => clickHeader("name")} sx={{ flex: 1 }} sort={sortBy==="name"?(sortReverse?"up":"down"):"none"} anchor="left" label="Name"/>
+              <FilesHeadItem onClick={() => clickHeader("name")} sx={{ flex: 1 }} sort={sortBy==="name"?(sortReverse?"up":"down"):"none"} anchor="left" label={t('FilesActiveArea.name')}/>
               {itemDetail && selectedItems.length !== 0 ? null :
               <>
-                <FilesHeadItem onClick={() => clickHeader("addDate")} sx={{ width: 103 }} sort={sortBy==="addDate"?(sortReverse?"up":"down"):"none"} anchor="right" label="Date added"/>
-                <FilesHeadItem onClick={() => clickHeader("size")} sx={{ width: 80 }} sort={sortBy==="size"?(sortReverse?"up":"down"):"none"} anchor="right" label="Size"/>
+                <FilesHeadItem onClick={() => clickHeader("addDate")} sx={{ width: 103 }} sort={sortBy==="addDate"?(sortReverse?"up":"down"):"none"} anchor="right" label={t('FilesActiveArea.dateAdded')}/>
+                <FilesHeadItem onClick={() => clickHeader("size")} sx={{ width: 80 }} sort={sortBy==="size"?(sortReverse?"up":"down"):"none"} anchor="right" label={t('FilesActiveArea.size')}/>
               </>
               }
             </Stack>
@@ -509,10 +510,10 @@ const FilesActiveArea = (props: {
             <Stack direction="row" pl={3}>
               <Divider orientation="vertical" />
               <Stack direction="column" width={400} px={3} py={2} spacing={0.5}>
-                <Typography variant="h5" fontWeight={500} pb={1}>Detail</Typography>
+                <Typography variant="h5" fontWeight={500} pb={1}>{t('FilesActiveArea.detail')}</Typography>
 
                 <Stack direction={"row"} justifyContent="space-between" spacing={3}>
-                  <Typography variant="body1">Name:</Typography>
+                  <Typography variant="body1">{t('FilesActiveArea.name')}:</Typography>
                   <Typography variant="body1">{selectedItems[0].name}</Typography>
                 </Stack>
 
@@ -522,17 +523,17 @@ const FilesActiveArea = (props: {
                 </Stack>
 
                 <Stack direction={"row"} justifyContent="space-between" spacing={3}>
-                  <Typography variant="body1">Date added:</Typography>
+                  <Typography variant="body1">{t('FilesActiveArea.dateAdded')}:</Typography>
                   <Typography variant="body1">{displayTime(Date.now()-(new Date (selectedItems[0].addDate).getTime()))}</Typography>
                 </Stack>
 
                 <Stack direction={"row"} justifyContent="space-between" spacing={3}>
-                  <Typography variant="body1">Date modified:</Typography>
+                  <Typography variant="body1">{t('FilesActiveArea.dateModified')}:</Typography>
                   <Typography variant="body1">{displayTime(Date.now()-(new Date (selectedItems[0].modDate).getTime()))}</Typography>
                 </Stack>
 
                 <Stack direction={"row"} justifyContent="space-between" spacing={3}>
-                  <Typography variant="body1">Size:</Typography>
+                  <Typography variant="body1">{t('FilesActiveArea.size')}:</Typography>
                   <Typography variant="body1">{displaySize(selectedItems[0].size)}</Typography>
                 </Stack>
 
@@ -564,7 +565,7 @@ const FilesActiveArea = (props: {
 
       </>)
   } else {
-    return <div>loading</div>
+    return <div>{t('FilesActiveArea.loading')}...</div>
   }
 }
 

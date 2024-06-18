@@ -5,12 +5,15 @@
 import { Button, DialogTitle, FormControl, FormLabel, Input, Modal, Stack, Box, DialogContent, DialogActions, TextField, Typography } from "@mui/material"
 import { useState } from "react"
 import { ExplorerItem } from "../../types/global"
+import { useTranslation } from "react-i18next"
 
 const WindowTextInput = (props: {
   item: Partial<ExplorerItem>,
   closeSelf: () => void,
   type: "new"|"rename"
 }) => {
+  const { t } = useTranslation()
+
   const [name, setName] = useState(props.type==="rename" ? props.item.name : "")
 
   const handleSubmit = (e: any) => {
@@ -22,7 +25,7 @@ const WindowTextInput = (props: {
   return (
     <DialogContent sx={{ width: 400 }}>
       <Typography variant="h6">
-        {props.type==="new" ? "New folder" : "Rename"}
+        {props.type==="new" ? t('WindowTextInput.newFolder') : t('WindowTextInput.rename')}
       </Typography>
       <form onSubmit={handleSubmit}>
         <Stack spacing={2}>
@@ -40,8 +43,8 @@ const WindowTextInput = (props: {
             />
           </FormControl>
           <Stack direction="row-reverse" spacing={2}>
-            <Button type="submit" variant="contained">Submit</Button>
-            <Button onClick={props.closeSelf}>Cancel</Button>
+            <Button type="submit" variant="contained">{t('WindowTextInput.submit')}</Button>
+            <Button onClick={props.closeSelf}>{t('WindowTextInput.cancel')}</Button>
           </Stack>
         </Stack>
       </form>

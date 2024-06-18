@@ -9,6 +9,7 @@ import { ThemeContext } from "@emotion/react"
 import { PermissionModes } from "../../types/enums"
 import { useFetch } from "use-http"
 import { UsersResponse, useGetUsersQuery } from "../../Services/users"
+import { useTranslation } from "react-i18next"
 
 const PermissionsTableRow = (props: {
         rowData: {id: string, name: string, perms: string},
@@ -16,6 +17,8 @@ const PermissionsTableRow = (props: {
         updateShare: (id: string, perms: "owner"|"editor"|"viewer") => void
         removeShare: (id: string) => void,
 }) => {
+    const { t } = useTranslation()
+
     return (
         <TableRow>
             <TableCell component="th" scope="row">
@@ -26,7 +29,7 @@ const PermissionsTableRow = (props: {
             </TableCell>
             <TableCell>
             <FormControl fullWidth>
-                <InputLabel id="permissions-role">Role</InputLabel>
+                <InputLabel id="permissions-role">{t("PermissionsTable.role")}</InputLabel>
                 <Select
                     labelId="permissions-role"
                     id="permissions-role-select"
@@ -35,13 +38,13 @@ const PermissionsTableRow = (props: {
                     onChange={(e) => props.updateShare(props.rowData.id, e.target.value as "owner"|"editor"|"viewer")}
                     disabled={props.perms!=="owner" || props.rowData.perms=="owner"}
                 >
-                    {props.rowData.perms=="owner" ? <MenuItem value={"owner"}>Owner</MenuItem> : null}
-                    <MenuItem value={"editor"}>Editor</MenuItem>
-                    <MenuItem value={"viewer"}>Viewer</MenuItem>
+                    {props.rowData.perms=="owner" ? <MenuItem value={"owner"}>{t("PermissionsTable.owner")}</MenuItem> : null}
+                    <MenuItem value={"editor"}>{t("PermissionsTable.editor")}</MenuItem>
+                    <MenuItem value={"viewer"}>{t("PermissionsTable.viewer")}</MenuItem>
                 </Select>
                 </FormControl>
             </TableCell>
-            <TableCell>Last activity: Oct 12, 2023</TableCell>
+            <TableCell>{t("PermissionsTable.lastActivity")}: Oct 12, 2023</TableCell>
             <TableCell>
                 {props.perms==="owner" && props.rowData.perms!=="owner" ? <IconButton aria-label="delete" color="error" onClick={() => props.removeShare(props.rowData.id)}>
                     <Delete />
@@ -53,6 +56,8 @@ const PermissionsTableRow = (props: {
 
 
 const PermissionsTable = (props: {perms: PermissionModes, currentShares: SharesList, setCurrentShares: (val: SharesList | ((array: SharesList) => SharesList)) => void}) => {
+    const { t } = useTranslation()
+    
     const [ newUserWindow, setNewUserWindow ] = useState<boolean>(false)
     const [ newUserId, setNewUserId ] = useState<string>("")
     const [ newUserPerm, setNewUserPerm ] = useState<"editor"|"viewer">("viewer")
@@ -87,13 +92,13 @@ const PermissionsTable = (props: {perms: PermissionModes, currentShares: SharesL
 
     return (
         <>
-            <ContentCard title={"Permissions"} actions={
+            <ContentCard title={t("PermissionsTable.permissions")} actions={
                 <>
                     {props.perms==="owner" ? <Button variant="outlined" startIcon={<MultipleStop />} onClick={() => setTransferWindow(true)}>
-                            Transfer ownership
+                            {t("PermissionsTable.transferOwnership")}
                         </Button> : undefined}
                     {props.perms==="owner" ? <Button variant="outlined" startIcon={<GroupAdd />} onClick={() => setNewUserWindow(true)}>
-                            Add user/group
+                            {t("PermissionsTable.addUser")}
                         </Button> : undefined}
                 </>
             }>
@@ -101,9 +106,9 @@ const PermissionsTable = (props: {perms: PermissionModes, currentShares: SharesL
                     <Table aria-label="Table for permissions management.">
                         <TableHead>
                         <TableRow>
-                            <TableCell>Account</TableCell>
-                            <TableCell>Role</TableCell>
-                            <TableCell>Activity</TableCell>
+                            <TableCell>{t("PermissionsTable.account")}</TableCell>
+                            <TableCell>{t("PermissionsTable.role")}</TableCell>
+                            <TableCell>{t("PermissionsTable.activity")}</TableCell>
                             <TableCell></TableCell>
                         </TableRow>
                         </TableHead>
@@ -119,13 +124,13 @@ const PermissionsTable = (props: {perms: PermissionModes, currentShares: SharesL
                 onClose={() => setNewUserWindow(false)}
             >
                 <DialogTitle>
-                    Add new user
+                    {t("PermissionsTable.addUser")}
                 </DialogTitle>
                 <DialogContent>
                     <Stack spacing={2} mt={0.75}>
-                        <TemplateSelect width={"400px"} label="User" selectedId={newUserId} setSelectedId={(val) => setNewUserId(val)} entities={{...users, results: newUsersList} as unknown as DaregAPIResponse<DaregAPIObjectExtended>}/>
+                        <TemplateSelect width={"400px"} label={t("PermissionsTable.user")} selectedId={newUserId} setSelectedId={(val) => setNewUserId(val)} entities={{...users, results: newUsersList} as unknown as DaregAPIResponse<DaregAPIObjectExtended>}/>
                         <FormControl fullWidth>
-                            <InputLabel id="permissions-role">Role</InputLabel>
+                            <InputLabel id="permissions-role">{t("PermissionsTable.role")}</InputLabel>
                             <Select
                                 labelId="permissions-role"
                                 id="permissions-role-select"
@@ -134,14 +139,14 @@ const PermissionsTable = (props: {perms: PermissionModes, currentShares: SharesL
                                 onChange={(e) => {setNewUserPerm(e.target.value as "editor"|"viewer")}}
                                 sx={{ width: 200 }}
                             >
-                                <MenuItem value={"editor"}>Editor</MenuItem>
-                                <MenuItem value={"viewer"}>Viewer</MenuItem>
+                                <MenuItem value={"editor"}>{t("PermissionsTable.editor")}</MenuItem>
+                                <MenuItem value={"viewer"}>{t("PermissionsTable.viewer")}</MenuItem>
                             </Select>
                         </FormControl>
                     </Stack>
                 </DialogContent>
                 <DialogActions>
-                    <Button size="large" disabled={newUserId===""} onClick={addNewShare}>Add user</Button>
+                    <Button size="large" disabled={newUserId===""} onClick={addNewShare}>{t("PermissionsTable.add")}</Button>
                 </DialogActions>
             </Dialog>
 
@@ -150,18 +155,18 @@ const PermissionsTable = (props: {perms: PermissionModes, currentShares: SharesL
                 onClose={() => setTransferWindow(false)}
             >
                 <DialogTitle>
-                    Transfer ownership
+                    {t("PermissionsTable.transferOwnership")}
                 </DialogTitle>
                 <DialogContent>
                     <Stack mt={0.75} mb={2}>
-                        <TemplateSelect width={"400px"} label="User" selectedId={transferUserId} setSelectedId={(val) => setTransferUserId(val)} entities={{...users, results: users?.results.filter(item => item.name!==" ")} as unknown as DaregAPIResponse<DaregAPIObjectExtended>}/>
+                        <TemplateSelect width={"400px"} label={t("PermissionsTable.user")} selectedId={transferUserId} setSelectedId={(val) => setTransferUserId(val)} entities={{...users, results: users?.results.filter(item => item.name!==" ")} as unknown as DaregAPIResponse<DaregAPIObjectExtended>}/>
                     </Stack>
-                    <Typography color="error">Don't forget to add permissions for yourself after</Typography>
-                    <Typography color="error">transfering if you don't want to completely lose access. </Typography>
+                    <Typography color="error">{t("PermissionsTable.transferWarning1")}</Typography>
+                    <Typography color="error">{t("PermissionsTable.transferWarning2")}</Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button size="large" onClick={() => setTransferWindow(false)}>Cancel</Button>
-                    <Button size="large" disabled={transferUserId===""} onClick={transferOwner}>Transfer</Button>
+                    <Button size="large" onClick={() => setTransferWindow(false)}>{t("PermissionsTable.cancel")}</Button>
+                    <Button size="large" disabled={transferUserId===""} onClick={transferOwner}>{t("PermissionsTable.transfer")}</Button>
                 </DialogActions>
             </Dialog>
 
