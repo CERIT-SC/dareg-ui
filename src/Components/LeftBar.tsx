@@ -87,7 +87,7 @@ const LeftBar = (props: {setSection: (value: string) => void}) => {
               <ListItemText primary={t('LeftBar.logout')} />
             </ListItemButton>
           </ListItem>
-          <ListItem disablePadding sx={{border: "1px", borderStyle: "solid", borderColor: "#A5D46E", borderRadius: "4px", backgroundColor: "#DCF1D2"}}>
+          <ListItem disablePadding sx={{border: "1px", borderStyle: "solid", borderRadius: "4px", borderColor: (theme) => theme.palette.mode==='light' ? "#9ed060" : "#4F7E13", backgroundColor: (theme) => theme.palette.mode==='light' ? "#dcf1d2" : "#1A3600"}}>
           <ListItemButton onClick={() => props.setSection("account")}>
               <ListItemIcon>
                 {avatarComponent}

@@ -35,7 +35,7 @@ const ContentHeader = <T, >({title, children, sx, backAction, actions, metadata}
     }
 
     return (
-        <Paper variant="outlined" sx={{p: 2, mt:2, border: "solid", borderWidth: 1, borderColor: "#9ed060", backgroundColor: "#dcf1d2", ...sx}}>
+        <Paper variant="outlined" sx={{p: 2, mt:2, border: "solid", borderWidth: 1, borderColor: (theme) => theme.palette.mode==='light' ? "#9ed060" : "#4F7E13", backgroundColor: (theme) => theme.palette.mode==='light' ? "#dcf1d2" : "#1A3600", ...sx}}>
             <Stack direction="row" justifyContent="space-between">
                 <Stack direction="row" alignItems="center">
                     {pathname.split('/').length > 2 ? 
@@ -52,7 +52,7 @@ const ContentHeader = <T, >({title, children, sx, backAction, actions, metadata}
                         return (
                             (item.renderCell || item.value) ? (
                             <Stack direction="row" spacing={1} alignItems="center" key={index}>
-                                <Avatar sx={{color: "#32421e", background: "#FFF"}} alt={item.label}>{item.icon}</Avatar>
+                                <Avatar sx={{color: (theme) => theme.palette.mode==='light' ? "#32421e" : theme.palette.text.primary, background: (theme) => theme.palette.background.paper}} alt={item.label}>{item.icon}</Avatar>
                                 <Typography variant="body1" color="text.primary">{item.renderCell ? item.renderCell(item.value) : item.value}</Typography>
                             </Stack>
                             ) : null

@@ -34,7 +34,7 @@ const TemplateView = () => {
                         variant="outlined"
                         value={data?.name}
                         disabled={true}
-                        sx={{maxWidth: "33.33%", background: "#FFF"}}
+                        sx={{maxWidth: "33.33%", background: (theme) => theme.palette.background.paper}}
                         />
                     <TextField
                         margin="dense"
@@ -43,7 +43,7 @@ const TemplateView = () => {
                         variant="outlined"
                         value={data?.description}
                         disabled={true}
-                        sx={{maxWidth: "66.67%", background: "#FFF"}}
+                        sx={{maxWidth: "66.67%", background: (theme) => theme.palette.background.paper}}
                         />
                 </Stack>
             </ContentHeader>
@@ -74,7 +74,7 @@ const TemplateView = () => {
                             variant="outlined"
                             value={""}
                             disabled={true}
-                            sx={{maxWidth: "33.33%", background: "#FFF"}}
+                            sx={{maxWidth: "33.33%", background: (theme) => theme.palette.background.paper}}
                             />
                         </Skeleton>
                         <Skeleton width={"67%"}>
@@ -85,7 +85,7 @@ const TemplateView = () => {
                             variant="outlined"
                             value={""}
                             disabled={true}
-                            sx={{maxWidth: "66.67%", background: "#FFF"}}
+                            sx={{maxWidth: "66.67%", background: (theme) => theme.palette.background.paper}}
                             />
                         </Skeleton>
                     </Stack>
