@@ -357,7 +357,7 @@ const FilesActiveArea = (props: {
             <Typography noWrap variant="h5" fontWeight={500}>{data?.info.name==="" ? "My files" : data?.info.name}</Typography>
           </Stack>
           {selectedItems.length > 0 && selectedItems.filter((item) => item.size===-1).length===0 ?
-            <Stack sx={{ minHeight: 34, border: "solid", borderWidth: "1px", borderRadius: 1, borderColor: (theme) => theme.palette.grey[300], paddingLeft: 1, paddingRight: 1 }} direction="row" alignItems="center" spacing={1} divider={<Divider sx={{ color: "black", height: 32 }} orientation="vertical"/>}>
+            <Stack sx={{ minHeight: 34, border: "solid", borderWidth: "1px", borderRadius: 1, borderColor: (theme) => theme.palette.action.focus, paddingLeft: 1, paddingRight: 1 }} direction="row" alignItems="center" spacing={1} divider={<Divider sx={{ color: "black", height: 32 }} orientation="vertical"/>}>
               {true?null:<>
               <Stack direction="row" alignItems="center" display={"flex"}>
                 <MyIconButton tooltip="New folder" onClick={() => setNewFolderModalVisible(true)}>
@@ -424,7 +424,7 @@ const FilesActiveArea = (props: {
               
                 <>
                   <MyIconButton tooltip="Download" onClick={() => {}}>
-                    <DownloadRounded fontSize="inherit" />
+                    <DownloadRounded sx={{ color: (theme) => theme.palette.mode==="dark" ? theme.palette.text.primary : theme.palette.action.active }} fontSize="inherit" />
                   </MyIconButton>
                 </>
 
@@ -477,13 +477,13 @@ const FilesActiveArea = (props: {
               </>
               }
             </Stack>
-            <Stack direction="column" height={1} overflow={"auto"}>
+            <Stack direction="column" height={1} overflow={"auto"} sx={{ userSelect: "none", WebkitUserSelect: "none" }}>
 
               {sortedItems.map((item, index) =>
                 <>
                   <div onClick={(e) => handleClick(e, item, index)}>
                     <Divider/>
-                    <Box pb={1} pt={1} sx={{ backgroundColor: selectedItems.includes(item) ? (theme) => theme.palette.grey[200] : null }}>
+                    <Box pb={1} pt={1} sx={{ backgroundColor: selectedItems.includes(item) ? (theme) => theme.palette.action.selected : null }}>
                         <Stack direction="row" pl={1} pr={1} alignItems={"center"}>
                           {item.name.includes(".") ?
                             <InsertDriveFile sx={{ marginRight: 3, opacity: 0.7 }} fontSize="medium"></InsertDriveFile>
