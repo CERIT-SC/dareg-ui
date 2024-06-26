@@ -35,7 +35,7 @@ const ContentHeader = <T, >({title, children, sx, backAction, actions, metadata}
     }
 
     return (
-        <Paper variant="outlined" sx={{p: 2, mt:2, border: "solid", borderWidth: 1, borderColor: (theme) => theme.palette.mode==='light' ? "#9ed060" : "#4F7E13", backgroundColor: (theme) => theme.palette.mode==='light' ? "#dcf1d2" : "#1A3600", ...sx}}>
+        <Paper variant="outlined" sx={{p: 2, mt:2, border: "solid", borderWidth: 1, borderColor: (theme) => theme.palette.superGreen.border, backgroundColor: (theme) => theme.palette.superGreen.bg, ...sx}}>
             <Stack direction="row" justifyContent="space-between">
                 <Stack direction="row" alignItems="center">
                     {pathname.split('/').length > 2 ? 
