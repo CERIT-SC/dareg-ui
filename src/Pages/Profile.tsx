@@ -8,6 +8,7 @@ import ContentHeader from '../Components/ContentHeader';
 import ContentCard from '../Components/ContentCard';
 import SettingsMenu from '../Components/SettingsMenu';
 import { useGetProfileQuery, useUpdateProfileMutation } from '../Services/profile';
+import { useEffect } from 'react';
 
 type AdvancedUser = User & {organization: string}
 const Profile = () => {
@@ -16,7 +17,11 @@ const Profile = () => {
     const { t, i18n } = useTranslation()
     const profile = useGetProfileQuery(1)
     const data = profile.data?.results[0]
+    console.log(data)
     const [ updateProfile ] = useUpdateProfileMutation()
+    useEffect(() => {
+        i18n.changeLanguage(data?.default_lang)
+    }, [profile.isSuccess])
 
     const langDict:{[key: string]: string} = {
         "en-US": "English",
@@ -74,7 +79,17 @@ const Profile = () => {
                         <SettingsMenu
                             bttnText={langDict[i18n.language]}
                             options={langDict}
-                            onClick={(lang) => i18n.changeLanguage(lang)}
+                            onClick={(lang: "en-US"|"cs-CZ") => {
+                                let updatedProfile
+                                const requestData = {
+                                    ...data,
+                                    default_lang: lang
+                                }
+                                updatedProfile = updateProfile(requestData)
+                                updatedProfile?.then((response) => {
+                                    i18n.changeLanguage(lang)
+                                })
+                            }}
                         />
                     </Stack>
                     <Divider sx={{ mt: 1, mb: 1 }}/>

@@ -114,6 +114,7 @@ export type ProfileData = {
     }
     last_login: string,
     default_theme: "system"|"dark"|"light",
+    default_lang: "cs-CZ"|"en-US",
 }
 
 module.exports = {
