@@ -14,6 +14,17 @@ export const profileApi = api.injectEndpoints({
         { type: 'Profile' as const, id: 'LIST' },
       ],
     }),
+    updateProfile: build.mutation<ProfileData, Partial<ProfileData>>({
+      query(data) {
+        const { id, ...body } = data
+        return {
+          url: `${OBJECT_NAME}/${id}/`,
+          method: 'PATCH',
+          body,
+        }
+      },
+      invalidatesTags: (profile) => [{ type: 'Profile', id: profile?.id }],
+    }),
     getErrorProne: build.query<{ success: boolean }, void>({
       query: () => 'error-prone',
     }),
@@ -22,9 +33,10 @@ export const profileApi = api.injectEndpoints({
 
 export const {
     useGetProfileQuery,
+    useUpdateProfileMutation,
     useGetErrorProneQuery,
 } = profileApi
 
 export const {
-    endpoints: { getProfile, getErrorProne },
+    endpoints: { getProfile, updateProfile, getErrorProne },
 } = profileApi

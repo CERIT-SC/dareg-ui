@@ -25,10 +25,12 @@ import DatasetView from './Pages/Datasets/DatasetView';
 import { ViewModes } from './types/enums';
 import DatasetList from './Pages/Datasets/DatasetList';
 import { darkTheme, lightTheme } from './theme';
+import { useGetProfileQuery } from './Services/profile';
 
 const App = () => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
-  const [selectedTheme, setSelectedTheme] = useState<"dark"|"light"|"system">("system")
+
+  const profile = useGetProfileQuery(1)
   const toTheme = (theme: "dark"|"light") => theme==="dark" ? darkTheme : lightTheme
 
   const getUser = () => {
@@ -65,7 +67,7 @@ const App = () => {
     <Provider url={config.REACT_APP_BASE_API_URL} options={options}>
       <BrowserRouter>
         <CssBaseline/>
-        <ThemeProvider theme={selectedTheme==="system" ? (prefersDarkMode ? lightTheme : darkTheme) : toTheme(selectedTheme)}>
+        <ThemeProvider theme={profile.isSuccess && profile.data?.results[0].default_theme!=="system" ? toTheme(profile.data?.results[0].default_theme) : (prefersDarkMode ? darkTheme : lightTheme)}>
               <Routes>
                 <Route element={<AuthenticatedRoute />}>
                   <Route path='/' element={<Layout />} >
@@ -99,7 +101,7 @@ const App = () => {
                       <Route path='new' element={<TemplatesNew mode={ViewModes.New} />} />
                     </Route>
                     
-                    <Route path='account' element={<Profile selectedTheme={selectedTheme} setSelectedTheme={setSelectedTheme} />} />
+                    <Route path='account' element={<Profile />} />
                   </Route>
                 </Route>
                 <Route element={<LoginLayout />} >

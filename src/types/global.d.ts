@@ -112,7 +112,8 @@ export type ProfileData = {
         date: string,
         environment: string,
     }
-    last_login: string
+    last_login: string,
+    default_theme: "system"|"dark"|"light",
 }
 
 module.exports = {
