@@ -3,7 +3,9 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import { CssBaseline, ThemeProvider, createTheme, useMediaQuery } from '@mui/material';
+import { CssBaseline, ThemeProvider, useMediaQuery } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
+import { PaletteOptions, Palette } from '@mui/material/styles/createPalette';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './Components/Layout';
 import Login from './Pages/Login';
@@ -22,18 +24,14 @@ import ProjectEdit from './Pages/Projects/ProjectEdit';
 import DatasetView from './Pages/Datasets/DatasetView';
 import { ViewModes } from './types/enums';
 import DatasetList from './Pages/Datasets/DatasetList';
+import { darkTheme, lightTheme } from './theme';
+import { useGetProfileQuery } from './Services/profile';
 
 const App = () => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
-  const [selectedTheme, setSelectedTheme] = useState<"dark"|"light"|"system">("system")
-  const darkTheme = createTheme({
-    palette: {
-      mode: selectedTheme==="system" ? (prefersDarkMode ? "light" : "dark") : selectedTheme,
-      primary: {main: "#2b8600"},
-      secondary: {main: "#54604d"}
 
-    }
-  })
+  const profile = useGetProfileQuery(1)
+  const toTheme = (theme: "dark"|"light") => theme==="dark" ? darkTheme : lightTheme
 
   const getUser = () => {
     const oidcStorage = sessionStorage.getItem(`oidc.user:${config.REACT_APP_OIDC_AUTHORITY}:${config.REACT_APP_OIDC_CLIENT_ID}`)
@@ -69,7 +67,7 @@ const App = () => {
     <Provider url={config.REACT_APP_BASE_API_URL} options={options}>
       <BrowserRouter>
         <CssBaseline/>
-        <ThemeProvider theme={darkTheme}>
+        <ThemeProvider theme={profile.isSuccess && profile.data?.results[0].default_theme!=="system" ? toTheme(profile.data?.results[0].default_theme) : (prefersDarkMode ? darkTheme : lightTheme)}>
               <Routes>
                 <Route element={<AuthenticatedRoute />}>
                   <Route path='/' element={<Layout />} >
@@ -103,7 +101,7 @@ const App = () => {
                       <Route path='new' element={<TemplatesNew mode={ViewModes.New} />} />
                     </Route>
                     
-                    <Route path='account' element={<Profile selectedTheme={selectedTheme} setSelectedTheme={setSelectedTheme} />} />
+                    <Route path='account' element={<Profile />} />
                   </Route>
                 </Route>
                 <Route element={<LoginLayout />} >

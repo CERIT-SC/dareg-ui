@@ -21,7 +21,7 @@ const MyIconButton = (props: {
                 color="secondary"
                 size="small"
                 >
-                    <Stack sx={{ color: hover ? "inherit" : "#858585", transition: "color 0.1s" }}>{props.children}</Stack>
+                    <Stack sx={{ transition: "color 0.1s" }}>{props.children}</Stack>
             </Button>
         </Tooltip>
         )

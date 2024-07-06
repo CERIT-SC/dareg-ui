@@ -28,7 +28,7 @@ const SkeletonView = ({name, mode}: {name: string, mode: ViewModes}) => {
                     variant="outlined"
                     value={""}
                     disabled={true}
-                    sx={{maxWidth: "33.33%", background: "#FFF"}}
+                    sx={{maxWidth: "33.33%", background: (theme) => theme.palette.background.paper}}
                     />
                 </Skeleton>
                 <Skeleton width={"67%"}>
@@ -39,7 +39,7 @@ const SkeletonView = ({name, mode}: {name: string, mode: ViewModes}) => {
                     variant="outlined"
                     value={""}
                     disabled={true}
-                    sx={{maxWidth: "66.67%", background: "#FFF"}}
+                    sx={{maxWidth: "66.67%", background: (theme) => theme.palette.background.paper}}
                     />
                 </Skeleton>
             </Stack>

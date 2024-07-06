@@ -17,7 +17,7 @@ const Layout = () => {
   const navigate = useNavigate()
 
   return (
-    <Stack width={"100vw"} height={"100vh"} direction="row" bgcolor={"background.default"} color={"text.primary"}>
+    <Stack width={"100vw"} height={"100vh"} overflow={"scroll"} direction="row" bgcolor={"background.default"} color={"text.primary"}>
       <LeftBar setSection={(to: string) => navigate(`/${to}`)} />
       <Stack direction={"row"} flexGrow={1} justifyContent="center">
         <Box pl={2} pr={2} flexGrow={1} flex={1} maxWidth={1800} overflow="auto">

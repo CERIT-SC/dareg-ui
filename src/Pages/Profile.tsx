@@ -7,15 +7,25 @@ import { User } from 'oidc-client-ts';
 import ContentHeader from '../Components/ContentHeader';
 import ContentCard from '../Components/ContentCard';
 import SettingsMenu from '../Components/SettingsMenu';
+import { useGetProfileQuery, useUpdateProfileMutation } from '../Services/profile';
+import { useEffect } from 'react';
 
 type AdvancedUser = User & {organization: string}
-const Profile = (props: {selectedTheme: string, setSelectedTheme: (theme: "light"|"dark"|"system") => void}) => {
+const Profile = () => {
     const auth = useAuth();
     const { avatarComponent} = useAvatar({size: 220});
     const { t, i18n } = useTranslation()
+    const profile = useGetProfileQuery(1)
+    const data = profile.data?.results[0]
+    console.log(data)
+    const [ updateProfile ] = useUpdateProfileMutation()
+    useEffect(() => {
+        i18n.changeLanguage(data?.default_lang)
+    }, [profile.isSuccess])
+
     const langDict:{[key: string]: string} = {
-      "en-US": "English",
-      "cs-CZ": "čeština",
+        "en-US": "English",
+        "cs-CZ": "čeština",
     }
     return(
         <>
@@ -61,27 +71,47 @@ const Profile = (props: {selectedTheme: string, setSelectedTheme: (theme: "light
                     </Table>
             </Stack>
         </ContentCard>
-        <ContentCard title='Settings'>
-            <Box sx={{width: 300}}>
-        <Stack direction="row" justifyContent="space-between" alignItems="baseline">
-            <Typography>{t("Settings.language")}: </Typography>
-            <SettingsMenu
-              bttnText={langDict[i18n.language]}
-              options={langDict}
-              onClick={(lang) => i18n.changeLanguage(lang)}
-            />
-          </Stack>
-          <Divider sx={{ mt: 1, mb: 1 }}/>
-          <Stack direction="row" justifyContent="space-between" alignItems="baseline">
-            <Typography>{t("Settings.appearance")}: </Typography>
-            <SettingsMenu 
-              bttnText={t(`Settings.${props.selectedTheme}`)} 
-              options={{system: t("Settings.system"), light: t("Settings.light"), dark: t("Settings.dark")}}
-              onClick={(theme: "light"|"dark"|"system") => {props.setSelectedTheme(theme)}}
-            />
-          </Stack>
-          </Box>
-        </ContentCard>
+        {profile.isSuccess ?
+            <ContentCard title='Settings'>
+                <Box sx={{width: 300}}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="baseline">
+                        <Typography>{t("Settings.language")}: </Typography>
+                        <SettingsMenu
+                            bttnText={langDict[i18n.language]}
+                            options={langDict}
+                            onClick={(lang: "en-US"|"cs-CZ") => {
+                                let updatedProfile
+                                const requestData = {
+                                    ...data,
+                                    default_lang: lang
+                                }
+                                updatedProfile = updateProfile(requestData)
+                                updatedProfile?.then((response) => {
+                                    i18n.changeLanguage(lang)
+                                })
+                            }}
+                        />
+                    </Stack>
+                    <Divider sx={{ mt: 1, mb: 1 }}/>
+                    <Stack direction="row" justifyContent="space-between" alignItems="baseline">
+                        <Typography>{t("Settings.appearance")}: </Typography>
+                        <SettingsMenu 
+                            bttnText={t(`Settings.${profile.data.results[0].default_theme}`)} 
+                            options={{system: t("Settings.system"), light: t("Settings.light"), dark: t("Settings.dark")}}
+                            onClick={(theme: "light"|"dark"|"system") => {
+                                let updatedProfile
+                                const requestData = {
+                                    ...data,
+                                    default_theme: theme
+                                }
+                                updatedProfile = updateProfile(requestData)
+                            }}
+                        />
+                    </Stack>
+                </Box>
+            </ContentCard>
+            : <Typography>Loading...</Typography>
+        }
         </>
     );
 }

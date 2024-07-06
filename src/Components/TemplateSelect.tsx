@@ -21,7 +21,7 @@ const TemplateSelect = <T extends DaregAPIObjectExtended>({label, selectedId, se
         disableClearable
         id="combo-box-demo"
         options={entities?.results || []}
-        sx={{ml: 0, width: width ? width : "33%", background: "background"}}
+        sx={{ml: 0, width: width ? width : "33%", background: (theme) => theme.palette.background.paper}}
         getOptionLabel={(option: T) => option.name}
         value={entities?.results.find((template: T) => template.id === selectedId) as NonNullable<T> || undefined}
         onChange={(e, value) => setSelectedId((value as T).id as string)}

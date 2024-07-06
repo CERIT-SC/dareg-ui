@@ -140,7 +140,7 @@ const DatasetView = ({mode}: Props) => {
                             variant="outlined"
                             value={data.name}
                             onChange={(e) => handleChange("name", e.target.value)}
-                            sx={{maxWidth: "33.33%", background: "#FFF"}}
+                            sx={{maxWidth: "33.33%", background: (theme) => theme.palette.background.paper}}
                             disabled={mode===ViewModes.View}
                             />
                         <TextField
@@ -150,7 +150,7 @@ const DatasetView = ({mode}: Props) => {
                             variant="outlined"
                             value={data.description}
                             onChange={(e) => handleChange("description", e.target.value)}
-                            sx={{maxWidth: "66.67%", backgroundColor: "#FFF"}}
+                            sx={{maxWidth: "66.67%", backgroundColor: (theme) => theme.palette.background.paper}}
                             disabled={mode===ViewModes.View}
                             />
                     </Stack>

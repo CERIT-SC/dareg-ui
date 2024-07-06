@@ -144,7 +144,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             variant="outlined"
                             value={data?.name}
                             onChange={(e) => handleChange("name", e)}
-                            sx={{maxWidth: "33.33%", background: "#FFF"}}
+                            sx={{maxWidth: "33.33%", background: (theme) => theme.palette.background.paper}}
                             disabled={mode===ViewModes.View}
                             />
                         <TextField
@@ -154,7 +154,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             variant="outlined"
                             value={data?.description}
                             onChange={(e) => handleChange("description", e)}
-                            sx={{maxWidth: "66.67%", background: "#FFF"}}
+                            sx={{maxWidth: "66.67%", background: (theme) => theme.palette.background.paper}}
                             disabled={mode===ViewModes.View}
                             />
                     </Stack>

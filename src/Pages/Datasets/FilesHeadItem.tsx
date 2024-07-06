@@ -19,7 +19,7 @@ const FilesHeadItem = (props: {
     <Box display="flex" sx={props?.sx as any} flexDirection="row" justifyContent={props.anchor==="right"?"flex-end":"flex-start"}>
       <Link
         underline="none"
-        color='primary.plainColor'
+        color={(theme) => theme.palette.text.primary}
         component="button"
         fontSize={15}
         onClick={props.onClick}

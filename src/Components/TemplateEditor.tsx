@@ -96,7 +96,7 @@ const TemplateEditor = ({data, setData, open, closeSelf, id}: TemplateEditorProp
           zIndex: 1000,
         }}
         backAction={closeSelf}>
-          <Stack direction="row" justifyContent="space-between" mt={2} sx={{background: "#FFF", p:1 }}>
+          <Stack direction="row" justifyContent="space-between" mt={2} bgcolor={(theme) => theme.palette.background.paper} sx={{p:1}}>
             <Stack direction={"row"} gap={2}>
               <ToggleButtonGroup
                 color="primary"
