@@ -16,10 +16,13 @@ import { Dataset, useGetDatasetsQuery } from "../../Services/datasets";
 import DateTimeFormatter from "../../Components/DateTimeFormatter";
 import PermissionsTable from "../../Components/PermissionsContainer/PermissionsTable";
 import SkeletonView from "../../Components/SkeletonView";
+import { useTranslation } from "react-i18next";
 
 export type ProjectDataStateKeys = keyof ProjectsData;
 
 const ProjectEdit = ({mode}: {mode: ViewModes}) => {
+
+    const { t } = useTranslation()
 
     const navigate = useNavigate();
     const { projectId, tab } = useParams();
@@ -93,20 +96,20 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
     }
     
     const datasetsTable: Column<Dataset>[] = [
-        { id: 'name', label: 'Name', minWidth: 200 },
-        { id: 'description', label: 'Description', minWidth: 400 },
-        { id: 'tags', label: 'Tags', minWidth: 100, renderCell: (params: any) => (params.tags?.map((item: string, index: number) => (<Chip label={item} size="small" variant="outlined" />)) || "None") },
-        { id: 'created_by', label: 'Creator', minWidth: 200, renderCell: (params: any) => (params.created_by?.full_name || "Unknown")},
-        { id: 'created', label: 'Creation', minWidth: 200, renderCell: (params: any) => <DateTimeFormatter>{params.created}</DateTimeFormatter>},
-        { id: 'actions', label: 'Actions', minWidth: 50, renderCell: (params: any) => (
-            <Button variant="contained" size="small" onClick={() => navigate(`/collections/${projectId}/datasets/${params.id}`)}>View</Button>
+        { id: 'name', label: t('ProjectEdit.name'), minWidth: 200 },
+        { id: 'description', label: t('ProjectEdit.description'), minWidth: 400 },
+        { id: 'tags', label: t('ProjectEdit.tags'), minWidth: 100, renderCell: (params: any) => (params.tags?.map((item: string, index: number) => (<Chip label={item} size="small" variant="outlined" />)) || "None") },
+        { id: 'created_by', label: t('ProjectEdit.creator'), minWidth: 200, renderCell: (params: any) => (params.created_by?.full_name || "Unknown")},
+        { id: 'created', label: t('ProjectEdit.created'), minWidth: 200, renderCell: (params: any) => <DateTimeFormatter>{params.created}</DateTimeFormatter>},
+        { id: 'actions', label: t('ProjectEdit.actions'), minWidth: 50, renderCell: (params: any) => (
+            <Button variant="contained" size="small" onClick={() => navigate(`/collections/${projectId}/datasets/${params.id}`)}>{t('ProjectEdit.view')}</Button>
         )}
     ]
 
     if (!projectDataLoading){
         return (
             <Box>
-                <ContentHeader title={`Collection: ${mode}`} actions={
+                <ContentHeader title={`${t('ProjectEdit.collection')}: ${t('mode.'+mode)}`} actions={
                         data.perms!=="viewer" ?
                             mode===ViewModes.View ? (
                                 <Button
@@ -115,7 +118,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                                     endIcon={<Edit />}
                                     onClick={() => navigate(`/collections/${data?.id}/edit`)}
                                 >
-                                Edit
+                                {t('ProjectEdit.edit')}
                                 </Button>
                             ) : (
                                 <>
@@ -127,7 +130,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                                         size="medium"
                                         onClick={() => saveForm()}
                                     >
-                                        Save
+                                        {t('ProjectEdit.save')}
                                     </LoadingButton>
                                 </>
                             )
@@ -136,7 +139,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                         <TextField
                             autoFocus
                             margin="dense"
-                            label="Collection name"
+                            label={t('ProjectEdit.collectionName')}
                             fullWidth
                             variant="outlined"
                             value={data?.name}
@@ -146,7 +149,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             />
                         <TextField
                             margin="dense"
-                            label="Collection description"
+                            label={t('ProjectEdit.collectionDescription')}
                             fullWidth
                             variant="outlined"
                             value={data?.description}
@@ -165,14 +168,14 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                                 }}
                                     aria-label="lab API tabs example"
                                 >
-                                <Tab label="Datasets" value={"datasets"} />
-                                <Tab label="Settings" value={"settings"} />
+                                <Tab label={t('ProjectEdit.datasets')} value={"datasets"} />
+                                <Tab label={t('ProjectEdit.settings')} value={"settings"} />
                             </TabList>
                         </ContentCard>
                     : null
                     }
                     <TabPanel value="datasets" sx={{p:0}}>
-                        <ContentCard title={"Datasets"} actions={
+                        <ContentCard title={t('ProjectEdit.datasets')} actions={
                             <>
                                 {/* <TextField size="small" id="dataset-search" 
                                 InputProps={{
@@ -180,7 +183,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                                 }}/> */}
                                 {data.perms!=="viewer" ? 
                                 <Button variant={"contained"} size="medium" endIcon={<Add />} onClick={() => navigate(`/collections/${data?.id}/datasets/new`)}>
-                                    New Dataset
+                                    {t('ProjectEdit.newDataset')}
                                 </Button> : null}
                             </>
                         }>
@@ -194,7 +197,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                         </ContentCard>
                     </TabPanel>
                     <TabPanel value="settings" sx={{p:0}}>
-                        {!facilities ? <></> : (<ContentCard title={"Select facility"}>
+                        {!facilities ? <></> : (<ContentCard title={t('ProjectEdit.selectFacility')}>
                             <Stack direction="row" justifyContent="flex-start" alignItems="baseline" spacing={3}>
                                 <TemplateSelect 
                                     disabled={mode===ViewModes.View}
@@ -205,7 +208,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                                 />
                             </Stack>
                         </ContentCard>)}
-                        {!schemas ? <></> : (<ContentCard title={"Select default template"}>
+                        {!schemas ? <></> : (<ContentCard title={t('ProjectEdit.selectDefaultTemplate')}>
                             <Stack direction="row" justifyContent="flex-start" alignItems="baseline" spacing={3}>
                                 <TemplateSelect
                                     disabled={mode===ViewModes.View}
@@ -236,7 +239,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                         size="large"
                         onClick={() => saveForm()}
                         >
-                        Save
+                        {t('ProjectEdit.save')}
                     </LoadingButton>
                 </ContentCard>)}
                 {/* {error ? <Typography variant="subtitle1">{error.message || ""}</Typography> : <p></p>} */}
@@ -244,7 +247,7 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
         )
     } else {
         return (
-            <SkeletonView name="Collection" mode={mode} />
+            <SkeletonView name={t('ProjectEdit.collection')} mode={mode} />
         )
     }
 }

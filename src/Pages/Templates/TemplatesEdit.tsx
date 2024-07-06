@@ -11,6 +11,7 @@ import { SchemasData } from "../../types/global";
 import { ViewModes } from "../../types/enums";
 import { useAddSchemaMutation, useGetSchemaQuery, useUpdateSchemaMutation } from "../../Services/schemas";
 import { LoadingButton } from "@mui/lab";
+import { useTranslation } from "react-i18next";
 
 
 type TemplateEditorStateKeys = keyof SchemasData | 'full-editor';
@@ -20,6 +21,7 @@ type Props = {
 }
 
 const TemplatesNew = ({mode}: Props) => {
+    const { t } = useTranslation()
 
     const navigate = useNavigate();
     const { templateId } = useParams();
@@ -85,12 +87,12 @@ const TemplatesNew = ({mode}: Props) => {
 
     return (
       <Box>
-        <ContentHeader title={`Template: ${mode}`}>
+        <ContentHeader title={`${t('TemplatesEdit.template')}: ${t('mode.'+mode)}`}>
             <Stack direction="row" justifyContent="center" alignItems="baseline" gap={2}>
                 <TextField
                     autoFocus
                     margin="dense"
-                    label="Template name"
+                    label={t('TemplatesEdit.templateName')}
                     fullWidth
                     variant="outlined"
                     value={data.name}
@@ -99,7 +101,7 @@ const TemplatesNew = ({mode}: Props) => {
                     />
                 <TextField
                     margin="dense"
-                    label="Template description"
+                    label={t('TemplatesEdit.templateDescription')}
                     fullWidth
                     variant="outlined"
                     value={data.description}
@@ -108,7 +110,7 @@ const TemplatesNew = ({mode}: Props) => {
                     />
             </Stack>
         </ContentHeader>
-        <ContentCard title={"Edit templates"}>
+        <ContentCard title={t('TemplatesEdit.editTemplates')}>
             <Stack direction="row" justifyContent="flex-start" alignItems="baseline" spacing={3}>
                 {/* <Button onClick={() => openEditor("data-schema")}>
                     <Paper sx={{p:5}}>
@@ -125,17 +127,17 @@ const TemplatesNew = ({mode}: Props) => {
                 <Button onClick={() => openEditor("full-editor")}>
                     <Paper sx={{p:5}}>
                         <DesignServices fontSize="large" />
-                        <Typography sx={{fontWeight: "bold"}} variant="body1">Templates Editor</Typography>
+                        <Typography sx={{fontWeight: "bold"}} variant="body1">{t('TemplatesEdit.templatesEditor')}</Typography>
                     </Paper>
                 </Button>
             </Stack>
             <TemplateEditor data={data} setData={setData} open={templateEditorState} closeSelf={closeEditor} />
         </ContentCard>
 
-        <ContentCard title={"Preview"}>
+        <ContentCard title={t('TemplatesEdit.preview')}>
             {(data.schema || data.uischema) ? 
             <FormsWrapped schema={data.schema} uischema={data.uischema} data={{}} setData={() => {}} />
-            : <>No schema defined, use "Edit templates" section</>}
+            : <>{t('TemplatesEdit.noSchema')}</>}
         </ContentCard>
 
         {/* <ContentCard title={"Permissions"} actions={
@@ -154,7 +156,7 @@ const TemplatesNew = ({mode}: Props) => {
                 size="large"
                 onClick={() => saveForm()}
             >
-                Save
+                {t('TemplatesEdit.save')}
             </LoadingButton>
         </ContentCard>
         {/*error ? <Typography variant="subtitle1">{error.message || ""}</Typography> : <p></p>*/}

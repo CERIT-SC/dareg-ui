@@ -21,12 +21,15 @@ import FilesActiveArea from "./FilesActiveArea";
 import TemplateSelect from "../../Components/TemplateSelect";
 import PermissionsTable from "../../Components/PermissionsContainer/PermissionsTable";
 import SkeletonView from "../../Components/SkeletonView";
+import { useTranslation } from "react-i18next";
 
 type Props = {
     mode: ViewModes
 }
 
 const DatasetView = ({mode}: Props) => {
+
+    const { t } = useTranslation()
 
     const navigate = useNavigate();
 
@@ -113,17 +116,17 @@ const DatasetView = ({mode}: Props) => {
     if (!datasetLoading) {
         return (
             <Box>
-                <ContentHeader<Dataset & Facility> title={`Dataset: ${mode}`} actions={
+                <ContentHeader<Dataset & Facility> title={`Dataset: ${t('mode.'+mode)}`} actions={
                             mode===ViewModes.View && data.perms!=="viewer" ? (<Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => navigate(`/collections/${projectId}/datasets/${datasetId}/edit`)}>
-                                Edit
+                                {t('DatasetView.edit')}
                             </Button>) : <></>
                         }
                         metadata={
                             mode === ViewModes.View ? [
-                                { id: "name", value: projectData?.name ?? "", label: "Project Name", icon: <Assignment /> },
-                                { id: "abbreviation", value: projectData?.facility.abbreviation ?? "", label: "Facility abbreviation", icon: <HomeRepairService /> },
-                                { id: "created", value: data.created || "", label: "Created At", icon: <AccessTime />, renderCell: (value) => (new Date(value).toLocaleString()) },
-                                { id: "created_by", value: data.created_by?.full_name || "", label: "Author", icon: <AccountCircle /> },
+                                { id: "name", value: projectData?.name ?? "", label: t('DatasetView.projectName'), icon: <Assignment /> },
+                                { id: "abbreviation", value: projectData?.facility.abbreviation ?? "", label: t('DatasetView.facilityAbbreviation'), icon: <HomeRepairService /> },
+                                { id: "created", value: data.created || "", label: t('DatasetView.createdAt'), icon: <AccessTime />, renderCell: (value) => (new Date(value).toLocaleString()) },
+                                { id: "created_by", value: data.created_by?.full_name || "", label: t('DatasetView.author'), icon: <AccountCircle /> },
                             ] :
                             []
                         }>
@@ -131,7 +134,7 @@ const DatasetView = ({mode}: Props) => {
                         <TextField
                             autoFocus
                             margin="dense"
-                            label="Dataset name"
+                            label={t('DatasetView.datasetName')}
                             fullWidth
                             required
                             variant="outlined"
@@ -142,7 +145,7 @@ const DatasetView = ({mode}: Props) => {
                             />
                         <TextField
                             margin="dense"
-                            label="Dataset description"
+                            label={t('DatasetView.datasetDescription')}
                             fullWidth
                             variant="outlined"
                             value={data.description}
@@ -152,10 +155,10 @@ const DatasetView = ({mode}: Props) => {
                             />
                     </Stack>
                     {mode===ViewModes.New && schemas ?
-                        <TemplateSelect label="Select template" selectedId={data.schema as string} setSelectedId={(value) => handleChange("schema", value)} entities={schemas}/>
+                        <TemplateSelect label={t('DatasetView.selectTemplate')} selectedId={data.schema as string} setSelectedId={(value) => handleChange("schema", value)} entities={schemas}/>
                     : <></>}
                     {mode===ViewModes.New && schemas ?
-                        <TemplateSelect label="Select template" selectedId={data.schema as string} setSelectedId={(value) => handleChange("schema", value)} entities={schemas}/>
+                        <TemplateSelect label={t('DatasetView.selectTemplate')} selectedId={data.schema as string} setSelectedId={(value) => handleChange("schema", value)} entities={schemas}/>
                     : <></>}
                 </ContentHeader>
                 <TabContext value={tabContent}>
@@ -166,22 +169,22 @@ const DatasetView = ({mode}: Props) => {
                                 }} 
                                     aria-label="lab API tabs example"
                                 >
-                                <Tab label="Metadata" value={"metadata"} />
-                                <Tab label="Files" value={"files"} />
-                                <Tab label="Settings" value={"settings"} />
+                                <Tab label={t('DatasetView.metadata')} value={"metadata"} />
+                                <Tab label={t('DatasetView.files')} value={"files"} />
+                                <Tab label={t('DatasetView.settings')} value={"settings"} />
                             </TabList>
                     </ContentCard>
                     <TabPanel value="metadata" sx={{p:0}}>
-                        <ContentCard title={"Metadata"} actions={
+                        <ContentCard title={t('DatasetView.metadata')} actions={
                             <Button sx={{ml:2}} variant="contained" size="small" onClick={toggleEditor}>
-                                Switch Editor
+                                {t('DatasetView.switchEditor')}
                             </Button>
                         }>
                             {error ? (
                                 <Alert sx={{mb:2}} severity="warning">
-                                    There might be a problem with metadata! Switch to the text editor instead?
+                                    {t('DatasetView.metadataProblem')}
                                     <Button sx={{ml:2}} variant="contained" size="small" onClick={toggleEditor}>
-                                        Switch
+                                        {t('DatasetView.switch')}
                                     </Button>
                                 </Alert>
                             ) : <></> }
@@ -208,13 +211,13 @@ const DatasetView = ({mode}: Props) => {
                         </ContentCard>
                     </TabPanel>
                     <TabPanel value="files" sx={{p:0}}>
-                        <ContentCard title={"Files preview"} actions={
+                        <ContentCard title={t('DatasetView.filesPreview')} actions={
                             <>
                                 <FormGroup>
-                                    <FormControlLabel sx={{ width: 130 }} control={<Switch defaultChecked size="small" checked={autoRefresh} onChange={(e) => setAutoRefresh(e.target.checked)} />} label="Auto refresh" />
+                                    <FormControlLabel sx={{ width: 135 }} control={<Switch defaultChecked size="small" checked={autoRefresh} onChange={(e) => setAutoRefresh(e.target.checked)} />} label={t('DatasetView.autoRefresh')} />
                                 </FormGroup>
                                 <Button variant="contained" size="small" onClick={() => window.open(`"${config.REACT_APP_BASE_ONEZONE_URL}/i#/onedata/spaces/${projectData?.onedata_space_id}/data`, "_blank")}>
-                                    Open folder in Onedata
+                                    {t('DatasetView.openOnedata')}
                                 </Button>
                             </>
                         }>
@@ -222,7 +225,7 @@ const DatasetView = ({mode}: Props) => {
                         </ContentCard>
                     </TabPanel>
                     <TabPanel value="settings" sx={{p:0}}>
-                        <ContentCard title={"Onedata settings"}>
+                        <ContentCard title={t('DatasetView.onedataSettings')}>
                             <>
                                 <TextField 
                                     label="Space ID"
@@ -254,11 +257,11 @@ const DatasetView = ({mode}: Props) => {
                                 size="large"
                                 onClick={() => saveForm()}
                             >
-                                Save
+                                {t('DatasetView.save')}
                             </LoadingButton>
                         )}
                         {tabContent==="0" ? <Button disabled={/*data.metadata==="{}"*/undefined} variant="contained" size="large" endIcon={<DataObject />} onClick={() => downloadMetadata()}>
-                            Download metadata
+                        {t('DatasetView.downloadMetadata')}
                         </Button> : null} 
                     </Stack>
                 </ContentCard>

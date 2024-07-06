@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableRow, Skeleton, TableProps,
 import { Key, ReactFragment, useEffect, useState } from 'react';
 import { DaregAPIResponse } from '../../types/global';
 import { Dataset } from '../../Services/datasets';
+import { useTranslation } from 'react-i18next';
 
 export interface Column<T> {
     id: keyof T | 'actions';
@@ -24,6 +25,8 @@ interface Props<T> extends TableProps {
 }
 
 const DaregTable = <T, >({ columns, data, loading = false, page = 1, setPage = () => {}, ...other }: Props<T>) => {
+    
+    const { t } = useTranslation()
 
     const [ rowsPerPage, setRowsPerPage ] = useState(100);
 
@@ -63,7 +66,7 @@ const DaregTable = <T, >({ columns, data, loading = false, page = 1, setPage = (
                 <TextField
                     margin="dense"
                     size="small"
-                    label="Seach"
+                    label={t('DaregTable.search')}
                     fullWidth
                     variant="outlined"
                     value={searchTerm}
@@ -98,7 +101,7 @@ const DaregTable = <T, >({ columns, data, loading = false, page = 1, setPage = (
                         })) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} align="center">
-                                    No data available
+                                    {t('DaregTable.noData')}
                                 </TableCell>
                             </TableRow>
                         )}
@@ -107,6 +110,8 @@ const DaregTable = <T, >({ columns, data, loading = false, page = 1, setPage = (
                         <TableRow>
                             <TableCell colSpan={columns.length} align="right">
                                 <TablePagination
+                                    labelDisplayedRows={function defaultLabelDisplayedRows({ from, to, count }) { return `${from}–${to} ${t('DaregTable.of')} ${count !== -1 ? count : `${t('DaregTable.moreThan')} ${to}`}`; }}
+                                    labelRowsPerPage={t('DaregTable.rowsPerPage')}
                                     component="div"
                                     count={data.count || -1}
                                     page={page-1}
@@ -126,7 +131,7 @@ const DaregTable = <T, >({ columns, data, loading = false, page = 1, setPage = (
                 <TextField
                     margin="dense"
                     size="small"
-                    label="Seach"
+                    label={t('DaregTable.search')}
                     fullWidth
                     variant="outlined"
                     value={searchTerm}
