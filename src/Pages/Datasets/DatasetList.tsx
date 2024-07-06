@@ -10,27 +10,30 @@ import { DaregAPIResponse, ProjectsData } from '../../types/global';
 import { Project, useGetProjectsQuery } from '../../Services/projects';
 import { Dataset, DatasetsResponse, useGetDatasetsQuery } from '../../Services/datasets';
 import DateTimeFormatter from '../../Components/DateTimeFormatter';
+import { useTranslation } from 'react-i18next';
 
 const DatasetList = () => {
+
+  const { t } = useTranslation()
 
   const [ page, setPage ] = useState(1)
   const {data, isLoading} = useGetDatasetsQuery({page: page, projId: undefined})
   const navigate = useNavigate()
 
   const tableColumns: Column<Dataset>[] = [
-    { id: 'name', label: 'Name', minWidth: 200 },
-    { id: 'description', label: 'Description', minWidth: 400 },
+    { id: 'name', label: t('DatasetList.name'), minWidth: 200 },
+    { id: 'description', label: t('DatasetList.description'), minWidth: 400 },
     // facility
-    { id: 'created_by', label: 'Creator', minWidth: 200, renderCell: (params: any) => (params.created_by?.full_name || "Unknown")},
-    { id: 'created', label: 'Creation', minWidth: 200, renderCell: (params: any) => <DateTimeFormatter>{params.created}</DateTimeFormatter> },
-    { id: 'actions', label: 'Actions', minWidth: 50, renderCell: (params: any) => (
-        <Button variant="contained" size="small" onClick={() => navigate(`/collections/${params.project.id}/datasets/${params.id}`)}>View</Button>
+    { id: 'created_by', label: t('DatasetList.creator'), minWidth: 200, renderCell: (params: any) => (params.created_by?.full_name || "Unknown")},
+    { id: 'created', label: t('DatasetList.creation'), minWidth: 200, renderCell: (params: any) => <DateTimeFormatter>{params.created}</DateTimeFormatter> },
+    { id: 'actions', label: t('DatasetList.actions'), minWidth: 50, renderCell: (params: any) => (
+        <Button variant="contained" size="small" onClick={() => navigate(`/collections/${params.project.id}/datasets/${params.id}`)}>{t('DatasetList.view')}</Button>
     )}
   ]
 
   return (
     <Box>
-      <ContentHeader title={"Datasets"} actions={<></>}>
+      <ContentHeader title={t('DatasetList.datasets')} actions={<></>}>
       </ContentHeader>
       <ContentCard>
         <DaregTable

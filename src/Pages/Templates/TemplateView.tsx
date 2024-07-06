@@ -8,8 +8,11 @@ import { Edit } from "@mui/icons-material";
 import { useFetch } from "use-http";
 import { SchemasData } from "../../types/global";
 import { useGetSchemaQuery } from "../../Services/schemas";
+import { useTranslation } from "react-i18next";
 
 const TemplateView = () => {
+    const { t } = useTranslation()
+
     const navigate = useNavigate();
     const { templateId } = useParams()
 
@@ -20,16 +23,16 @@ const TemplateView = () => {
     if (data){
         return (
             <Box>
-                <ContentHeader title={"Template: View"} actions={
+                <ContentHeader title={t('TemplatesEdit.templateView')} actions={
                     <Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => navigate(`/templates/${data?.id}/edit`)}>
-                        Edit
+                        {t('TemplatesEdit.edit')}
                     </Button>
                 }>
                 <Stack direction="row" justifyContent="center" alignItems="baseline" gap={2}>
                     <TextField
                         autoFocus
                         margin="dense"
-                        label="Template name"
+                        label={t('TemplatesEdit.templateName')}
                         fullWidth
                         variant="outlined"
                         value={data?.name}
@@ -38,7 +41,7 @@ const TemplateView = () => {
                         />
                     <TextField
                         margin="dense"
-                        label="Template description"
+                        label={t('TemplatesEdit.templateDescription')}
                         fullWidth
                         variant="outlined"
                         value={data?.description}
@@ -47,20 +50,20 @@ const TemplateView = () => {
                         />
                 </Stack>
             </ContentHeader>
-            <ContentCard title={"Form"}>
+            <ContentCard title={t('TemplatesEdit.preview')}>
                 {(data?.schema || data?.uischema) ? 
                     <FormsWrapped schema={data.schema} uischema={data.uischema} data={{}} setData={() => {}} />
-                    : <>No schema defined, use "Edit templates" section</>}
+                    : <>{t('TemplatesEdit.noSchema')}</>}
                 </ContentCard>
             </Box>
         )
     } else {
         return (
             <Box>
-                <ContentHeader title={"Template: View"} actions={
+                <ContentHeader title={t('TemplatesEdit.templateView')} actions={
                     <Skeleton>
                         <Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => {}}>
-                            Edit
+                            {t('TemplatesEdit.edit')}
                         </Button>
                     </Skeleton>
                     }>
@@ -69,7 +72,7 @@ const TemplateView = () => {
                             <TextField
                             autoFocus
                             margin="dense"
-                            label="Template name"
+                            label={t('TemplatesEdit.templateName')}
                             fullWidth
                             variant="outlined"
                             value={""}
@@ -80,7 +83,7 @@ const TemplateView = () => {
                         <Skeleton width={"67%"}>
                         <TextField
                             margin="dense"
-                            label="Template description"
+                            label={t('TemplatesEdit.templateDescription')}
                             fullWidth
                             variant="outlined"
                             value={""}
@@ -90,7 +93,7 @@ const TemplateView = () => {
                         </Skeleton>
                     </Stack>
                 </ContentHeader>
-                <ContentCard title={"Form"}>
+                <ContentCard title={t('TemplatesEdit.preview')}>
                     <Skeleton />
                 </ContentCard>
             </Box>

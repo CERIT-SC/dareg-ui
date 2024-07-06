@@ -8,29 +8,31 @@ import DaregTable, { Column } from '../../Components/EntityTable/EntityTable';
 import { DaregAPIResponse } from '../../types/global';
 import { Project, useGetProjectsQuery } from '../../Services/projects';
 import DateTimeFormatter from '../../Components/DateTimeFormatter';
+import { useTranslation } from 'react-i18next';
 
 const ProjectsList = () => {
+  const { t } = useTranslation()
 
   const [ page, setPage ] = useState(1)
   const {data: projects, isLoading} = useGetProjectsQuery(page)
   const navigate = useNavigate()
 
   const tableColumns: Column<Project>[] = [
-    { id: 'name', label: 'Name', minWidth: 200 },
-    { id: 'description', label: 'Description', minWidth: 400 },
-    { id: 'facility', label: 'Facility', minWidth: 200, renderCell: (params: any) => (params.facility.abbreviation)},
-    { id: 'created_by', label: 'Creator', minWidth: 200, renderCell: (params: any) => (params.created_by?.full_name || "Unknown")},
-    { id: 'created', label: 'Creation', minWidth: 200, renderCell: (params: any) => <DateTimeFormatter>{params.created}</DateTimeFormatter> },
-    { id: 'actions', label: 'Actions', minWidth: 50, renderCell: (params: any) => (
-      <Button variant="contained" size="small" onClick={() => navigate(`/collections/${params.id}`)}>View</Button>
+    { id: 'name', label: t('ProjectList.name'), minWidth: 200 },
+    { id: 'description', label: t('ProjectList.description'), minWidth: 400 },
+    { id: 'facility', label: t('ProjectList.facility'), minWidth: 200, renderCell: (params: any) => (params.facility.abbreviation)},
+    { id: 'created_by', label: t('ProjectList.creator'), minWidth: 200, renderCell: (params: any) => (params.created_by?.full_name || "Unknown")},
+    { id: 'created', label: t('ProjectList.creation'), minWidth: 200, renderCell: (params: any) => <DateTimeFormatter>{params.created}</DateTimeFormatter> },
+    { id: 'actions', label: t('ProjectList.actions'), minWidth: 50, renderCell: (params: any) => (
+      <Button variant="contained" size="small" onClick={() => navigate(`/collections/${params.id}`)}>{t('ProjectList.view')}</Button>
     )}
   ]
 
   return (
     <Box>
-      <ContentHeader<Project> title={"Collections"} actions={
+      <ContentHeader<Project> title={t('ProjectList.collections')} actions={
         <Button variant="contained" size="medium" endIcon={<PostAddRounded />} onClick={() => navigate("/collections/new")}>
-          Add new
+          {t('ProjectList.addNew')}
         </Button>
       }>
       </ContentHeader>

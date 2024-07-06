@@ -12,6 +12,7 @@ import CodeEditor from '@uiw/react-textarea-code-editor';
 import { validate } from "@jsonforms/core";
 import ContentHeader from "./ContentHeader";
 import validateSchema from "../Utils/validateSchema";
+import { useTranslation } from "react-i18next";
 
 const FullscreenTextArea = styled("textarea")(({ theme }) => ({
   height: "100%",
@@ -41,6 +42,8 @@ type TemplateEditorProps = {
 type EditorMode = "schema" | "ui" | "both"
 
 const TemplateEditor = ({data, setData, open, closeSelf, id}: TemplateEditorProps): JSX.Element => {
+
+  const { t } = useTranslation()
 
   const renderers = [
     ...materialRenderers,
@@ -81,10 +84,10 @@ const TemplateEditor = ({data, setData, open, closeSelf, id}: TemplateEditorProp
   return (
     <Dialog fullScreen open={open} onClose={closeSelf}>
       <Box display="flex" flexDirection="column" padding={1}>
-        <ContentHeader title={`Editing template: ${data.name}`} actions={
+        <ContentHeader title={`${t("TemplateEditor.editingTemplate")}: ${data.name}`} actions={
           <Stack direction={"row"} gap={1}>
-              <Button startIcon={<UndoRounded />} color="error" onClick={closeSelf}>Discard</Button>
-              <Button startIcon={<SaveRounded />} variant="contained" onClick={saveForm}>Save</Button>
+              <Button startIcon={<UndoRounded />} color="error" onClick={closeSelf}>{t("TemplateEditor.discard")}</Button>
+              <Button startIcon={<SaveRounded />} variant="contained" onClick={saveForm}>{t("TemplateEditor.save")}</Button>
           </Stack>
         } 
         sx={{
@@ -105,9 +108,9 @@ const TemplateEditor = ({data, setData, open, closeSelf, id}: TemplateEditorProp
                     setEditorMode(value)
                 }}
               >
-                <ToggleButton value="schema">Scheme</ToggleButton>
-                <ToggleButton value="ui">UI schema</ToggleButton>
-                <ToggleButton value="both">Side-by-side</ToggleButton>
+                <ToggleButton value="schema">{t("TemplateEditor.schema")}</ToggleButton>
+                <ToggleButton value="ui">{t("TemplateEditor.uiSchema")}</ToggleButton>
+                <ToggleButton value="both">{t("TemplateEditor.sideBySide")}</ToggleButton>
               </ToggleButtonGroup>
               <ButtonGroup size="small" variant="outlined">
                 <Button onClick={() => setTextSize(textSize - 1)}><TextDecreaseRounded fontSize="small" /></Button>
@@ -124,7 +127,7 @@ const TemplateEditor = ({data, setData, open, closeSelf, id}: TemplateEditorProp
                 startIcon={<VisibilityRounded />}
                 onClick={() => refreshPreview()}
               >
-                Render preview
+                {t("TemplateEditor.renderPreview")}
               </Button>
             </Stack>
           </Stack>

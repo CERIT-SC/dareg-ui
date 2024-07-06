@@ -4,11 +4,14 @@ import React from 'react';
 import ContentCard from './ContentCard';
 import ContentHeader from './ContentHeader';
 import { ViewModes } from '../types/enums';
+import { useTranslation } from 'react-i18next';
 
 const SkeletonView = ({name, mode}: {name: string, mode: ViewModes}) => {
+    const { t } = useTranslation()
+
     return (
         <Box>
-        <ContentHeader title={`${name}: ${mode}`} actions={
+        <ContentHeader title={`${name}: ${t('mode.'+mode)}`} actions={
             <Skeleton>
                 <Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => {}}>
                     Edit
