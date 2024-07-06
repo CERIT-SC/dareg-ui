@@ -46,7 +46,7 @@ const DatasetView = ({mode}: Props) => {
     
     const [ data, setData ] = useState<Dataset>({name: "", description: "", schema: projectData?.default_dataset_schema ? projectData?.default_dataset_schema.id : "", project: {id: "", name: ""}, metadata: {}, shares: {}} as Dataset);
     
-    const doi = useGetDoiQuery(datasetId as string, {skip: tabContent !== "4"}).data
+    const doi = useGetDoiQuery(datasetId as string, {skip: tabContent !== "publish"}).data
 
     const {data: schemas, isLoading} = useGetSchemasQuery(1) // TODO: Implement pagination
 
