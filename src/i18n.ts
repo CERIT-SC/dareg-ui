@@ -148,6 +148,19 @@ i18n
             save: "Save",
             downloadMetadata: "Download metadata"
           },
+          PreShareTab: {
+            preShare: "Pre-share",
+            addNew: "Add new",
+            label: "Label",
+            permissions: "Permissions",
+            readOnly: "Read only",
+            readWrite: "Read-write",
+            fullAccess: "Full access",
+            noActive: "No active share links",
+            addNewLinkShare: "Add a new link share",
+            labelLabel: "You can add a label for later identification",
+            submit: "Submit"
+          },
           PublishTab: {
             requestDoi: "Request DOI",
             createDoi: "You can still make changes to this dataset after requesting a DOI.",
@@ -402,6 +415,19 @@ i18n
             onedataSettings: "Onedata nastavení",
             save: "Uložit",
             downloadMetadata: "Stáhnout metadata"
+          },
+          PreShareTab: {
+            preShare: "Sdílení",
+            addNew: "Přidat",
+            label: "Popisek",
+            permissions: "Oprávnění",
+            readOnly: "Pouze čtení",
+            readWrite: "Čtení a zápis",
+            fullAccess: "Plný přístup",
+            noActive: "Žádné aktivní odkazy",
+            addNewLinkShare: "Přidat nový odkaz",
+            labelLabel: "Můžete přidat popisek pro lepší organizaci",
+            submit: "Uložit"
           },
           PublishTab: {
             requestDoi: "Vytvořit DOI",

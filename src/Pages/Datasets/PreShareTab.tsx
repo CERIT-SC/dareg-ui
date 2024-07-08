@@ -2,8 +2,11 @@ import { useState } from "react"
 import ContentCard from "../../Components/ContentCard"
 import { Box, Button, Dialog, DialogContent, Divider, FormControl, IconButton, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material"
 import { Delete } from "@mui/icons-material"
+import { useTranslation } from "react-i18next"
 
 const PreShareTab = () => {
+    const { t } = useTranslation()
+
     const [newLinkWindow, setNewLinkWindow] = useState(false)
     const [newLinkLabel, setNewLinkLabel] = useState("")
     const [newLinkLevel, setNewLinkLevel] = useState("read")
@@ -17,8 +20,8 @@ const PreShareTab = () => {
     }
 
     return (
-        <ContentCard title={"Pre-share"} actions={
-            <Button size="small" variant="contained" onClick={() => setNewLinkWindow(true)}>Add new</Button>
+        <ContentCard title={t('PreShareTab.preShare')} actions={
+            <Button size="small" variant="contained" onClick={() => setNewLinkWindow(true)}>{t('PreShareTab.addNew')}</Button>
         }>
             <>
                 {shares.length > 0 ? shares.map((share) => (
@@ -32,41 +35,41 @@ const PreShareTab = () => {
                             <Typography noWrap >https://devel.dareg.biodata.ceitec.cz/api/v1/share/fj2h2eo20wiojerigjeirg</Typography>
                         </Box>
                         <Box flex={1}>
-                            <TextField label="Label" fullWidth size="small" value={share.label} onChange={(e) => setShares(shares.map((item) => item.id === share.id ? {...item, label: e.target.value} : item))}></TextField>
+                            <TextField label={t('PreShareTab.label')} fullWidth size="small" value={share.label} onChange={(e) => setShares(shares.map((item) => item.id === share.id ? {...item, label: e.target.value} : item))}></TextField>
                         </Box>
                         <FormControl sx={{width: 200}}>
-                            <InputLabel id={`${share.id}-label`}>Permissions</InputLabel>
+                            <InputLabel id={`${share.id}-label`}>{t('PreShareTab.permissions')}</InputLabel>
                             <Select
                                 labelId={`${share.id}-label`}
                                 value={share.level}
-                                label="Permissions"
+                                label={t('PreShareTab.permissions')}
                                 size="small"
                                 onChange={(e) => setShares(shares.map((item) => item.id === share.id ? {...item, level: e.target.value as "read"|"readwrite"|"full"} : item))}
                             >
-                                <MenuItem value={"read"}>Read-only</MenuItem>
-                                <MenuItem value={"readwrite"}>Read-write</MenuItem>
-                                <MenuItem value={"full"}>Full access</MenuItem>
+                                <MenuItem value={"read"}>{t('PreShareTab.readOnly')}</MenuItem>
+                                <MenuItem value={"readwrite"}>{t('PreShareTab.readWrite')}</MenuItem>
+                                <MenuItem value={"full"}>{t('PreShareTab.fullAccess')}</MenuItem>
                             </Select>
                         </FormControl>
                     </Stack>
                 </>
-                )) : <Typography>No active shares links</Typography>}
+                )) : <Typography>{t('PreShareTab.noActive')}</Typography>}
                 <Dialog open={newLinkWindow} onClose={() => setNewLinkWindow(false)}>
                 <DialogContent sx={{ width: 400 }}>
                         <Stack>
                                 <Box>
                                     <Typography variant="h6">
-                                        Add a new link share
+                                        {t('PreShareTab.addNewLinkShare')}
                                     </Typography>
                                     <Typography variant="body2">
-                                        You can add a label for later identification
+                                        {t('PreShareTab.labelLabel')}
                                     </Typography>
                                 </Box>
                                 <TextField
                                     autoFocus
                                     margin="dense"
                                     name="name"
-                                    label="Label"
+                                    label={t('PreShareTab.label')}
                                     type="text"
                                     fullWidth
                                     variant="filled"
@@ -76,22 +79,22 @@ const PreShareTab = () => {
                                     onChange={(e) => setNewLinkLabel(e.target.value)}
                                 />
                                 <FormControl sx={{mt:2}}>
-                                <InputLabel id={"newshare-label"}>Permissions</InputLabel>
+                                <InputLabel id={"newshare-label"}>{t('PreShareTab.permissions')}</InputLabel>
                                 <Select
                                     labelId={"newshare-label"}
                                     value={newLinkLevel}
-                                    label="Permissions"
+                                    label={t('PreShareTab.permissions')}
                                     size="small"
                                     onChange={(e) => setNewLinkLevel(e.target.value)}
                                 >
-                                    <MenuItem value={"read"}>Read-only</MenuItem>
-                                    <MenuItem value={"readwrite"}>Read-write</MenuItem>
-                                    <MenuItem value={"full"}>Full access</MenuItem>
+                                <MenuItem value={"read"}>{t('PreShareTab.readOnly')}</MenuItem>
+                                <MenuItem value={"readwrite"}>{t('PreShareTab.readWrite')}</MenuItem>
+                                <MenuItem value={"full"}>{t('PreShareTab.fullAccess')}</MenuItem>
                                 </Select>
                                 </FormControl>
 
                             <Stack direction="row-reverse" spacing={2} sx={{mt:2}}>
-                                <Button type="submit" onClick={handleNewShare} variant="contained">Submit</Button>
+                                <Button type="submit" onClick={handleNewShare} variant="contained">{t('PreShareTab.submit')}</Button>
                             </Stack>
                         </Stack>
                 </DialogContent>
