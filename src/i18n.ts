@@ -102,7 +102,7 @@ i18n
             add: "Add",
             user: "User",
             transferWarning1: "Don't forget to add permissions for yourself after",
-            transferWarning2: "transfering if you don't want to completely lose access. ",
+            transferWarning2: "transferring if you don't want to completely lose access. ",
             cancel: "Cancel",
             transfer: "Transfer"
           },
