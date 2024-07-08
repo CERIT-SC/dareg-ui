@@ -435,7 +435,7 @@ i18n
             requestFailed: "Požadavek selhal",
             doiReqistered: "DOI je registrované",
             viewDoi: "Zobrazit DOI",
-            doiRegistered: "DOI je registrováno. Můžete ho použít ve svých publikacích před finalizovaním. Po finalizování již nebude možné provádět žádné změny. ",
+            doiRegistered: "DOI je registrováno. Můžete ho použít ve svých publikacích před finalizováním. Po finalizování již nebude možné provádět žádné změny. ",
             finalize: "Finalizovat",
             actionIrreversible: "Tato akce je nevratná", 
             finalized: "Finalizováno", 
