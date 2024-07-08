@@ -1,5 +1,5 @@
-import { AccessTime, AccountCircle, Assignment, Autorenew, DataObject, Edit, GroupAdd, HomeRepairService, Save } from "@mui/icons-material";
-import { Alert, Box, Button, FormControlLabel, FormGroup, Skeleton, Stack, Switch, Tab, TextField, Typography } from "@mui/material";
+import { AccessTime, AccountCircle, Assignment, Cancel, CheckCircle, ContentPaste, DataObject, Delete, Edit, GroupAdd, HomeRepairService, Save } from "@mui/icons-material";
+import { Alert, Box, Button, Checkbox, Dialog, DialogContent, Divider, FormControl, FormControlLabel, FormGroup, Grid, IconButton, Input, InputAdornment, InputLabel, Link, ListItemText, MenuItem, OutlinedInput, Paper, Select, SelectChangeEvent, Skeleton, Stack, Step, StepContent, StepLabel, Stepper, Switch, Tab, TextField, Typography } from "@mui/material";
 import ContentHeader from "../../Components/ContentHeader";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -22,6 +22,10 @@ import TemplateSelect from "../../Components/TemplateSelect";
 import PermissionsTable from "../../Components/PermissionsContainer/PermissionsTable";
 import SkeletonView from "../../Components/SkeletonView";
 import { useTranslation } from "react-i18next";
+import { Doi, useGetDoiQuery } from "../../Services/dois";
+import { useGetFilesQuery } from "../../Services/files";
+import PublishTab from "./PublishTab";
+import PreShareTab from "./PreShareTab";
 
 type Props = {
     mode: ViewModes
@@ -42,6 +46,8 @@ const DatasetView = ({mode}: Props) => {
     const [ tabContent, setTabContent ] = useState<string>(tab ? tab as string : "metadata")
     
     const [ data, setData ] = useState<Dataset>({name: "", description: "", schema: projectData?.default_dataset_schema ? projectData?.default_dataset_schema.id : "", project: {id: "", name: ""}, metadata: {}, shares: {}} as Dataset);
+    
+    const doi = useGetDoiQuery(datasetId as string, {skip: tabContent !== "publish"}).data
 
     const {data: schemas, isLoading} = useGetSchemasQuery(1) // TODO: Implement pagination
 
@@ -110,10 +116,13 @@ const DatasetView = ({mode}: Props) => {
         element.click();
     }
 
+    const [formCorrect, setFormCorrect] = useState(false);
+
     const [autoRefresh, setAutoRefresh] = useState(true)
 
+    const { data: filesData } = useGetFilesQuery({ dataset_id: datasetId as string, file_id: null })
 
-    if (!datasetLoading) {
+    if (!datasetLoading){
         return (
             <Box>
                 <ContentHeader<Dataset & Facility> title={`Dataset: ${t('mode.'+mode)}`} actions={
@@ -157,22 +166,21 @@ const DatasetView = ({mode}: Props) => {
                     {mode===ViewModes.New && schemas ?
                         <TemplateSelect label={t('DatasetView.selectTemplate')} selectedId={data.schema as string} setSelectedId={(value) => handleChange("schema", value)} entities={schemas}/>
                     : <></>}
-                    {mode===ViewModes.New && schemas ?
-                        <TemplateSelect label={t('DatasetView.selectTemplate')} selectedId={data.schema as string} setSelectedId={(value) => handleChange("schema", value)} entities={schemas}/>
-                    : <></>}
                 </ContentHeader>
                 <TabContext value={tabContent}>
                     <ContentCard>
-                            <TabList onChange={(e, newValue) => {
-                                    setTabContent(newValue)
-                                    window.history.replaceState(null, "CEITEC Dataset Register", `/collections/${projectId}/datasets/${datasetId}/${newValue}`)
-                                }} 
-                                    aria-label="lab API tabs example"
-                                >
-                                <Tab label={t('DatasetView.metadata')} value={"metadata"} />
-                                <Tab label={t('DatasetView.files')} value={"files"} />
-                                <Tab label={t('DatasetView.settings')} value={"settings"} />
-                            </TabList>
+                        <TabList onChange={(e, newValue) => {
+                                setTabContent(newValue)
+                                window.history.replaceState(null, "CEITEC Dataset Register", `/collections/${projectId}/datasets/${datasetId}/${newValue}`)
+                            }} 
+                                aria-label="lab API tabs example"
+                            >
+                            <Tab label={t('DatasetView.metadata')} value={"metadata"} />
+                            <Tab label={t('DatasetView.files')} value={"files"} />
+                            <Tab label={t('DatasetView.preShare')} value={"preshare"} />
+                            <Tab label={t('DatasetView.settings')} value={"settings"} />
+                            <Tab label={t('DatasetView.publish')} value={"publish"} />
+                        </TabList>
                     </ContentCard>
                     <TabPanel value="metadata" sx={{p:0}}>
                         <ContentCard title={t('DatasetView.metadata')} actions={
@@ -190,7 +198,7 @@ const DatasetView = ({mode}: Props) => {
                             ) : <></> }
                             {editorMode==='form' ? (
                                 schema && schema.uischema ? (
-                                    <FormsWrapped readonly={mode===ViewModes.View} schema={schema.schema} uischema={schema.uischema} data={data.metadata} setData={(value) => handleChange("metadata", value)} />
+                                    <FormsWrapped setErrors={(errors) => setFormCorrect(errors.length===0)} readonly={mode===ViewModes.View} schema={schema.schema} uischema={schema.uischema} data={data.metadata} setData={(value) => handleChange("metadata", value)} />
                                 ) : <><FormsWrapperSkeleton></FormsWrapperSkeleton></>
                             ) : (
                                 <CodeEditor
@@ -224,8 +232,28 @@ const DatasetView = ({mode}: Props) => {
                             <FilesActiveArea id={datasetId || ""} changeId={() => {}} autoRefresh={autoRefresh} />
                         </ContentCard>
                     </TabPanel>
+                    <TabPanel value="preshare" sx={{p:0}}>
+                        <PreShareTab/>
+                    </TabPanel>
                     <TabPanel value="settings" sx={{p:0}}>
-                        <ContentCard title={t('DatasetView.onedataSettings')}>
+                        <ContentCard title={"Dataset lifecycle settings"}>
+                            <>
+                                    <TextField 
+                                        label="Dataset ID"
+                                        value={data.id}
+                                        disabled={true}
+                                        fullWidth
+                                        sx={{mb:2}}/>
+                                    <TextField 
+                                        label="Dataset Retention"
+                                        value={"3m"}
+                                        helperText="How long should the dataset be kept on hot storage?"
+                                        disabled={true}
+                                        fullWidth
+                                        sx={{mb:2}}/>
+                            </>
+                        </ContentCard>
+                        <ContentCard title={"Onedata settings"}>
                             <>
                                 <TextField 
                                     label="Space ID"
@@ -244,6 +272,15 @@ const DatasetView = ({mode}: Props) => {
                         {mode!==ViewModes.New && Object.keys(data.shares).length !== 0 ? 
                             <PermissionsTable perms={mode===ViewModes.Edit ? data.perms : "viewer"} currentShares={currentShares} setCurrentShares={setCurrentShares}/>
                         : null }
+                    </TabPanel>
+                    <TabPanel value="publish" sx={{p:0}}>
+                        {doi ?
+                            <PublishTab
+                                doi={doi as Doi}
+                                filesData={filesData}
+                                formCorrect={formCorrect}
+                            />
+                        : null}
                     </TabPanel>
                 </TabContext>
                 <ContentCard paperProps={{variant: "elevation", elevation: 0}} sx={{mb: 2, p: 0}}>

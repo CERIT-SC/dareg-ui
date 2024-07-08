@@ -25,9 +25,10 @@ type FormsWrappedProps = {
   uischema: Object,
   data: any,
   setData: (data: any) => void,
+  setErrors?: (errors: any) => void,
 } & Omit<JsonFormsInitStateProps, "data" | "renderers" | "cells" | "schema" | "uischema" | "onChange">
 
-const FormsWrapped = ({schema, uischema, data, setData, ...other}: FormsWrappedProps): JSX.Element => {
+const FormsWrapped = ({schema, uischema, data, setData, setErrors, ...other}: FormsWrappedProps): JSX.Element => {
 
   //const JSschema = useMemo(() => loadJSON(schema), [schema])
   //const JSschemaui = useMemo(() => loadJSON(uischema), [uischema])
@@ -40,7 +41,7 @@ const FormsWrapped = ({schema, uischema, data, setData, ...other}: FormsWrappedP
         data={data}
         renderers={renderers}
         cells={materialCells}
-        onChange={({ errors, data }) => setData(data)}
+        onChange={({ errors, data }) => {setData(data); if (setErrors) setErrors(errors)}}
         validationMode='ValidateAndShow'
         {...other}
         />
