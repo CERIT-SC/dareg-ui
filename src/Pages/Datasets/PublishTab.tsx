@@ -11,6 +11,7 @@ import { materialCells, materialRenderers } from "@jsonforms/material-renderers"
 import ratingControlTester from "../../ratingControlTester"
 import RatingControl from "../../RatingControl"
 import CodeEditor from '@uiw/react-textarea-code-editor';
+import { useTranslation } from "react-i18next"
 
 type Props = {
     doi: Doi,
@@ -25,6 +26,8 @@ const renderers = [
 ];
 
 const PublishTab = ({doi, filesData, formCorrect}: Props) => {
+
+    const { t } = useTranslation()
 
     const transform = useMemo(() => JSON.stringify(doi, undefined, 4), [doi])
 
@@ -101,93 +104,93 @@ const PublishTab = ({doi, filesData, formCorrect}: Props) => {
             <>
                 <Grid container spacing={2}>
                     <Grid item flex={1}>
-                        <ContentCard title={"Request DOI"}>
+                        <ContentCard title={t('PublishTab.requestDoi')}>
                             <Stepper activeStep={doi.attributes.state === "none" ? 0 : doi.attributes.state === "draft" ? 1 : 2} orientation="vertical" sx={{pb: 1}}>
-                                <Step key={"Request DOI"}>
-                                    <StepLabel>Request DOI</StepLabel>
+                                <Step key={t('PublishTab.requestDoi')}>
+                                    <StepLabel>{t('PublishTab.requestDoi')}</StepLabel>
                                     <StepContent>
-                                        <Typography sx={{mt:1}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
+                                        <Typography sx={{mt:1}}>{t('PublishTab.createDoi')}</Typography>
 
                                         <Stack direction="row" alignItems="baseline">
-                                            <LoadingButton sx={{mt:1.5, mr: 2}} loading={loadingBttn} onClick={requestDoi} variant="contained">Request DOI</LoadingButton>
+                                            <LoadingButton sx={{mt:1.5, mr: 2}} loading={loadingBttn} onClick={requestDoi} variant="contained">{t('PublishTab.requestDoi')}</LoadingButton>
                                             {doiFailed ? 
-                                                <Typography variant="overline" color="error" fontWeight={600} fontSize={13}>Request failed</Typography>
+                                                <Typography variant="overline" color="error" fontWeight={600} fontSize={13}>{t('PublishTab.requestFailed')}</Typography>
                                             : null}
                                         </Stack>
                                     </StepContent>
                                 </Step>
                                 <Step key={"Lock"}>
-                                    <StepLabel>DOI registered{doi.attributes.state === "draft" ? <Link onClick={() => setDoiWindowOpen(true)} href="#" sx={{ml: 2}} color={"secondary"}>View DOI</Link> : null}</StepLabel>
+                                    <StepLabel>{t('PublishTab.doiReqistered')}{doi.attributes.state === "draft" ? <Link onClick={() => setDoiWindowOpen(true)} href="#" sx={{ml: 2}} color={"secondary"}>{t('PublishTab.viewDoi')}</Link> : null}</StepLabel>
                                     <StepContent>
                                         <FormControl fullWidth>
                                             <Input endAdornment={<InputAdornment position="end"><IconButton onClick={() => {navigator.clipboard.writeText(doi.id)}}><ContentPaste/></IconButton></InputAdornment>} disabled id="doiReg" sx={{mt:1}} fullWidth value={doi.id}></Input>
                                         </FormControl>
-                                        <Typography sx={{mt:1.5}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
+                                        <Typography sx={{mt:1.5}}>{t('PublishTab.doiRegistered')}</Typography>
                                         <Stack direction="row" alignItems="baseline">
-                                            <LoadingButton color="error" sx={{mt:1.5, mr: 2}} loading={loadingBttnFinal} onClick={finalizeDoi} variant="contained">Finalize</LoadingButton>
+                                            <LoadingButton color="error" sx={{mt:1.5, mr: 2}} loading={loadingBttnFinal} onClick={finalizeDoi} variant="contained">{t('PublishTab.finalize')}</LoadingButton>
                                             {doiFinalFailed ? 
-                                                <Typography variant="overline" color="error" fontWeight={600} fontSize={13}>Request failed</Typography>
+                                                <Typography variant="overline" color="error" fontWeight={600} fontSize={13}>{t('PublishTab.requestFailed')}</Typography>
                                             :
-                                                <Typography variant="overline" color="error" fontWeight={600} fontSize={13}>This action is irreversible</Typography>
+                                                <Typography variant="overline" color="error" fontWeight={600} fontSize={13}>{t('PublishTab.actionIrreversible')}</Typography>
                                             }
                                         </Stack>
                                     </StepContent>
                                 </Step>
                                 <Step key={"Finalized"} completed={doi.attributes.state === "findable"}>
-                                    <StepLabel>Finalized{doi.attributes.state === "findable" ? <Link onClick={() => setDoiWindowOpen(true)} href="#" sx={{ml: 2}} color={"secondary"}>View DOI</Link> : null}</StepLabel>
+                                    <StepLabel>{t('PublishTab.finalized')}{doi.attributes.state === "findable" ? <Link onClick={() => setDoiWindowOpen(true)} href="#" sx={{ml: 2}} color={"secondary"}>{t('PublishTab.viewDoi')}</Link> : null}</StepLabel>
                                     <StepContent>
                                     <FormControl fullWidth>
                                         <Input endAdornment={<InputAdornment position="end"><IconButton onClick={() => {navigator.clipboard.writeText(doi.id)}}><ContentPaste/></IconButton></InputAdornment>} disabled id="doiReg" sx={{mt:1}} fullWidth value={doi.id}></Input>
                                     </FormControl>
-                                    <Typography sx={{mt:1.5}}>DOI is now findable. You cannot make any changes. </Typography>
+                                    <Typography sx={{mt:1.5}}>{t('PublishTab.doiFindable')}</Typography>
                                     </StepContent>
                                 </Step>
                             </Stepper>
                         </ContentCard>
                     </Grid>
                     <Grid item flex={1}>
-                        <ContentCard title={"Publication"}>
+                        <ContentCard title={t('PublishTab.publication')}>
                             <>
-                                <Typography sx={{mt:1.5}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Earum minus esse enim corrupti! Eius nam sint corrupti laborum fuga esse repellat! Sed totam saepe, nam mollitia fugiat commodi voluptates assumenda!</Typography>
+                                <Typography sx={{mt:1.5}}>{t('PublishTab.publicationText')}</Typography>
                                 {formCorrect ? 
                                     <Stack direction="row" alignItems="center" mb={-1}>
                                         <CheckCircle color="success" fontSize="small"></CheckCircle>
-                                        <Typography sx={{ml:1, mt: 0.25}} color="success" variant="overline">Metadata</Typography>
+                                        <Typography sx={{ml:1, mt: 0.25}} color="success" variant="overline">{t('PublishTab.metadata')}</Typography>
                                     </Stack>
                                 :
                                     <Stack direction="row" alignItems="center" mb={-1}>
                                         <Cancel color="error" fontSize="small"></Cancel>
-                                        <Typography sx={{ml:1, mt: 0.25}} color="error" variant="overline">Metadata incorrect</Typography>
+                                        <Typography sx={{ml:1, mt: 0.25}} color="error" variant="overline">{t('PublishTab.metadataIncorrect')}</Typography>
                                     </Stack>
                                 }
                                 {filesData && filesData.files && filesData.files[16] && (filesData.files[16][1] as any).length > 0 ?
                                     <Stack direction="row" alignItems="center" mb={-1}>
                                         <CheckCircle color="success" fontSize="small"></CheckCircle>
-                                        <Typography sx={{ml:1, mt: 0.25}} color="success" variant="overline">Files</Typography>
+                                        <Typography sx={{ml:1, mt: 0.25}} color="success" variant="overline">{t('PublishTab.files')}</Typography>
                                     </Stack>
                                 :
                                     <Stack direction="row" alignItems="center" mb={-1}>
                                         <Cancel color="error" fontSize="small"></Cancel>
-                                        <Typography sx={{ml:1, mt: 0.25}} color="error" variant="overline">Files missing</Typography>
+                                        <Typography sx={{ml:1, mt: 0.25}} color="error" variant="overline">{t('PublishTab.filesMissing')}</Typography>
                                     </Stack>
                                 }
                                 {doi && doi.attributes.state === "findable" ?
                                     <Stack direction="row" alignItems="center" mb={-1}>
                                         <CheckCircle color="success" fontSize="small"></CheckCircle>
-                                        <Typography sx={{ml:1, mt: 0.25}} color="success" variant="overline">DOI</Typography>
+                                        <Typography sx={{ml:1, mt: 0.25}} color="success" variant="overline">{t('PublishTab.doi')}</Typography>
                                     </Stack>
                                 :
                                     <Stack direction="row" alignItems="center" mb={-1}>
                                         <Cancel color="error" fontSize="small"></Cancel>
-                                        <Typography sx={{ml:1, mt: 0.25}} color="error" variant="overline">DOI missing</Typography>
+                                        <Typography sx={{ml:1, mt: 0.25}} color="error" variant="overline">{t('PublishTab.doiMissing')}</Typography>
                                     </Stack>
                                 }
 
                                 <FormControl fullWidth sx={{mt: 2.5}}>
-                                    <InputLabel id="repo-select">Select repositories</InputLabel>
+                                    <InputLabel id="repo-select">{t('PublishTab.selectRepositories')}</InputLabel>
                                     <Select
                                         disabled={!(formCorrect && filesData && filesData.files && filesData.files[16] && (filesData.files[16][1] as any).length > 0 && doi && doi.attributes.state === "findable")}
-                                        input={<OutlinedInput label="Select repositories" />}
+                                        input={<OutlinedInput label={t('PublishTab.selectRepositories')} />}
                                         labelId="repo-select"
                                         fullWidth
                                         multiple
@@ -211,7 +214,7 @@ const PublishTab = ({doi, filesData, formCorrect}: Props) => {
                                         sx={{mt:2.5}}
                                         variant="contained"
                                     >
-                                        Publish
+                                        {t('PublishTab.publish')}
                                     </Button>
                                 </Box>
                             </>
@@ -224,7 +227,7 @@ const PublishTab = ({doi, filesData, formCorrect}: Props) => {
                     onClose={() => setDoiWindowOpen(false)}
                 >
                     <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        DOI<IconButton onClick={() => setDoiWindowOpen(false)}><Close/></IconButton>
+                        {t('PublishTab.doi')}<IconButton onClick={() => setDoiWindowOpen(false)}><Close/></IconButton>
                     </DialogTitle>
                     <DialogContent dividers>
                         <CodeEditor
@@ -242,7 +245,7 @@ const PublishTab = ({doi, filesData, formCorrect}: Props) => {
                         />        
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => setDoiWindowOpen(false)}>Close</Button>
+                        <Button onClick={() => setDoiWindowOpen(false)}>{t('PublishTab.close')}</Button>
                     </DialogActions>
                 </Dialog>
             </>
