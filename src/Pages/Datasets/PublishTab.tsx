@@ -2,7 +2,7 @@ import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogCont
 import { Doi, useFinalizeDoiMutation, useNewDoiMutation } from "../../Services/dois"
 import ContentCard from "../../Components/ContentCard"
 import { LoadingButton } from "@mui/lab"
-import { Cancel, CheckCircle, Close, ContentPaste } from "@mui/icons-material"
+import { Cancel, CheckCircle, Close, ContentPaste, Opacity } from "@mui/icons-material"
 import { useMemo, useState } from "react"
 import { useParams } from "react-router-dom"
 import { Files } from "../../Services/files"
@@ -149,7 +149,7 @@ const PublishTab = ({doi, filesData, formCorrect}: Props) => {
                         </ContentCard>
                     </Grid>
                     <Grid item flex={1}>
-                        <ContentCard title={t('PublishTab.publication')}>
+                        <ContentCard title={t('PublishTab.publication')} sx={{ opacity: 0.2 }}>
                             <>
                                 <Typography sx={{mt:1.5}}>{t('PublishTab.publicationText')}</Typography>
                                 {formCorrect ? 
@@ -189,7 +189,8 @@ const PublishTab = ({doi, filesData, formCorrect}: Props) => {
                                 <FormControl fullWidth sx={{mt: 2.5}}>
                                     <InputLabel id="repo-select">{t('PublishTab.selectRepositories')}</InputLabel>
                                     <Select
-                                        disabled={!(formCorrect && filesData && filesData.files && filesData.files[16] && (filesData.files[16][1] as any).length > 0 && doi && doi.attributes.state === "findable")}
+                                        disabled
+                                        //disabled={!(formCorrect && filesData && filesData.files && filesData.files[16] && (filesData.files[16][1] as any).length > 0 && doi && doi.attributes.state === "findable")}
                                         input={<OutlinedInput label={t('PublishTab.selectRepositories')} />}
                                         labelId="repo-select"
                                         fullWidth
@@ -198,7 +199,7 @@ const PublishTab = ({doi, filesData, formCorrect}: Props) => {
                                         onChange={repoChange}
                                         renderValue={(selected) => selected.join(', ')}
                                         MenuProps={MenuProps}
-                                    >
+                                        >
                                         {repos.map((name) => (
                                             <MenuItem key={name} value={name}>
                                                 <Checkbox checked={repo.indexOf(name) > -1}/>
@@ -209,16 +210,28 @@ const PublishTab = ({doi, filesData, formCorrect}: Props) => {
                                 </FormControl>
                                 <Box sx={{display: "flex", flexDirection:"row-reverse"}}>
                                     <Button
-                                        disabled={!(formCorrect && filesData && filesData.files && filesData.files[16] && (filesData.files[16][1] as any).length > 0 && doi && doi.attributes.state === "findable")}
+                                        disabled
+                                        //disabled={!(formCorrect && filesData && filesData.files && filesData.files[16] && (filesData.files[16][1] as any).length > 0 && doi && doi.attributes.state === "findable")}
                                         fullWidth
                                         sx={{mt:2.5}}
                                         variant="contained"
-                                    >
+                                        >
                                         {t('PublishTab.publish')}
                                     </Button>
                                 </Box>
                             </>
                         </ContentCard>
+                            <Typography
+                                variant="subtitle2"
+                                textAlign={"center"}
+                                sx={{
+                                    position: 'relative',
+                                    top: '-50%',
+                                    opacity: 1
+                                }}
+                            >
+                                {t('PublishTab.unavailable')}
+                            </Typography>
                     </Grid>
                 </Grid>
                 <Dialog

@@ -169,6 +169,7 @@ i18n
             doiMissing: "doi missing", 
             selectRepositories: "Select repositories",
             publish: "Publish",
+            unavailable: "Unavailable",
             close: "Close"
           },
           FilesActiveArea: {
@@ -423,6 +424,7 @@ i18n
             doiMissing: "doi chybí", 
             selectRepositories: "Vybrat repozitáře",
             publish: "Publikovat",
+            unavailable: "Nedostupné",
             close: "Zavřít"
           },
           FilesActiveArea: {
