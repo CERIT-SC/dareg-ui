@@ -7,6 +7,7 @@ type Pair<T> = ['name' | 'file_id' | 'mode' | 'size' | 'hard_links_count' | 'ati
 type Pairs<T> = Pair<T>[]
 
 export type File = Pairs<string | number | string[] | 'DIR' | 'REG' | null>
+
 export type Files = {
   files: [
     ['name', string],

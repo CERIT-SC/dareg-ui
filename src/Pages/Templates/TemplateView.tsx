@@ -4,10 +4,10 @@ import { Box, Button, Skeleton, Stack, TextField } from "@mui/material";
 import ContentCard from "../../Components/ContentCard";
 import ContentHeader from "../../Components/ContentHeader";
 import FormsWrapped from "../../Components/FormsWrapped";
-import { Edit } from "@mui/icons-material";
+import { AccessTime, AccountCircle, Assignment, Edit, RestorePage } from "@mui/icons-material";
 import { useFetch } from "use-http";
 import { SchemasData } from "../../types/global";
-import { useGetSchemaQuery } from "../../Services/schemas";
+import { Schema, useGetSchemaQuery } from "../../Services/schemas";
 import { useTranslation } from "react-i18next";
 
 const TemplateView = () => {
@@ -23,11 +23,18 @@ const TemplateView = () => {
     if (data){
         return (
             <Box>
-                <ContentHeader title={t('TemplatesEdit.templateView')} actions={
+                <ContentHeader<Schema> title={t('TemplatesEdit.templateView')} actions={
                     <Button variant={"contained"} size="medium" endIcon={<Edit />} onClick={() => navigate(`/templates/${data?.id}/edit`)}>
                         {t('TemplatesEdit.edit')}
                     </Button>
-                }>
+                }
+                metadata={[
+                        // { id: "name", value: data?.name ?? "", label: t('TemplatesEdit.templateName'), icon: <Assignment /> },
+                        { id: "version", value: data?.version.toString() ?? "", label: t('TemplatesEdit.version'), icon: <RestorePage /> },
+                        { id: "created", value: data.created || "", label: t('TemplateList.creation'), icon: <AccessTime />, renderCell: (value) => (new Date(value).toLocaleString()) },
+                        { id: "created_by", value: data.created_by?.full_name || "Unknown", label: t('DatasetView.author'), icon: <AccountCircle /> }]
+                }
+                >
                 <Stack direction="row" justifyContent="center" alignItems="baseline" gap={2}>
                     <TextField
                         autoFocus

@@ -20,6 +20,7 @@ const TemplateList = () => {
   const tableColumns: Column<Schema>[] = [
     { id: 'name', label: t('TemplateList.name'), minWidth: 200 },
     { id: 'description', label: t('TemplateList.description'), minWidth: 400 },
+    { id: 'version', label: t('TemplateList.version'), minWidth: 200, renderCell: (params: any) => (params.version || "NaN")},
     { id: 'created_by', label: t('TemplateList.creator'), minWidth: 200, renderCell: (params: any) => (params.created_by?.full_name || "Unknown")},
     { id: 'created', label: t('TemplateList.creation'), minWidth: 200, renderCell: (params: any) => <DateTimeFormatter>{params.created}</DateTimeFormatter> },
     { id: 'actions', label: t('TemplateList.actions'), minWidth: 50, renderCell: (params: any) => (

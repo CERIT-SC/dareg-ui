@@ -1,6 +1,6 @@
 import { or } from "@jsonforms/core"
 import { AccessTime, AccountCircle, ArrowBackRounded, HomeRepairService } from "@mui/icons-material"
-import { Paper, Stack, IconButton, Typography, SxProps, Avatar, Box } from "@mui/material"
+import { Paper, Stack, IconButton, Typography, SxProps, Avatar, Box, Tooltip } from "@mui/material"
 import { ReactFragment } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
@@ -52,7 +52,9 @@ const ContentHeader = <T, >({title, children, sx, backAction, actions, metadata}
                         return (
                             (item.renderCell || item.value) ? (
                             <Stack direction="row" spacing={1} alignItems="center" key={index}>
-                                <Avatar sx={{color: (theme) => theme.palette.mode==='light' ? "#32421e" : theme.palette.text.primary, background: (theme) => theme.palette.background.paper}} alt={item.label}>{item.icon}</Avatar>
+                                <Tooltip title={item.label}>
+                                    <Avatar sx={{color: (theme) => theme.palette.mode==='light' ? "#32421e" : theme.palette.text.primary, background: (theme) => theme.palette.background.paper}} alt={item.label}>{item.icon}</Avatar>
+                                </Tooltip>
                                 <Typography variant="body1" color="text.primary">{item.renderCell ? item.renderCell(item.value) : item.value}</Typography>
                             </Stack>
                             ) : null

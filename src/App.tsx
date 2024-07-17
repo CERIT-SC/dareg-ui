@@ -28,7 +28,7 @@ import { darkTheme, lightTheme } from './theme';
 import { useGetProfileQuery } from './Services/profile';
 
 const App = () => {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: light)')
 
   const profile = useGetProfileQuery(1)
   const toTheme = (theme: "dark"|"light") => theme==="dark" ? darkTheme : lightTheme

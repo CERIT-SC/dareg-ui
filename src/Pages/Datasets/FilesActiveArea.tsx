@@ -125,7 +125,6 @@ import { useTranslation } from "react-i18next"
 
 // Make function that takes a Files object and return data object
 const convertFilesToData = (files: Files): { info: ExplorerItem, content: ExplorerItem[] } => {
-  console.log("Files", files)
   const { files: fileInfo } = files;
   const [ name, file_id, mode, size, hard_links_count, atime, mtime, ctime, owner_id, parent_id, provider_id, storage_user_id, storage_group_id, shares, index, type, children] = fileInfo;
 
@@ -230,7 +229,7 @@ const FilesActiveArea = (props: {
   const [ searchTerm, setSearchTerm ] = useState<string>("")
 
   const [ currentFolderId, setCurrentFolderId ] = useState<string | null>(null)
-  const { data: filesData, isLoading } = useGetFilesQuery({ dataset_id: props.id, file_id: currentFolderId}, {pollingInterval: props.autoRefresh ? 10000 : 0})
+  const { data: filesData, isLoading, error } = useGetFilesQuery({ dataset_id: props.id, file_id: currentFolderId}, {pollingInterval: props.autoRefresh ? 10000 : 0})
 
   // Returns a human readable time label
   const displayTime = (milliseconds: number) => {
@@ -249,6 +248,7 @@ const FilesActiveArea = (props: {
   }
 
   const data = useMemo(() => {
+    console.log("Error", error)
     if (filesData) {
       return convertFilesToData(filesData);
     }
@@ -348,7 +348,16 @@ const FilesActiveArea = (props: {
 
   const [searchFocus, setSearchFocus] = useState(false);
   const [itemDetail, setItemDetail] = useState(true);
-
+  if (error) {
+    console.log("Error", error)
+    return (
+      <div>
+        <h2 style={{ textAlign: 'center' }}>
+          {t('No files are available for this dataset')}
+        </h2>
+      </div>
+    );
+  }
   if (data) {
       return (
       <>

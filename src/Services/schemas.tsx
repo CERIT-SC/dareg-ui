@@ -6,6 +6,7 @@ export type Schema = DaregAPIObjectBase & {
   description: string
   schema: Object
   uischema: Object
+  version: number
 }
 
 const OBJECT_NAME = 'schemas'

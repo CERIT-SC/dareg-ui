@@ -257,7 +257,8 @@ i18n
             actions: "Actions",
             view: "View",
             templates: "Templates",
-            addNew: "Add new"
+            addNew: "Add new",
+            version: "Version"
           },
           TemplatesEdit: {
             template: "Template",
@@ -269,7 +270,8 @@ i18n
             noSchema: 'No schema defined, use "Edit templates" section',
             save: "Save",
             edit: "Edit",
-            templateView: "Template: view"
+            templateView: "Template: view",
+            version: "Version"
           },
           mode: {
             view: "view",
@@ -525,7 +527,8 @@ i18n
             actions: "Akce",
             view: "Zobrazit",
             templates: "Šablony",
-            addNew: "Vytvořit"
+            addNew: "Vytvořit",
+            version: "Verze"
           },
           TemplatesEdit: { // and view
             template: "Šablona",
@@ -537,7 +540,8 @@ i18n
             noSchema: 'Schéma není definované, použijte sekci "Upravit šablonu"',
             save: "Uložit",
             edit: "Upravit",
-            templateView: "Šablona: zobrazit"
+            templateView: "Šablona: zobrazit",
+            version: "Verze"
           },
           mode: {
             view: "zobrazit",

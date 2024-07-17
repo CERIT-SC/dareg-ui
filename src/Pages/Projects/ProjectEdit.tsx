@@ -159,21 +159,18 @@ const ProjectEdit = ({mode}: {mode: ViewModes}) => {
                             />
                     </Stack>
                 </ContentHeader>
-                <TabContext value={tabContent}>
-                    {mode!==ViewModes.New ? 
-                        <ContentCard>
-                            <TabList onChange={(e, newValue) => {
-                                    setTabContent(newValue)
-                                    window.history.replaceState(null, "CEITEC Dataset Register", `/collections/${projectId}/${newValue}`)
-                                }}
-                                    aria-label="lab API tabs example"
-                                >
-                                <Tab label={t('ProjectEdit.datasets')} value={"datasets"} />
-                                <Tab label={t('ProjectEdit.settings')} value={"settings"} />
-                            </TabList>
-                        </ContentCard>
-                    : null
-                    }
+                <TabContext value={tabContent}> 
+                    <ContentCard>
+                        <TabList onChange={(e, newValue) => {
+                                setTabContent(newValue)
+                                window.history.replaceState(null, "CEITEC Dataset Register", `/collections/${projectId}/${newValue}`)
+                            }}
+                                aria-label="lab API tabs example"
+                            >
+                            {mode!==ViewModes.New ? <Tab label={t('ProjectEdit.datasets')} value={"datasets"} /> : null}
+                            <Tab label={t('ProjectEdit.settings')} value={"settings"} />
+                        </TabList>
+                    </ContentCard>
                     <TabPanel value="datasets" sx={{p:0}}>
                         <ContentCard title={t('ProjectEdit.datasets')} actions={
                             <>
