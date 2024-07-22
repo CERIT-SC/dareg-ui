@@ -262,7 +262,7 @@ const DatasetView = ({mode}: Props) => {
                                     fullWidth
                                     sx={{mb:2}}/>
                                 <TextField 
-                                    label="File ID"
+                                    label="Dataset ID"
                                     value={datasetData?.onedata_file_id}
                                     disabled={true}
                                     fullWidth
