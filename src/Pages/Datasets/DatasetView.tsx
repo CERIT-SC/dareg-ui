@@ -224,7 +224,7 @@ const DatasetView = ({mode}: Props) => {
                                 <FormGroup>
                                     <FormControlLabel sx={{ width: 135 }} control={<Switch defaultChecked size="small" checked={autoRefresh} onChange={(e) => setAutoRefresh(e.target.checked)} />} label={t('DatasetView.autoRefresh')} />
                                 </FormGroup>
-                                <Button variant="contained" size="small" onClick={() => window.open(`"${config.REACT_APP_BASE_ONEZONE_URL}/i#/onedata/spaces/${projectData?.onedata_space_id}/data`, "_blank")}>
+                                <Button variant="contained" size="small" onClick={() => window.open(`${config.REACT_APP_BASE_ONEZONE_URL}/i#/onedata/spaces/${projectData?.onedata_space_id}/data`, "_blank")}>
                                     {t('DatasetView.openOnedata')}
                                 </Button>
                             </>
