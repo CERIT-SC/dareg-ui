@@ -50,6 +50,8 @@ build_app:
     paths:
       - $CI_PROJECT_DIR/build/
     expire_in: 2 hours
+  except:
+    - tags
   # needs: ["unit test"]
 
 build_image:
